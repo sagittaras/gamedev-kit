@@ -1,6 +1,7 @@
 ﻿using Sagittaras.Dices.Extensions;
 using Sagittaras.Dices.Probability;
 using Sagittaras.Dices.Ranges;
+using Sagittaras.Dices.Rolling;
 
 namespace Sagittaras.Dices
 {
@@ -58,6 +59,19 @@ namespace Sagittaras.Dices
         public static int Roll(RollRange range)
         {
             return Instance.Adapter.Next(range.Min, range.Max + 1);
+        }
+
+        /// <summary>
+        ///     Rolls multi-side dice as specified by the given die roll configuration and calculates the resulting value.
+        /// </summary>
+        /// <param name="dieRoll">
+        ///     The configuration for the dice roll, including the number of sides on the die and any base value to add
+        ///     to the result.
+        /// </param>
+        /// <returns>The resulting integer value after performing the dice roll calculation, including the base value.</returns>
+        public static int RollDices(DieRoll dieRoll)
+        {
+            return Instance.Adapter.NextDieSide(dieRoll) + dieRoll.BaseValue;
         }
     }
 }
