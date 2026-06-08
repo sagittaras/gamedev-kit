@@ -52,11 +52,11 @@ namespace Sagittaras.Dices
         ///     Generates a random integer within the specified range using the configured adapter.
         /// </summary>
         /// <param name="range">
-        ///     The inclusive range, represented by a <see cref="RollRange"/>,
+        ///     The inclusive range, represented by a <see cref="RandomRange"/>,
         ///     within which the random number will be generated.
         /// </param>
         /// <returns>A randomly generated integer within the specified range.</returns>
-        public static int Roll(RollRange range)
+        public static int Next(RandomRange range)
         {
             return Instance.Adapter.Next(range.Min, range.Max + 1);
         }

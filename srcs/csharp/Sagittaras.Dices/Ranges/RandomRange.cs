@@ -5,19 +5,19 @@ namespace Sagittaras.Dices.Ranges
     /// <summary>
     ///     Represents an inclusive roll between min and max value.
     /// </summary>
-    public readonly partial struct RollRange : IEquatable<RollRange>, IComparable<RollRange>
+    public readonly partial struct RandomRange : IEquatable<RandomRange>, IComparable<RandomRange>
     {
         /// <summary>
         ///     Represents a roll range with a fixed single value of 1.
         /// </summary>
-        public static readonly RollRange One = new(1);
+        public static readonly RandomRange One = new(1);
 
         /// <summary>
         ///     Represents a roll range spanning all possible angles in degrees.
         /// </summary>
-        public static readonly RollRange Angle = new(0, 360);
+        public static readonly RandomRange Angle = new(0, 360);
         
-        public RollRange(int min, int max)
+        public RandomRange(int min, int max)
         {
             if (min > max)
             {
@@ -28,7 +28,7 @@ namespace Sagittaras.Dices.Ranges
             Max = max;
         }
 
-        public RollRange(int value) : this(value, value)
+        public RandomRange(int value) : this(value, value)
         {
         }
         
@@ -49,7 +49,7 @@ namespace Sagittaras.Dices.Ranges
         }
 
         /// <inheritdoc />
-        public bool Equals(RollRange other)
+        public bool Equals(RandomRange other)
         {
             return Min == other.Min && Max == other.Max;
         }
@@ -57,7 +57,7 @@ namespace Sagittaras.Dices.Ranges
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return obj is RollRange other && Equals(other);
+            return obj is RandomRange other && Equals(other);
         }
 
         /// <inheritdoc />
@@ -67,7 +67,7 @@ namespace Sagittaras.Dices.Ranges
         }
 
         /// <inheritdoc />
-        public int CompareTo(RollRange other)
+        public int CompareTo(RandomRange other)
         {
             int minComparison = Min.CompareTo(other.Min);
             return minComparison != 0 ? minComparison : Max.CompareTo(other.Max);
