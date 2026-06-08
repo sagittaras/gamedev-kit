@@ -1,4 +1,5 @@
 using Sagittaras.Dices.Extensions;
+using Sagittaras.Dices.Ranges;
 
 namespace Sagittaras.Dices.Probability
 {
@@ -17,6 +18,17 @@ namespace Sagittaras.Dices.Probability
         public static T FlipCoin<T>(T a, T b)
         {
             return Half.Try() ? a : b;
+        }
+
+        /// <summary>
+        ///     Generates a new random <see cref="Chance"/> value within the predefined range.
+        /// </summary>
+        /// <returns>
+        ///     Returns a randomly generated <see cref="Chance"/> value between <see cref="Chance.MinValue"/> and <see cref="Chance.MaxValue"/>.
+        /// </returns>
+        public static Chance Next()
+        {
+            return new RandomRange(MinValue, MaxValue).Next();
         }
     }
 }
