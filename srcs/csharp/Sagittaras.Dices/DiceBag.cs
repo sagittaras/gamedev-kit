@@ -1,5 +1,6 @@
 ﻿using Sagittaras.Dices.Extensions;
 using Sagittaras.Dices.Probability;
+using Sagittaras.Dices.Ranges;
 
 namespace Sagittaras.Dices
 {
@@ -44,6 +45,19 @@ namespace Sagittaras.Dices
         public static bool TryChance(Chance chance)
         {
             return Instance.Adapter.NextChance(Chance.Max) <= chance.Value;
+        }
+
+        /// <summary>
+        ///     Generates a random integer within the specified range using the configured adapter.
+        /// </summary>
+        /// <param name="range">
+        ///     The inclusive range, represented by a <see cref="RollRange"/>,
+        ///     within which the random number will be generated.
+        /// </param>
+        /// <returns>A randomly generated integer within the specified range.</returns>
+        public static int Roll(RollRange range)
+        {
+            return Instance.Adapter.Next(range.Min, range.Max + 1);
         }
     }
 }
