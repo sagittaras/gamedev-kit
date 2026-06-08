@@ -88,7 +88,7 @@ namespace Sagittaras.Dices.Probability
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return Value;
+            return Value.GetHashCode();
         }
 
         /// <inheritdoc />
