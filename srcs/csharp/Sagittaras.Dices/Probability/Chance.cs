@@ -56,7 +56,7 @@ namespace Sagittaras.Dices.Probability
         ///     Creates a new instance of <see cref="Chance"/> from floating point value.
         /// </summary>
         /// <param name="value">A probability chance as a floating point value.</param>
-        public Chance(float value) : this((int)(value * MaxValue))
+        public Chance(float value) : this((int)(value * Factor))
         {
         }
 
@@ -64,7 +64,7 @@ namespace Sagittaras.Dices.Probability
         ///     Creates a new instance of <see cref="Chance"/> from floating point value.
         /// </summary>
         /// <param name="value">A probability chance as a floating point value.</param>
-        public Chance(double value) : this((int)(value * MaxValue))
+        public Chance(double value) : this((int)(value * Factor))
         {
         }
 
