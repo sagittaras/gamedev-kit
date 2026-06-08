@@ -100,7 +100,7 @@ namespace Sagittaras.Dices.Probability
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{Value / Factor}";
+            return $"{Value / Factor}%";
         }
     }
 }
