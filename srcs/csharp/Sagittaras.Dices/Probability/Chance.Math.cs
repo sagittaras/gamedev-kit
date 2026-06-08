@@ -17,8 +17,6 @@ namespace Sagittaras.Dices.Probability
 
         #endregion
 
-        #region Left-Side Chance
-
         #region Integer
 
         public static Chance operator +(Chance a, int b)
@@ -31,8 +29,6 @@ namespace Sagittaras.Dices.Probability
             return new Chance(a.Value - b);
         }
 
-        #endregion
-        
         #endregion
     }
 }
