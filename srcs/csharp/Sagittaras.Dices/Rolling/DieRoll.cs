@@ -21,7 +21,7 @@ namespace Sagittaras.Dices.Rolling
 
         public DieRoll(int baseValue, int dieSides = MinDieSides)
         {
-            Guard.Against.GreaterThan(dieSides, MinDieSides);
+            Guard.Against.LessThan(dieSides, MinDieSides);
             
             BaseValue = baseValue;
             DieSides = dieSides;
