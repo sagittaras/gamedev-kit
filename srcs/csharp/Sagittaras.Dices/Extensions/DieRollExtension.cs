@@ -5,9 +5,9 @@ namespace Sagittaras.Dices.Extensions
     public static class DieRollExtension
     {
         /// <inheritdoc cref="DiceBag.Roll" />
-        public static int Roll(this DieRoll dieRoll, IDiceBag diceBag)
+        public static int Roll(this DieRoll dieRoll, IDiceBag? diceBag = null)
         {
-            return diceBag.Roll(dieRoll);
+            return (diceBag ?? DiceBag.Instance).Roll(dieRoll);
         }
     }
 }

@@ -18,6 +18,11 @@ namespace Sagittaras.Dices
         {
             Adapter = adapter;
         }
+
+        /// <summary>
+        ///     Represents a globally shared instance of the dice bag, providing a single point of access for randomization operations.
+        /// </summary>
+        public static IDiceBag Instance { get; set; } = new DiceBag();
         
         /// <summary>
         ///     Adapter providing the randomization mechanism for the dice bag.

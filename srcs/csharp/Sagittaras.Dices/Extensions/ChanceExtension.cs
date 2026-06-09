@@ -5,9 +5,9 @@ namespace Sagittaras.Dices.Extensions
     public static class ChanceExtension
     {
         /// <inheritdoc cref="DiceBag.Try" />
-        public static bool Try(this Chance chance, IDiceBag diceBag)
+        public static bool Try(this Chance chance, IDiceBag? diceBag = null)
         {
-            return diceBag.Try(chance);
+            return (diceBag ?? DiceBag.Instance).Try(chance);
         }
 
         /// <summary>
