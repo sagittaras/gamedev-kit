@@ -1,4 +1,6 @@
 ﻿using System;
+using Sagittaras.GuardClauses;
+using Sagittaras.GuardClauses.Extensions;
 
 namespace Sagittaras.Dices.Ranges
 {
@@ -19,10 +21,7 @@ namespace Sagittaras.Dices.Ranges
         
         public RandomRange(int min, int max)
         {
-            if (min > max)
-            {
-                throw new ArgumentException("Min cannot be greater than max", nameof(min));
-            }
+            Guard.Against.GreaterThan(min, max);
             
             Min = min;
             Max = max;

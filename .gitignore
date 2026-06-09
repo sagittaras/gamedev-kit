@@ -5,3 +5,4 @@
 # CSharp
 [Oo]bj/
 [Bb]in/
+*.DotSettings.user

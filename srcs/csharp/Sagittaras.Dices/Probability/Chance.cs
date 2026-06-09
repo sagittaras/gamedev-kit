@@ -1,4 +1,6 @@
 ﻿using System;
+using Sagittaras.GuardClauses;
+using Sagittaras.GuardClauses.Extensions;
 
 namespace Sagittaras.Dices.Probability
 {
@@ -44,11 +46,8 @@ namespace Sagittaras.Dices.Probability
         /// <exception cref="ArgumentOutOfRangeException">The number is out of <see cref="MinValue"/> and <see cref="MaxValue"/> range.</exception>
         public Chance(int value)
         {
-            if (value is < MinValue or > MaxValue)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), $"Value must be between {MinValue} and {MaxValue}.");
-            }
-
+            Guard.Against.OutOfRange(value, MinValue, MaxValue);
+            
             Value = value;
         }
 

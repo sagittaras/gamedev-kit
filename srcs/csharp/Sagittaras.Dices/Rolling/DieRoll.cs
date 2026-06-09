@@ -1,4 +1,6 @@
 ﻿using System;
+using Sagittaras.GuardClauses;
+using Sagittaras.GuardClauses.Extensions;
 
 namespace Sagittaras.Dices.Rolling
 {
@@ -19,6 +21,8 @@ namespace Sagittaras.Dices.Rolling
 
         public DieRoll(int baseValue, int dieSides = MinDieSides)
         {
+            Guard.Against.GreaterThan(dieSides, MinDieSides);
+            
             BaseValue = baseValue;
             DieSides = dieSides;
             MaxValue = baseValue + dieSides;
