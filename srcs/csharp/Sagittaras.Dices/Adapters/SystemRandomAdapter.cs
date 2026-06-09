@@ -3,22 +3,22 @@
 namespace Sagittaras.Dices.Adapters
 {
     /// <summary>
-    ///     Provides a default implementation of <see cref="IDiceBagAdapter"/> using <see cref="Random"/> class.
+    ///     Provides a default implementation of <see cref="IDiceBagAdapter"/> using <see cref="System.Random"/> class.
     /// </summary>
     public class SystemRandomAdapter : IDiceBagAdapter
     {
-        private Random _random = CreateRandom();
+        private Random Random { get; set; } = CreateRandom();
 
         /// <inheritdoc />
         public int Next(int min, int max)
         {
-            return _random.Next(min, max);
+            return Random.Next(min, max);
         }
 
         /// <inheritdoc />
         public void Reseed()
         {
-            _random = CreateRandom();
+            Random = CreateRandom();
         }
         
         private static Random CreateRandom()
