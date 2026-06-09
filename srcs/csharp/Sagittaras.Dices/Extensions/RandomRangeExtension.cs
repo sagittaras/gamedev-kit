@@ -5,9 +5,9 @@ namespace Sagittaras.Dices.Extensions
     public static class RandomRangeExtension
     {
         /// <inheritdoc cref="DiceBag.Next" />
-        public static int Next(this RandomRange range)
+        public static int Next(this RandomRange range, IDiceBag diceBag)
         {
-            return DiceBag.Next(range);
+            return diceBag.Next(range);
         }
     }
 }

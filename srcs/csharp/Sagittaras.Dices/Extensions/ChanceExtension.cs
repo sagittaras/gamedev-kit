@@ -4,10 +4,10 @@ namespace Sagittaras.Dices.Extensions
 {
     public static class ChanceExtension
     {
-        /// <inheritdoc cref="DiceBag.TryChance(Chance)" />
-        public static bool Try(this Chance chance)
+        /// <inheritdoc cref="DiceBag.Try" />
+        public static bool Try(this Chance chance, IDiceBag diceBag)
         {
-            return DiceBag.TryChance(chance);
+            return diceBag.Try(chance);
         }
 
         /// <summary>

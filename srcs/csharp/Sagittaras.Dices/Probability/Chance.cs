@@ -1,4 +1,5 @@
 ﻿using System;
+using Sagittaras.Dices.Ranges;
 using Sagittaras.GuardClauses;
 using Sagittaras.GuardClauses.Extensions;
 
@@ -38,6 +39,11 @@ namespace Sagittaras.Dices.Probability
         ///     Represents the half-chance value, equivalent to 50% probability.
         /// </summary>
         public static readonly Chance Half = new(MaxValue / 2);
+        
+        /// <summary>
+        ///     Represents a range of possible chance values.
+        /// </summary>
+        public static readonly RandomRange Range = new(MinValue, MaxValue);
 
         /// <summary>
         ///     Creates a new instance of <see cref="Chance"/> from integer value.

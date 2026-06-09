@@ -14,6 +14,11 @@ namespace Sagittaras.Dices
     public readonly struct ChanceTable<T>
     {
         /// <summary>
+        ///     Dice bag used for generation of random chances.
+        /// </summary>
+        private readonly IDiceBag _diceBag;
+
+        /// <summary>
         ///     Represents a table of weighted probabilities for selecting entries based on their <see cref="Chance"/>.
         /// </summary>
         private readonly Chance[] _probabilities;
@@ -24,8 +29,9 @@ namespace Sagittaras.Dices
         /// </summary>
         private readonly List<T> _entries;
         
-        public ChanceTable(ICollection<KeyValuePair<T, Chance>> pairs)
+        public ChanceTable(IDiceBag diceBag, ICollection<KeyValuePair<T, Chance>> pairs)
         {
+            _diceBag = diceBag;
             _entries = new List<T>();
             
             int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + pair.Value);
@@ -65,7 +71,7 @@ namespace Sagittaras.Dices
         {
             entry = default;
 
-            int index = Array.BinarySearch(_probabilities, Chance.Next());
+            int index = Array.BinarySearch(_probabilities, _diceBag.NextChance());
             if (index < 0)
             {
                 index = ~index;

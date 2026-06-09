@@ -4,10 +4,10 @@ namespace Sagittaras.Dices.Extensions
 {
     public static class DieRollExtension
     {
-        /// <inheritdoc cref="DiceBag.RollDices(DieRoll)" />
-        public static int Roll(this DieRoll dieRoll)
+        /// <inheritdoc cref="DiceBag.Roll" />
+        public static int Roll(this DieRoll dieRoll, IDiceBag diceBag)
         {
-            return DiceBag.RollDices(dieRoll);
+            return diceBag.Roll(dieRoll);
         }
     }
 }
