@@ -29,9 +29,9 @@ namespace Sagittaras.Dices
         /// </summary>
         private readonly List<T> _entries;
         
-        public ChanceTable(IDiceBag diceBag, ICollection<KeyValuePair<T, Chance>> pairs)
+        public ChanceTable(ICollection<KeyValuePair<T, Chance>> pairs, IDiceBag? diceBag = null)
         {
-            _diceBag = diceBag;
+            _diceBag = diceBag ?? DiceBag.Instance;
             _entries = new List<T>();
             
             int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + pair.Value);
