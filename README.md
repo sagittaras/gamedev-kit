@@ -17,6 +17,10 @@ We believe that game development deserves much more openness! 💙
 
 *Základní instrukce o tom, jak si kterýkoli z dostupných balíčků přidat do svého projektu.*
 
+## What's Inside
+
+See [Docs](.docs/index.md) for what's inside and how to use it.
+
 ## License
 
-*License Name*. See [[LICENSE]] for details.
+Apache 2.0 License. See [LICENSE](LICENSE) for details.
