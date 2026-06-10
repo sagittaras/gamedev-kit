@@ -16,6 +16,9 @@ To add a package to your Unity project:
 
 > If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
 
+> **Check dependencies.** Some packages require other packages from this kit to function. Before importing
+> a package, review its dependencies listed in the documentation and include all required DLLs.
+
 ---
 
 ## Packages
@@ -53,7 +56,7 @@ if (table.TryNext(out string? loot))
 }
 ```
 
-> 📦 [Documentation](./dices/index.md)
+> 📦 [Documentation](./dices/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 
@@ -73,4 +76,4 @@ public void SetHealth(int value, int max)
 }
 ```
 
-> 📦 [Documentation](./guard-clauses/index.md)
+> 📦 [Documentation](./guard-clauses/index.md) · **Dependencies:** none

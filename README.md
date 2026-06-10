@@ -24,6 +24,9 @@ To add a package to your Unity project:
 
 > If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
 
+> **Check dependencies.** Some packages require other packages from this kit to function. Before importing
+> a package, review its dependencies in the [documentation](.docs/index.md) and include all required DLLs.
+
 ## What's Inside
 
 See [Docs](.docs/index.md) for what's inside and how to use it.

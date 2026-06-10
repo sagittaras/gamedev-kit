@@ -1,5 +1,11 @@
 # Sagittaras.GuardClauses
 
+## Dependencies
+
+This package has no dependencies on other packages from the kit.
+
+---
+
 `Sagittaras.GuardClauses` is a lightweight implementation of the guard clause pattern for defensive
 programming. Guard clauses validate input at the start of a method and throw immediately if the input
 is invalid — keeping the method body free from nested conditions and making invalid states visible early.

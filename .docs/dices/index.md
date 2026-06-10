@@ -6,6 +6,14 @@ like `DieRoll`, `Chance`, and `RandomRange`, and let `DiceBag` resolve them. The
 each type carries its own meaning and constraints, so the intent behind a random operation is visible directly
 in the code rather than buried in magic numbers.
 
+## Dependencies
+
+| Package | Required |
+|---|---|
+| [Sagittaras.GuardClauses](../guard-clauses/index.md) | ✅ |
+
+Make sure `Sagittaras.GuardClauses.dll` is present in `Assets/Plugins/` alongside `Sagittaras.Dices.dll`.
+
 ## Architecture
 
 The library is built around three layers:
