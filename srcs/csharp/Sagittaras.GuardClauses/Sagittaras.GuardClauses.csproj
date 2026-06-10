@@ -4,6 +4,12 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
+        <Title>Guard Clauses</Title>
+        <Authors>Sagittaras Games</Authors>
+        <Description>Lightweight guard clause pattern for defensive programming.</Description>
+        <PackageProjectUrl>https://github.com/sagittaras/gamedev-kit</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/sagittaras/gamedev-kit</RepositoryUrl>
     </PropertyGroup>
 
 </Project>

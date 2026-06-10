@@ -4,6 +4,12 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
+        <Title>Dice Rolling</Title>
+        <Authors>Sagittaras Games</Authors>
+        <Description>Dice rolling and randomness abstractions for game logic.</Description>
+        <PackageProjectUrl>https://github.com/sagittaras/gamedev-kit</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/sagittaras/gamedev-kit</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
