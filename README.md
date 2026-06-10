@@ -15,7 +15,14 @@ We believe that game development deserves much more openness! 💙
 
 ## Getting Started
 
-*Základní instrukce o tom, jak si kterýkoli z dostupných balíčků přidat do svého projektu.*
+Each package is distributed as a compiled DLL via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
+To add a package to your Unity project:
+
+1. Download the desired `.dll` from the latest release.
+2. Place it in your project under `Assets/Plugins/`.
+3. Unity will automatically detect and reference the assembly.
+
+> If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
 
 ## What's Inside
 
