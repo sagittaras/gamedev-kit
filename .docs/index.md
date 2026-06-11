@@ -77,3 +77,8 @@ public void SetHealth(int value, int max)
 ```
 
 > 📦 [Documentation](./guard-clauses/index.md) · **Dependencies:** none
+
+---
+
+## FAQ
+See [FAQ](.docs/faq.md)

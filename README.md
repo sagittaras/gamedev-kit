@@ -71,3 +71,8 @@ We were looking for it too, and you don't have to! Define hook-points, prepare a
 ## License
 
 Apache 2.0 License. See [LICENSE](LICENSE) for details.
+
+---
+
+## FAQ
+See [FAQ](.docs/faq.md) in documentation.
