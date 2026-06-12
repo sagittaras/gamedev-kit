@@ -1,4 +1,34 @@
-# Sagittaras Game Development Kit
+<h1 align="center">Sagittaras Game Development Kit</h1>
+
+<p align="center">
+    Ready-made solutions for game development. Battle-tested by real games.
+</p>
+
+<p align="center">
+    <a href="LICENSE">
+        <img alt="GitHub License" src="https://img.shields.io/github/license/sagittaras/gamedev-kit?style=flat-square">
+    </a>
+    <a href="https://github.com/sagittaras/gamedev-kit/releases">
+        <img alt="GitHub Release" src="https://img.shields.io/github/v/release/sagittaras/gamedev-kit?style=flat-square">
+    </a>
+    <a href="https://github.com/sagittaras/gamedev-kit/actions/workflows/release.yml">
+        <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/sagittaras/gamedev-kit/release.yml?style=flat-square">
+    </a>
+    <a href="https://github.com/sponsors/sagittaras">
+        <img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Sponsors-Support-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white">
+    </a>
+</p>
+
+<p align="center">
+    <a href="https://bsky.app/profile/sagittaras.bsky.social">
+        <img alt="Bluesky followers" src="https://img.shields.io/bluesky/followers/sagittaras.bsky.social?style=flat-square&label=Follow%20@sagittaras.bsky.social&color=%232d5d83">
+    </a>
+    <a href="https://mastodon.gamedev.place/@sagittaras">
+        <img alt="Mastodon Follow" src="https://img.shields.io/mastodon/follow/110701089198897448?domain=mastodon.gamedev.place&style=flat-square&label=Follow%20@sagittaras&color=%236364FF">
+    </a>
+</p>
+
+---
 
 Every indie developer knows the situation. Problems and solutions that are often repeated from project to project.
 And over time you realize that other people are solving the same problems. And these solutions are often rewritten
