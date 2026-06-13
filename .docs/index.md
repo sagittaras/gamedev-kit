@@ -84,8 +84,7 @@ public void SetHealth(int value, int max)
 
 Delta-time based timer primitives for game loops. Provides `IntervalTimer` for recurring interval tracking,
 `CallbackTimer` for registering actions that fire at a set rate, and `Cooldown` for single-shot duration
-guards that wait for an explicit reset — all driven by manual `deltaTime` accumulation with no coroutines
-or background threads.
+guards that wait for an explicit reset — all driven by manual `deltaTime` accumulation.
 
 ```csharp
 // Fire logic every 2 seconds

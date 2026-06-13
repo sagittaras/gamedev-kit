@@ -58,13 +58,6 @@ own development.
 Below you will find an overview of the packages we are currently working on or plan to share -
 without a fixed release schedule.
 
-### ⏱ Timing API
-
-`elapse += Time.deltaTime`, and the follows if. Every cooldown, every interval, every animation. And how many times
-have you repeated this timing method?
-
-We did a lot, so we prepared a small but powerful API with two types that save us from this repetition.
-
 ### 🔲 Grid
 
 Coordinate system, cell properties, entity movement tracking. Even though we run the entire Vectro Blast on it,
