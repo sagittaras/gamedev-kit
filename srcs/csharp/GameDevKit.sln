@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Dices", "Sagitta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.GuardClauses", "Sagittaras.GuardClauses\Sagittaras.GuardClauses.csproj", "{C6F40923-C674-4AEE-8FA6-B82709908DE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Timing", "Sagittaras.Timing\Sagittaras.Timing.csproj", "{816645DF-44E7-4DBE-B1AD-66B69BE108E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +20,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{50CF4466-AE11-421B-9A67-CF352E270584} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
 		{C6F40923-C674-4AEE-8FA6-B82709908DE2} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
+		{816645DF-44E7-4DBE-B1AD-66B69BE108E6} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{50CF4466-AE11-421B-9A67-CF352E270584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -28,5 +31,9 @@ Global
 		{C6F40923-C674-4AEE-8FA6-B82709908DE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6F40923-C674-4AEE-8FA6-B82709908DE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6F40923-C674-4AEE-8FA6-B82709908DE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{816645DF-44E7-4DBE-B1AD-66B69BE108E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{816645DF-44E7-4DBE-B1AD-66B69BE108E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{816645DF-44E7-4DBE-B1AD-66B69BE108E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{816645DF-44E7-4DBE-B1AD-66B69BE108E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
