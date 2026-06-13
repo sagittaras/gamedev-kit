@@ -80,5 +80,31 @@ public void SetHealth(int value, int max)
 
 ---
 
+### Sagittaras.Timing
+
+Delta-time based timer primitives for game loops. Provides `IntervalTimer` for recurring interval tracking,
+`CallbackTimer` for registering actions that fire at a set rate, and `Cooldown` for single-shot duration
+guards that wait for an explicit reset — all driven by manual `deltaTime` accumulation.
+
+```csharp
+// Fire logic every 2 seconds
+var timer = new IntervalTimer(2f);
+
+// Invoke a callback every 0.5 s
+var spawner = new CallbackTimer(0.5f, () => SpawnEnemy());
+
+// Global cooldown — 500 ms, controlled reset
+var gcd = new Cooldown(0.5f);
+if (gcd.IsReady) 
+{ 
+    ExecuteAction(); 
+    gcd.Reset(); 
+}
+```
+
+> 📦 [Documentation](./timing/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+
+---
+
 ## FAQ
-See [FAQ](.docs/faq.md)
+See [FAQ](./faq.md)
