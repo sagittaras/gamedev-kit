@@ -13,7 +13,7 @@ namespace Sagittaras.Timing
         ///     Creates a new instance of <see cref="Cooldown"/> with the specified duration.
         /// </summary>
         /// <param name="duration">The duration of the cooldown in seconds.</param>
-        /// <param name="startsOnCooldown">Indicates whether the cooldown should start as NOT ready.</param>
+        /// <param name="startsOnCooldown">Prevents the cooldown to be immediately ready.</param>
         public Cooldown(float duration, bool startsOnCooldown = false)
         {
             Guard.Against.LessThanZero(duration);
@@ -26,7 +26,7 @@ namespace Sagittaras.Timing
         ///     Creates a new instance of <see cref="Cooldown"/> configured by <see cref="TimeSpan"/> instance.
         /// </summary>
         /// <param name="duration">Instance of <see cref="TimeSpan"/> configuring the duration of the cooldown.</param>
-        /// <param name="startsOnCooldown">Indicates whether the cooldown should start as NOT ready.</param>
+        /// <param name="startsOnCooldown">Prevents the cooldown to be immediately ready.</param>
         public Cooldown(TimeSpan duration, bool startsOnCooldown = false) : this((float)duration.TotalSeconds, startsOnCooldown)
         {
         }
