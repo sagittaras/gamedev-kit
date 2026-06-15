@@ -47,6 +47,10 @@ To add a package to your Unity project:
 
 ## What's Inside
 
+<a href="./guard-clauses/index.md"><img src="https://img.shields.io/badge/Sagittaras.GuardClauses-darkgreen?style=flat-square" alt="Sagittaras.GuardClauses"/></a>
+<a href="./dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
+<a href="./timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
+
 See [Docs](.docs/index.md) for what's inside and how to use it.
 
 ## What's Comming

@@ -1,4 +1,10 @@
-# Sagittaras Game Development Kit
+<h1 align="center">Sagittaras Game Development Kit</h1>
+
+<p align="center">
+    <a href="./guard-clauses/index.md"><img src="https://img.shields.io/badge/Sagittaras.GuardClauses-darkgreen?style=flat-square" alt="Sagittaras.GuardClauses"/></a>
+    <a href="./dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
+    <a href="./timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
+</p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
 built and battle-tested during the development of our own titles — *Spellborn* and *Vectro Blast*. We open-source
