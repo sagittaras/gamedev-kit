@@ -2,6 +2,10 @@
 
 namespace Sagittaras.Dices.Extensions
 {
+    /// <summary>
+    ///     Provides extension methods for working with the <see cref="Chance"/> structure, enabling operations such as
+    ///     probabilistic tries, weighted picking between options, and normalization of chances in relation to a probability sum.
+    /// </summary>
     public static class ChanceExtension
     {
         /// <inheritdoc cref="DiceBag.Try" />

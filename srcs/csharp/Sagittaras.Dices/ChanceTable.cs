@@ -13,6 +13,8 @@ namespace Sagittaras.Dices
     /// <typeparam name="T">Type of the entries in the table.</typeparam>
     public readonly struct ChanceTable<T>
     {
+        private readonly ICollection<KeyValuePair<T, Chance>> _pairs;
+
         /// <summary>
         ///     Dice bag used for generation of random chances.
         /// </summary>
@@ -28,19 +30,25 @@ namespace Sagittaras.Dices
         ///     represents an item that can be selected based on its associated probability.
         /// </summary>
         private readonly List<T> _entries;
-        
+
+        /// <summary>
+        ///     Creates a new instance of Chance Table.
+        /// </summary>
+        /// <param name="pairs">Pairs of entries and their associated chances.</param>
+        /// <param name="diceBag">Allows overriding the default instance of a dice bag.</param>
         public ChanceTable(ICollection<KeyValuePair<T, Chance>> pairs, IDiceBag? diceBag = null)
         {
+            _pairs = pairs;
             _diceBag = diceBag ?? DiceBag.Instance;
             _entries = new List<T>();
-            
-            int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + pair.Value);
+
+            int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + (int)pair.Value);
             int noChance = probabilitySum < Chance.MaxValue
                 ? Chance.MaxValue - probabilitySum
                 : 0;
 
             List<Chance> probabilities = new();
-            int accumulation = 0;
+            Chance accumulation = Chance.Min;
             foreach ((T entry, Chance chance) in pairs)
             {
                 accumulation += chance.Normalize(probabilitySum);
@@ -53,10 +61,10 @@ namespace Sagittaras.Dices
             {
                 probabilities.Add(noChance);
             }
-            
+
             _probabilities = probabilities.ToArray();
         }
-        
+
         /// <summary>
         ///     Attempts to randomly select an entry from the chance table based on weighted probabilities.
         /// </summary>

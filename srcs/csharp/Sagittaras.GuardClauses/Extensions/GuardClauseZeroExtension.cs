@@ -2,6 +2,9 @@
 
 namespace Sagittaras.GuardClauses.Extensions
 {
+    /// <summary>
+    ///     Provides zero-based guard clauses.
+    /// </summary>
     public static class GuardClauseZeroExtension
     {
         /// <summary>
