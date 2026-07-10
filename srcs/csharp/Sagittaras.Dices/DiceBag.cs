@@ -27,7 +27,7 @@ namespace Sagittaras.Dices
         /// <summary>
         ///     Adapter providing the randomization mechanism for the dice bag.
         /// </summary>
-        private IDiceBagAdapter Adapter { get; set; } = IDiceBagAdapter.Default;
+        private IDiceBagAdapter Adapter { get; } = IDiceBagAdapter.Default;
 
         /// <summary>
         ///     Reseeds the underlying random number generator used within the dice bag,
