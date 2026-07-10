@@ -10,6 +10,7 @@
         <PackageProjectUrl>https://github.com/sagittaras/gamedev-kit</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/sagittaras/gamedev-kit</RepositoryUrl>
+        <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
