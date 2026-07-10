@@ -21,5 +21,15 @@ namespace Sagittaras.Progression
         {
             return Value;
         }
+        
+        public static bool operator ==(Experience a, Experience b)
+        {
+            return a.Value == b.Value;
+        }
+
+        public static bool operator !=(Experience a, Experience b)
+        {
+            return a.Value != b.Value;
+        }
     }
 }
