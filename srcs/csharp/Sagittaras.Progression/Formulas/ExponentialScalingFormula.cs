@@ -18,12 +18,12 @@ namespace Sagittaras.Progression.Formulas
         ///     Exponential multiplier applied per level.
         /// </summary>
         private readonly float _multiplier;
-        
+
         /// <summary>
         ///     Experience points required to advance from level 1 to level 2, as a base value.
         /// </summary>
         private readonly int _baseValue;
-        
+
         public ExponentialScalingFormula(float multiplier = DefaultMultiplier, int baseValue = DefaultBaseValue)
         {
             _multiplier = multiplier;
@@ -33,9 +33,7 @@ namespace Sagittaras.Progression.Formulas
         /// <inheritdoc />
         public Experience Calculate(int currentLevel)
         {
-            return currentLevel == 1
-                ? _baseValue
-                : (int) (_baseValue * Math.Pow(_multiplier, currentLevel - 1));
+            return (int)(_baseValue * Math.Pow(_multiplier, currentLevel - 1));
         }
     }
 }
