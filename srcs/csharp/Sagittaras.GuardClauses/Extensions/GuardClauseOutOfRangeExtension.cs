@@ -2,6 +2,9 @@
 
 namespace Sagittaras.GuardClauses.Extensions
 {
+    /// <summary>
+    ///     Provides out-of-range guard clauses for integer values.
+    /// </summary>
     public static class GuardClauseOutOfRangeExtension
     {
         /// <summary>

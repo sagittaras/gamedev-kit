@@ -10,10 +10,17 @@ namespace Sagittaras.Dices
     /// </summary>
     public class DiceBag : IDiceBag
     {
+        /// <summary>
+        ///     Creates a new default instance of DiceBag.
+        /// </summary>
         public DiceBag()
         {
         }
 
+        /// <summary>
+        ///     Creates a new instance of DiceBag using the specified adapter.
+        /// </summary>
+        /// <param name="adapter">Custom adapter used for dice bag's randomization logic.</param>
         public DiceBag(IDiceBagAdapter adapter)
         {
             Adapter = adapter;

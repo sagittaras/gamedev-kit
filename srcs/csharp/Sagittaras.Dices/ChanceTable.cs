@@ -13,6 +13,8 @@ namespace Sagittaras.Dices
     /// <typeparam name="T">Type of the entries in the table.</typeparam>
     public readonly struct ChanceTable<T>
     {
+        private readonly ICollection<KeyValuePair<T, Chance>> _pairs;
+
         /// <summary>
         ///     Dice bag used for generation of random chances.
         /// </summary>
@@ -29,8 +31,14 @@ namespace Sagittaras.Dices
         /// </summary>
         private readonly List<T> _entries;
 
+        /// <summary>
+        ///     Creates a new instance of Chance Table.
+        /// </summary>
+        /// <param name="pairs">Pairs of entries and their associated chances.</param>
+        /// <param name="diceBag">Allows overriding the default instance of a dice bag.</param>
         public ChanceTable(ICollection<KeyValuePair<T, Chance>> pairs, IDiceBag? diceBag = null)
         {
+            _pairs = pairs;
             _diceBag = diceBag ?? DiceBag.Instance;
             _entries = new List<T>();
 

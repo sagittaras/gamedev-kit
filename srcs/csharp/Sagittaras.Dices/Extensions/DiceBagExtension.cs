@@ -2,6 +2,10 @@
 
 namespace Sagittaras.Dices.Extensions
 {
+    /// <summary>
+    ///     Provides extension methods for the <see cref="IDiceBag"/> interface, offering additional functionality
+    ///     for simulating probabilistic scenarios and selecting weighted outcomes.
+    /// </summary>
     public static class DiceBagExtension
     {
         /// <summary>

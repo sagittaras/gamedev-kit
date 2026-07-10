@@ -19,6 +19,11 @@ namespace Sagittaras.Dices.Rolling
         /// </summary>
         public const int MinDieSides = 1;
 
+        /// <summary>
+        ///     Creates a new <see cref="DieRoll"/> with the specified base value and die sides.
+        /// </summary>
+        /// <param name="baseValue">Base value for the die roll calculation.</param>
+        /// <param name="dieSides">Number of sides on a die.</param>
         public DieRoll(int baseValue, int dieSides = MinDieSides)
         {
             Guard.Against.LessThan(dieSides, MinDieSides);
