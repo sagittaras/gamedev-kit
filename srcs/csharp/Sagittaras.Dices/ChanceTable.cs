@@ -28,19 +28,19 @@ namespace Sagittaras.Dices
         ///     represents an item that can be selected based on its associated probability.
         /// </summary>
         private readonly List<T> _entries;
-        
+
         public ChanceTable(ICollection<KeyValuePair<T, Chance>> pairs, IDiceBag? diceBag = null)
         {
             _diceBag = diceBag ?? DiceBag.Instance;
             _entries = new List<T>();
-            
-            int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + pair.Value);
+
+            int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + (int)pair.Value);
             int noChance = probabilitySum < Chance.MaxValue
                 ? Chance.MaxValue - probabilitySum
                 : 0;
 
             List<Chance> probabilities = new();
-            int accumulation = 0;
+            Chance accumulation = Chance.Min;
             foreach ((T entry, Chance chance) in pairs)
             {
                 accumulation += chance.Normalize(probabilitySum);
@@ -53,10 +53,10 @@ namespace Sagittaras.Dices
             {
                 probabilities.Add(noChance);
             }
-            
+
             _probabilities = probabilities.ToArray();
         }
-        
+
         /// <summary>
         ///     Attempts to randomly select an entry from the chance table based on weighted probabilities.
         /// </summary>
