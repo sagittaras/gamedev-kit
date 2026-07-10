@@ -17,7 +17,7 @@ public class LevelTest
         ExponentialScalingFormula formula = new();
         Level level = new(1, formula);
         
-        LevelGainResult result = level.Gain(formula.Calculate(level.Value) + overflow);
+        LevelGainResult result = level.Gain(formula.Calculate(level) + overflow);
         result.LevelsGained.Should().Be(1);
         result.LeveledUp.Should().BeTrue();
 
@@ -39,7 +39,7 @@ public class LevelTest
 
         for (int i = 0; i < levelsToGain; i++)
         {
-            toGain += formula.Calculate(level.Value + i);
+            toGain += formula.Calculate((int) level + i);
         }
 
         LevelGainResult result = level.Gain(toGain);
@@ -69,9 +69,9 @@ public class LevelTest
     {
         ExponentialScalingFormula formula = new();
         Level level = new(1, formula);
-        level += formula.Calculate(level.Value);
+        level += formula.Calculate(level);
         
-        Level next = level.LevelUp();
-        next.Value.Should().Be(2);
+        int next = level.LevelUp();
+        next.Should().Be(2);
     }
 }

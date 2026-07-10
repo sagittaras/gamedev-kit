@@ -6,7 +6,7 @@ namespace Sagittaras.Progression
     /// <summary>
     ///     Carries a value representing the current level and the progress towards the next one. 
     /// </summary>
-    public readonly struct Level
+    public readonly partial struct Level
     {
         private const int DefaultMinValue = 1;
         
@@ -82,11 +82,6 @@ namespace Sagittaras.Progression
 
             Experience overflow = Progress.Current - Progress.Threshold;
             return new Level(Value + 1, _formula, overflow);
-        }
-
-        public static Level operator +(Level a, Experience b)
-        {
-            return new Level(a, a.Progress + b);
         }
     }
 }
