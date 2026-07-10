@@ -29,7 +29,7 @@ public class ExponentialScalingFormulaTest
         const int baseValue = 200;
 
         // xp = base * multiplier ^ (level - 1)
-        ExponentialScalingFormula formula = new(multiplier, baseValue);
+        ExponentialScalingFormula formula = new(baseValue, multiplier);
         
         Experience level2 = formula.Calculate(2);
         level2.Should().Be(250); 

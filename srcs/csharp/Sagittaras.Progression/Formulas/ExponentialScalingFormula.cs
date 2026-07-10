@@ -13,21 +13,21 @@ namespace Sagittaras.Progression.Formulas
     {
         private const float DefaultMultiplier = 1.25f;
         private const int DefaultBaseValue = 100;
+        
+        /// <summary>
+        ///     Experience points required to advance from level 1 to level 2, as a base value.
+        /// </summary>
+        private readonly int _baseValue;
 
         /// <summary>
         ///     Exponential multiplier applied per level.
         /// </summary>
         private readonly float _multiplier;
 
-        /// <summary>
-        ///     Experience points required to advance from level 1 to level 2, as a base value.
-        /// </summary>
-        private readonly int _baseValue;
-
-        public ExponentialScalingFormula(float multiplier = DefaultMultiplier, int baseValue = DefaultBaseValue)
+        public ExponentialScalingFormula(int baseValue = DefaultBaseValue, float multiplier = DefaultMultiplier)
         {
-            _multiplier = multiplier;
             _baseValue = baseValue;
+            _multiplier = multiplier;
         }
 
         /// <inheritdoc />
