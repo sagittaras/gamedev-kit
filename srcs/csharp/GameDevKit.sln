@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Timing", "Sagitt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Progression", "Sagittaras.Progression\Sagittaras.Progression.csproj", "{2BB3DD51-72D1-4B61-A887-B469DD11B7B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Tests.Progression", "Sagittaras.Tests.Progression\Sagittaras.Tests.Progression.csproj", "{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,7 @@ Global
 		{C6F40923-C674-4AEE-8FA6-B82709908DE2} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
 		{816645DF-44E7-4DBE-B1AD-66B69BE108E6} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
 		{2BB3DD51-72D1-4B61-A887-B469DD11B7B9} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
+		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240} = {202AAC9D-C0E9-4F2B-B483-407B109268A6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{50CF4466-AE11-421B-9A67-CF352E270584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -42,5 +45,9 @@ Global
 		{2BB3DD51-72D1-4B61-A887-B469DD11B7B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BB3DD51-72D1-4B61-A887-B469DD11B7B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BB3DD51-72D1-4B61-A887-B469DD11B7B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
