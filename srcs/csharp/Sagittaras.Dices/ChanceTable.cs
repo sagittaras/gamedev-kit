@@ -34,7 +34,7 @@ namespace Sagittaras.Dices
             _diceBag = diceBag ?? DiceBag.Instance;
             _entries = new List<T>();
             
-            int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + pair.Value);
+            int probabilitySum = pairs.Aggregate(0, (sum, pair) => sum + (int)pair.Value);
             int noChance = probabilitySum < Chance.MaxValue
                 ? Chance.MaxValue - probabilitySum
                 : 0;
