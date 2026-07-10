@@ -4,11 +4,11 @@ namespace Sagittaras.GuardClauses.Extensions
 {
     public static class GuardClauseBooleanExtension
     {
-        public static void False(this IGuardClause _, bool value)
+        public static void False(this IGuardClause _, bool value, string? message = null)
         {
             if (!value)
             {
-                throw new InvalidOperationException("Value was expected to be true.");
+                throw new InvalidOperationException(message ?? "Value was expected to be true.");
             }
         }
     }

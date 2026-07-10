@@ -78,7 +78,7 @@ namespace Sagittaras.Progression
         /// <returns>New instance of level with corresponding progression value.</returns>
         private Level LevelUp()
         {
-            Guard.Against.False(Progress.Reached);
+            Guard.Against.False(Progress.Reached, $"Player did not reach the threshold to level up [{Progress.Current} / {Progress.Threshold} XP]");
 
             Experience overflow = Progress.Current - Progress.Threshold;
             return new Level(Value + 1, _formula, overflow);
