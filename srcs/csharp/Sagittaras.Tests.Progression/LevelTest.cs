@@ -22,7 +22,7 @@ public class LevelTest
         result.LeveledUp.Should().BeTrue();
 
         Level current = result;
-        current.Progress.Current.Should().Be(overflow);
+        current.Progress.Value.Should().Be(overflow);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class LevelTest
 
         Level current = result;
         current.Value.Should().Be(levelsToGain + 1);
-        current.Progress.Current.Should().Be(Experience.Zero);
+        current.Progress.Value.Should().Be(Experience.Zero);
     }
 
     /// <summary>

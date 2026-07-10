@@ -61,15 +61,15 @@ namespace Sagittaras.Progression
         public LevelGainResult Gain(Experience experience)
         {
             int levelsGained = 0;
-            Level current = this + experience;
+            Level level = this + experience;
 
-            while (current.Progress.Reached)
+            while (level.Progress.Reached)
             {
-                current = current.LevelUp();
+                level = level.LevelUp();
                 levelsGained++;
             }
 
-            return new LevelGainResult(this, current, levelsGained);
+            return new LevelGainResult(level, levelsGained);
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace Sagittaras.Progression
         /// <returns>New instance of level with corresponding progression value.</returns>
         public Level LevelUp()
         {
-            Guard.Against.False(Progress.Reached, $"Player did not reach the threshold to level up [{Progress.Current} / {Progress.Threshold} XP]");
+            Guard.Against.False(Progress.Reached, $"Player did not reach the threshold to level up [{Progress.Value} / {Progress.Threshold} XP]");
 
-            Experience overflow = Progress.Current - Progress.Threshold;
+            Experience overflow = Progress.Value - Progress.Threshold;
             return new Level(Value + 1, _formula, overflow);
         }
     }

@@ -9,10 +9,10 @@
         ///     Creates a new progression instance.
         /// </summary>
         /// <param name="threshold">Threshold required to reach to advance to the next level.</param>
-        /// <param name="current">Current value of experience.</param>
-        public Progress(Experience threshold, Experience current)
+        /// <param name="value">Current value of experience.</param>
+        public Progress(Experience threshold, Experience value)
         {
-            Current = current;
+            Value = value;
             Threshold = threshold;
         }
 
@@ -27,7 +27,7 @@
         /// <summary>
         ///     Current value of experience.
         /// </summary>
-        public Experience Current { get; }
+        public Experience Value { get; }
         
         /// <summary>
         ///     Threshold value of experience required to reach the next level.
@@ -37,16 +37,16 @@
         /// <summary>
         ///     Indicates whether the progression has reached the threshold.
         /// </summary>
-        public bool Reached => Current >= Threshold;
+        public bool Reached => Value >= Threshold;
         
         public static Progress operator +(Progress progress, Experience experience)
         {
-            return new Progress(progress.Threshold, progress.Current + experience);
+            return new Progress(progress.Threshold, progress.Value + experience);
         }
         
         public static Progress operator -(Progress progress, Experience experience)
         {
-            return new Progress(progress.Threshold, progress.Current - experience);
+            return new Progress(progress.Threshold, progress.Value - experience);
         }
     }
 }

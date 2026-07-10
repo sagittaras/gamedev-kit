@@ -5,22 +5,16 @@
     /// </summary>
     public readonly struct LevelGainResult
     {
-        public LevelGainResult(Level original, Level current, int levelsGained)
+        public LevelGainResult(Level level, int levelsGained)
         {
-            Original = original;
-            Current = current;
+            Level = level;
             LevelsGained = levelsGained;
         }
         
         /// <summary>
-        ///     Instance of a level before the operation.
-        /// </summary>
-        public Level Original { get; }
-        
-        /// <summary>
         ///     Instance of a newly gained level.
         /// </summary>
-        public Level Current { get; }
+        public Level Level { get; }
         
         /// <summary>
         ///     Number of levels gained.
@@ -34,7 +28,7 @@
         
         public static implicit operator Level(LevelGainResult result)
         {
-            return result.Current;
+            return result.Level;
         }
     }
 }
