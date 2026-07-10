@@ -1,11 +1,13 @@
-﻿namespace Sagittaras.Progression
+﻿using Sagittaras.Progression.Formulas;
+
+namespace Sagittaras.Progression
 {
     /// <summary>
     ///     A formula that calculates the experience required to reach a certain level.
     /// </summary>
     public interface IExperienceFormula
     {
-        static IExperienceFormula Default = new DefaultExperienceFormula();
+        static IExperienceFormula Default = new ExponentialScalingFormula();
         
         /// <summary>
         ///     Calculates the experience required to reach the next level.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sagittaras.Progression
+namespace Sagittaras.Progression.Formulas
 {
     /// <summary>
     ///     Represents the default formula used to calculate the experience required to level up in the progression system.
@@ -9,9 +9,9 @@ namespace Sagittaras.Progression
     ///     This formula calculates the experience based on a base value and an exponential multiplier. It provides
     ///     a structured approach for defining progression curves within the game.
     /// </remarks>
-    public sealed class DefaultExperienceFormula : IExperienceFormula
+    public sealed class ExponentialScalingFormula : IExperienceFormula
     {
-        private const float DefaultMultiplier = 1.1f;
+        private const float DefaultMultiplier = 1.25f;
         private const int DefaultBaseValue = 100;
 
         /// <summary>
@@ -24,14 +24,10 @@ namespace Sagittaras.Progression
         /// </summary>
         private readonly int _baseValue;
         
-        public DefaultExperienceFormula(float multiplier, int baseValue)
+        public ExponentialScalingFormula(float multiplier = DefaultMultiplier, int baseValue = DefaultBaseValue)
         {
             _multiplier = multiplier;
             _baseValue = baseValue;
-        }
-
-        public DefaultExperienceFormula() : this(DefaultMultiplier, DefaultBaseValue)
-        {
         }
 
         /// <inheritdoc />
