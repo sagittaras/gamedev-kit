@@ -10,14 +10,15 @@ namespace Sagittaras.GuardClauses.Extensions
         /// <param name="_">An instance of <see cref="IGuardClause"/> for method chaining.</param>
         /// <param name="input">The value to check.</param>
         /// <param name="threshold">The threshold value to compare against.</param>
+        /// <param name="message">A custom message to include in the exception.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         ///     Thrown when the <paramref name="input"/> is not less than the <paramref name="threshold"/>.
         /// </exception>
-        public static void GreaterThan(this IGuardClause _, int input, int threshold)
+        public static void GreaterThan(this IGuardClause _, int input, int threshold, string? message = null)
         {
             if (input > threshold)
             {
-                throw new ArgumentOutOfRangeException(nameof(input), input, $"Value must be less than {threshold}");
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be less than {threshold}");
             }
         }
 
@@ -27,14 +28,15 @@ namespace Sagittaras.GuardClauses.Extensions
         /// <param name="_">An instance of <see cref="IGuardClause"/> for method chaining.</param>
         /// <param name="input">The value to check.</param>
         /// <param name="threshold">The threshold value to compare against.</param>
+        /// <param name="message">A custom message to include in the exception.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the <paramref name="input"/> is less than the <paramref name="threshold"/>.
+        ///     Thrown when the <paramref name="input"/> is less than the <paramref name="threshold"/>.
         /// </exception>
-        public static void LessThan(this IGuardClause _, int input, int threshold)
+        public static void LessThan(this IGuardClause _, int input, int threshold, string? message = null)
         {
             if (input < threshold)
             {
-                throw new ArgumentOutOfRangeException(nameof(input), input, $"Value must be greater than {threshold}");
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be greater than {threshold}");
             }
         }
     }
