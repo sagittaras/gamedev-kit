@@ -17,7 +17,7 @@ public class LevelTest
         ExponentialScalingFormula formula = new();
         Level level = new(1, formula);
         
-        LevelGainResult result = level.Gain(formula.Calculate(1) + overflow);
+        LevelGainResult result = level.Gain(formula.Calculate(level.Value) + overflow);
         result.LevelsGained.Should().Be(1);
         result.LeveledUp.Should().BeTrue();
 
@@ -39,7 +39,7 @@ public class LevelTest
 
         for (int i = 0; i < levelsToGain; i++)
         {
-            toGain += formula.Calculate(i + 1);
+            toGain += formula.Calculate(level.Value + i);
         }
 
         LevelGainResult result = level.Gain(toGain);
@@ -49,5 +49,29 @@ public class LevelTest
         Level current = result;
         current.Value.Should().Be(levelsToGain + 1);
         current.Progress.Current.Should().Be(Experience.Zero);
+    }
+
+    /// <summary>
+    ///     Verify <see cref="Level.LevelUp"/> behavior when the threshold is not reached.
+    /// </summary>
+    [Fact]
+    public void LevelUp_ThresholdNotReached()
+    {
+        Level level = Level.MinValue;
+        level.Invoking(x => x.LevelUp()).Should().Throw<InvalidOperationException>();
+    }
+    
+    /// <summary>
+    ///     Verify <see cref="Level.LevelUp"/> behavior when the threshold is reached.
+    /// </summary>
+    [Fact]
+    public void LevelUp_ThresholdReached()
+    {
+        ExponentialScalingFormula formula = new();
+        Level level = new(1, formula);
+        level += formula.Calculate(level.Value);
+        
+        Level next = level.LevelUp();
+        next.Value.Should().Be(2);
     }
 }

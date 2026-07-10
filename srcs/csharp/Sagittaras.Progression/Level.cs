@@ -76,7 +76,7 @@ namespace Sagittaras.Progression
         ///     Makes a new instance of level.
         /// </summary>
         /// <returns>New instance of level with corresponding progression value.</returns>
-        private Level LevelUp()
+        public Level LevelUp()
         {
             Guard.Against.False(Progress.Reached, $"Player did not reach the threshold to level up [{Progress.Current} / {Progress.Threshold} XP]");
 
