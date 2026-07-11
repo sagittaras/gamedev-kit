@@ -21,6 +21,11 @@ namespace Sagittaras.Messaging.Collections
         private readonly Dictionary<int, IMediatorSubscriber> _subscribersByHashCode = new(16);
 
         /// <summary>
+        ///     Total number of registered subscribers.
+        /// </summary>
+        public int Count => _subscribersByHashCode.Count;
+
+        /// <summary>
         ///     Adds a new <see cref="IMediatorSubscriber"/> to the collection.
         /// </summary>
         /// <param name="subscriber">Instance of a new subscriber to be added.</param>
@@ -51,22 +56,22 @@ namespace Sagittaras.Messaging.Collections
             {
                 return;
             }
-            
+
             _subscribersByHashCode.Remove(callback.GetHashCode());
 
             if (!_subscribers.TryGetValue(subscriber.ContractType, out List<IMediatorSubscriber> subscribers))
             {
                 return;
             }
-            
+
             subscribers.Remove(subscriber);
         }
 
         public ContractSubscriberCollection Get(Type contractType)
         {
-            return _subscribers.TryGetValue(contractType, out List<IMediatorSubscriber>? subscribers) 
-                ? new ContractSubscriberCollection(subscribers.AsReadOnly()) 
-                : new ContractSubscriberCollection();
+            return _subscribers.TryGetValue(contractType, out List<IMediatorSubscriber>? subscribers)
+                ? new ContractSubscriberCollection(subscribers.AsReadOnly())
+                : ContractSubscriberCollection.Empty;
         }
 
         /// <inheritdoc />
