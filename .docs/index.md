@@ -5,6 +5,7 @@
     <a href="./dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
     <a href="./timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
     <a href="./messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
+    <a href="./progression/index.md"><img src="https://img.shields.io/badge/Sagittaras.Progression-orange?style=flat-square" alt="Sagittaras.Progression"/></a>
 </p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
@@ -136,6 +137,29 @@ void OnPlayerDied(PlayerDied contract)
 ```
 
 > 📦 [Documentation](./messaging/index.md) · **Dependencies:** none
+
+---
+
+### Sagittaras.Progression
+
+Level and experience progression for games. Provides `Experience` and `Progress` value types for tracking
+experience towards the next level, a `Level` type exposing `Gain`/`LevelUp` for resolving level-ups (including
+multiple at once), and a swappable `IExperienceFormula` — defaulting to an exponential curve — for defining how
+much experience each level requires.
+
+```csharp
+Level level = new Level(1);
+
+LevelGainResult result = level.Gain(new Experience(1000));
+if (result.LeveledUp)
+{
+    Debug.Log($"Gained {result.LevelsGained} level(s)!");
+}
+
+level = result;
+```
+
+> 📦 [Documentation](./progression/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 
