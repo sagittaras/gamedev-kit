@@ -4,6 +4,7 @@
     <a href="./guard-clauses/index.md"><img src="https://img.shields.io/badge/Sagittaras.GuardClauses-darkgreen?style=flat-square" alt="Sagittaras.GuardClauses"/></a>
     <a href="./dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
     <a href="./timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
+    <a href="./messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
 </p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
@@ -109,6 +110,32 @@ if (gcd.IsReady)
 ```
 
 > 📦 [Documentation](./timing/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+
+---
+
+### Sagittaras.Messaging
+
+Mediator / Pub-Sub library for loosely coupled communication between game components. Components exchange
+plain `IMediatorContract` messages through a central `IMediator`, so publishers and subscribers never need
+direct references to each other. Delivery is synchronous, duplicate subscriptions are deduplicated by
+delegate identity, and subscriber exceptions are caught and surfaced through a static `ExceptionRaised`
+event instead of interrupting the publish.
+
+```csharp
+public record PlayerDied(string PlayerName) : IMediatorContract;
+
+IMediator mediator = Mediator.Instance;
+mediator.Subscribe<PlayerDied>(OnPlayerDied);
+
+mediator.Publish(new PlayerDied("Hero"));
+
+void OnPlayerDied(PlayerDied contract)
+{
+    Debug.Log($"{contract.PlayerName} has died.");
+}
+```
+
+> 📦 [Documentation](./messaging/index.md) · **Dependencies:** none
 
 ---
 
