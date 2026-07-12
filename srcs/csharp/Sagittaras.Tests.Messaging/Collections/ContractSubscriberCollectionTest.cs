@@ -50,19 +50,19 @@ public class ContractSubscriberCollectionTest
         /// <summary>
         ///     Event used to monitor invocation of susbcriber method.
         /// </summary>
-        public event EventHandler Invocation;
+        public event EventHandler? Invocation;
 
         /// <summary>
         ///     Event used to monitor invocation exceptions.
         /// </summary>
-        public event EventHandler InvocationException;
+        public event EventHandler? InvocationException;
 
         /// <summary>
         ///     Simple subscriber method verifying invocation.
         /// </summary>
         public void OnMyContract(MyContract contract)
         {
-            Invocation.Invoke(this, EventArgs.Empty);
+            Invocation?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ public class ContractSubscriberCollectionTest
         /// <param name="e"></param>
         public void OnException(Exception e)
         {
-            InvocationException.Invoke(this, EventArgs.Empty);
+            InvocationException?.Invoke(this, EventArgs.Empty);
         }
     }
 }
