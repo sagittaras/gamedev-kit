@@ -16,7 +16,12 @@ namespace Sagittaras.Messaging
         /// <remarks>
         ///     Helps with logging of the exceptions during runtime, as Mediator itself has no native support for runtime.
         /// </remarks>
-        public static event EventHandler<SubscriberException>? ExceptionRaised; 
+        public static event EventHandler<SubscriberException>? ExceptionRaised;
+
+        /// <summary>
+        ///     Provides global access to the mediator for subscribing to, unsubscribing from, and publishing message contracts.
+        /// </summary>
+        public static IMediator Instance { get; } = new Mediator();
         
         /// <inheritdoc />
         public void Subscribe<TContract>(Action<TContract> callback) where TContract : IMediatorContract
