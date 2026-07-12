@@ -27,6 +27,24 @@ To add a package to your Unity project:
 > **Check dependencies.** Some packages require other packages from this kit to function. Before importing
 > a package, review its dependencies listed in the documentation and include all required DLLs.
 
+### `.pdb` and `.xml` files
+
+Alongside every `.dll`, each release also publishes a matching `.pdb` and `.xml` file. Neither is required for
+the package to work — Unity runs fine with just the `.dll` — but both are worth grabbing, especially if you're
+coming from Unity's own C# scripting and haven't worked much with precompiled .NET assemblies before:
+
+- **`.xml`** is the assembly's documentation file. It carries the same `<summary>` descriptions you'd see in
+  this documentation, but surfaced directly in your IDE — hover over any type or method from the package (e.g.
+  in Rider or Visual Studio) and you get IntelliSense tooltips, instead of having to jump back here or into
+  decompiled code to see what something does.
+- **`.pdb`** carries debug symbols. Without it, an exception thrown inside the package shows up in stack traces
+  as an unhelpful reference to the assembly with no file or line number. With the matching `.pdb` next to the
+  `.dll`, stack traces resolve to the actual file and line, which makes bug reports (and your own debugging)
+  far more useful.
+
+Drop both files in the same `Assets/Plugins/` folder as the `.dll` — Unity picks them up automatically, no
+extra configuration needed.
+
 ---
 
 ## Packages
