@@ -50,6 +50,7 @@ To add a package to your Unity project:
 <a href="./.docs/guard-clauses/index.md"><img src="https://img.shields.io/badge/Sagittaras.GuardClauses-darkgreen?style=flat-square" alt="Sagittaras.GuardClauses"/></a>
 <a href="./.docs/dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
 <a href="./.docs/timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
+<a href="./.docs/messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
 
 See [Docs](.docs/index.md) for what's inside and how to use it.
 
@@ -66,10 +67,6 @@ without a fixed release schedule.
 
 Coordinate system, cell properties, entity movement tracking. Even though we run the entire Vectro Blast on it,
 it is a highly portable abstraction that anyone can use!
-
-### 🔬 Messaging — Mediator / Pub-Sub
-
-Unified implementation of the Mediator pattern with best-practices set for game dev.
 
 ### ✅ Condition System
 
