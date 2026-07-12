@@ -29,13 +29,19 @@ jobs:
         working-directory: srcs/csharp
         run: |
           mkdir -p ../../artifacts
-          find . -path "*/bin/Release/netstandard2.1/*.dll" \
-            ! -name "*.Tests.dll" \
+          find . \( \
+            -path "*/bin/Release/netstandard2.1/*.dll" \
+            -o -path "*/bin/Release/netstandard2.1/*.pdb" \
+            -o -path "*/bin/Release/netstandard2.1/*.xml" \
+            \) ! -name "*.Tests.*" \
             -exec cp {} ../../artifacts/ \;
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*.dll
+          files: |
+            artifacts/*.dll
+            artifacts/*.pdb
+            artifacts/*.xml
           generate_release_notes: true
           draft: true

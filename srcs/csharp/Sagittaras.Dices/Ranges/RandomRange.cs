@@ -19,6 +19,11 @@ namespace Sagittaras.Dices.Ranges
         /// </summary>
         public static readonly RandomRange Angle = new(0, 360);
         
+        /// <summary>
+        ///     Creates a new <see cref="RandomRange"/> with the specified min and max values.
+        /// </summary>
+        /// <param name="min">Minimum inclusive value of the range.</param>
+        /// <param name="max">Maximum inclusive value of the range.</param>
         public RandomRange(int min, int max)
         {
             Guard.Against.GreaterThan(min, max);
@@ -27,6 +32,10 @@ namespace Sagittaras.Dices.Ranges
             Max = max;
         }
 
+        /// <summary>
+        ///     Creates a new <see cref="RandomRange"/> with the specified value.
+        /// </summary>
+        /// <param name="value">Static value used for min and max.</param>
         public RandomRange(int value) : this(value, value)
         {
         }

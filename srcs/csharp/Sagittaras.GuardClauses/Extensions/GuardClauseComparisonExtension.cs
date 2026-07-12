@@ -2,6 +2,9 @@
 
 namespace Sagittaras.GuardClauses.Extensions
 {
+    /// <summary>
+    ///     Provides comparison-based guard clauses.
+    /// </summary>
     public static class GuardClauseComparisonExtension
     {
         /// <summary>

@@ -1,3 +1,4 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace Sagittaras.Dices.Probability
 {
     // Defines an implicit conversion between numeric types and Chance.

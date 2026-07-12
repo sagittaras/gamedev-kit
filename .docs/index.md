@@ -4,6 +4,8 @@
     <a href="./guard-clauses/index.md"><img src="https://img.shields.io/badge/Sagittaras.GuardClauses-darkgreen?style=flat-square" alt="Sagittaras.GuardClauses"/></a>
     <a href="./dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
     <a href="./timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
+    <a href="./messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
+    <a href="./progression/index.md"><img src="https://img.shields.io/badge/Sagittaras.Progression-orange?style=flat-square" alt="Sagittaras.Progression"/></a>
 </p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
@@ -109,6 +111,55 @@ if (gcd.IsReady)
 ```
 
 > 📦 [Documentation](./timing/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+
+---
+
+### Sagittaras.Messaging
+
+Mediator / Pub-Sub library for loosely coupled communication between game components. Components exchange
+plain `IMediatorContract` messages through a central `IMediator`, so publishers and subscribers never need
+direct references to each other. Delivery is synchronous, duplicate subscriptions are deduplicated by
+delegate identity, and subscriber exceptions are caught and surfaced through a static `ExceptionRaised`
+event instead of interrupting the publish.
+
+```csharp
+public record PlayerDied(string PlayerName) : IMediatorContract;
+
+IMediator mediator = Mediator.Instance;
+mediator.Subscribe<PlayerDied>(OnPlayerDied);
+
+mediator.Publish(new PlayerDied("Hero"));
+
+void OnPlayerDied(PlayerDied contract)
+{
+    Debug.Log($"{contract.PlayerName} has died.");
+}
+```
+
+> 📦 [Documentation](./messaging/index.md) · **Dependencies:** none
+
+---
+
+### Sagittaras.Progression
+
+Level and experience progression for games. Provides `Experience` and `Progress` value types for tracking
+experience towards the next level, a `Level` type exposing `Gain`/`LevelUp` for resolving level-ups (including
+multiple at once), and a swappable `IExperienceFormula` — defaulting to an exponential curve — for defining how
+much experience each level requires.
+
+```csharp
+Level level = new Level(1);
+
+LevelGainResult result = level.Gain(new Experience(1000));
+if (result.LeveledUp)
+{
+    Debug.Log($"Gained {result.LevelsGained} level(s)!");
+}
+
+level = result;
+```
+
+> 📦 [Documentation](./progression/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 
