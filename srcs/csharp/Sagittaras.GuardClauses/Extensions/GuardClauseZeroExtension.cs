@@ -17,7 +17,7 @@ namespace Sagittaras.GuardClauses.Extensions
         {
             if (input == 0)
             {
-                throw new DivideByZeroException("Cannot divide by zero.");
+                throw new DivideByZeroException("Division by zero is not allowed");
             }
         }
 
@@ -26,12 +26,13 @@ namespace Sagittaras.GuardClauses.Extensions
         /// </summary>
         /// <param name="_">The guard clause instance. This parameter is often provided implicitly and is not directly used in the method logic.</param>
         /// <param name="input">The integer input to validate to ensure it is not less than zero.</param>
+        /// <param name="message">A custom message to include in the exception.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the input value is less than zero.</exception>
-        public static void LessThanZero(this IGuardClause _, float input)
+        public static void LessThanZero(this IGuardClause _, float input, string? message = null)
         {
             if (input < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(input), input, "Value must be greater than zero.");
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? "Value must be greater than zero");
             }
         }
     }
