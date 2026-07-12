@@ -5,6 +5,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{202AAC9D-C0E9-4F2B-B483-407B109268A6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5BAF6A9-F37C-423F-A221-C076220DD8D8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\README.md = ..\..\README.md
+		..\..\.gitignore = ..\..\.gitignore
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Dices", "Sagittaras.Dices\Sagittaras.Dices.csproj", "{50CF4466-AE11-421B-9A67-CF352E270584}"
 EndProject
@@ -22,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Progression", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Tests.Progression", "Sagittaras.Tests.Progression\Sagittaras.Tests.Progression.csproj", "{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{AEF77EFA-90F6-4A86-805F-234DC1F65CE6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{B2E8B1E5-65D4-4BFC-9324-8BA86C200313}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +44,8 @@ Global
 		{773BA602-4FBD-4E7C-97F0-29FE66779028} = {202AAC9D-C0E9-4F2B-B483-407B109268A6}
 		{2BB3DD51-72D1-4B61-A887-B469DD11B7B9} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
 		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240} = {202AAC9D-C0E9-4F2B-B483-407B109268A6}
+		{AEF77EFA-90F6-4A86-805F-234DC1F65CE6} = {A5BAF6A9-F37C-423F-A221-C076220DD8D8}
+		{B2E8B1E5-65D4-4BFC-9324-8BA86C200313} = {AEF77EFA-90F6-4A86-805F-234DC1F65CE6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{50CF4466-AE11-421B-9A67-CF352E270584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
