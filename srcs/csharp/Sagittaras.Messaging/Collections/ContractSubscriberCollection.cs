@@ -34,7 +34,7 @@ namespace Sagittaras.Messaging.Collections
         /// <param name="onException">Action callback allowing processing of subscriber exceptions.</param>
         public void Invoke(IMediatorContract contract, Action<SubscriberException> onException)
         {
-            foreach (IMediatorSubscriber? subscriber in _subscribers)
+            foreach (IMediatorSubscriber subscriber in _subscribers)
             {
                 try
                 {
