@@ -24,6 +24,11 @@ namespace Sagittaras.Progression.Formulas
         /// </summary>
         private readonly float _multiplier;
 
+        /// <summary>
+        ///     Creates a new instance of <see cref="ExponentialScalingFormula"/>.
+        /// </summary>
+        /// <param name="baseValue">Experience points required to advance from level 1 to level 2.</param>
+        /// <param name="multiplier">Exponential multiplier applied per level.</param>
         public ExponentialScalingFormula(int baseValue = DefaultBaseValue, float multiplier = DefaultMultiplier)
         {
             _baseValue = baseValue;

@@ -7,6 +7,12 @@ namespace Sagittaras.Progression
     /// </summary>
     public interface IExperienceFormula
     {
+        /// <summary>
+        ///     Default formula used for <see cref="Level"/> creation.
+        /// </summary>
+        /// <remarks>
+        ///     The default is used when no other formula is specified.
+        /// </remarks>
         static IExperienceFormula Default = new ExponentialScalingFormula();
         
         /// <summary>

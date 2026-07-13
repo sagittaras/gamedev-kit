@@ -39,6 +39,7 @@
         /// </summary>
         public bool Reached => Value >= Threshold;
         
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public static Progress operator +(Progress progress, Experience experience)
         {
             return new Progress(progress.Threshold, progress.Value + experience);
@@ -48,5 +49,6 @@
         {
             return new Progress(progress.Threshold, progress.Value - experience);
         }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 }

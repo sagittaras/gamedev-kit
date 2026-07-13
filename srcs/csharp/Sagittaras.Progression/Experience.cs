@@ -10,6 +10,10 @@
         /// </summary>
         public static readonly Experience Zero = new(0);
         
+        /// <summary>
+        ///     Creates a new experience value.
+        /// </summary>
+        /// <param name="value">Value of the experience.</param>
         public Experience(int value)
         {
             Value = value;
@@ -21,7 +25,8 @@
         public int Value { get; }
 
         #region Implicit Conversion
-
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        
         public static implicit operator Experience(int value)
         {
             return new Experience(value);
@@ -32,6 +37,7 @@
             return xp.Value;
         }
 
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         #endregion
     }
 }
