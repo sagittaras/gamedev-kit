@@ -25,5 +25,23 @@ namespace Sagittaras.GuardClauses.Extensions
                 throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be between {min} and {max}");
             }
         }
+
+        /// <inheritdoc cref="OutOfRange(IGuardClause,int,int,int,string?)" />
+        public static void OutOfRange(this IGuardClause _, float input, float min, float max, string? message = null)
+        {
+            if (input < min || input > max)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be between {min} and {max}");
+            }
+        }
+        
+        /// <inheritdoc cref="OutOfRange(IGuardClause,int,int,int,string?)" />
+        public static void OutOfRange(this IGuardClause _, double input, double min, double max, string? message = null)
+        {
+            if (input < min || input > max)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be between {min} and {max}");
+            }
+        }
     }
 }

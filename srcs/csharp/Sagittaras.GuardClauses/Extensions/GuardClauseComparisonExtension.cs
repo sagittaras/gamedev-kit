@@ -25,6 +25,24 @@ namespace Sagittaras.GuardClauses.Extensions
             }
         }
 
+        /// <inheritdoc cref="GreaterThan(IGuardClause, int, int, string?)" />
+        public static void GreaterThan(this IGuardClause _, float input, float threshold, string? message = null)
+        {
+            if (input > threshold)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be less than {threshold}");
+            }
+        }
+
+        /// <inheritdoc cref="GreaterThan(IGuardClause, int, int, string?)" />
+        public static void GreaterThan(this IGuardClause _, double input, double threshold, string? message = null)
+        {
+            if (input > threshold)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be less than {threshold}");
+            }
+        }
+
         /// <summary>
         ///     Ensures that a given value is greater than or equal to a specified threshold.
         /// </summary>
@@ -36,6 +54,24 @@ namespace Sagittaras.GuardClauses.Extensions
         ///     Thrown when the <paramref name="input"/> is less than the <paramref name="threshold"/>.
         /// </exception>
         public static void LessThan(this IGuardClause _, int input, int threshold, string? message = null)
+        {
+            if (input < threshold)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be greater than {threshold}");
+            }
+        }
+
+        /// <inheritdoc cref="LessThan(IGuardClause,int,int,string?)" />
+        public static void LessThan(this IGuardClause _, float input, float threshold, string? message = null)
+        {
+            if (input < threshold)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? $"Value must be greater than {threshold}");
+            }
+        }
+
+        /// <inheritdoc cref="LessThan(IGuardClause,int,int,string?)" />
+        public static void LessThan(this IGuardClause _, double input, double threshold, string? message = null)
         {
             if (input < threshold)
             {
