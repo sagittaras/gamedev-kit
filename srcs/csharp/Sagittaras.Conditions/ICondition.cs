@@ -1,4 +1,6 @@
-﻿namespace Sagittaras.Conditions
+﻿using System.Collections.Generic;
+
+namespace Sagittaras.Conditions
 {
     /// <summary>
     ///     Condition that can be attached to an entity and used to validate whether the entity meets certain criteria.
@@ -8,17 +10,17 @@
         /// <summary>
         ///     Type of condition representing evaluation behavior and required parameters. 
         /// </summary>
-        object ConditionType { get; }
+        ConditionType ConditionType { get; }
         
         /// <summary>
         ///     Specified the target to which the condition is applied.
         /// </summary>
-        object Target { get; }
+        ConditionTarget Target { get; }
         
         /// <summary>
-        ///     Parameters required for the condition evaluation.
+        ///     Parameters required for the condition evaluation.;
         /// </summary>
-        int[] Parameters { get; }
+        IReadOnlyList<int> Parameters { get; }
 
         /// <summary>
         ///     Indicates whether the result of condition evaluation should be negated.
