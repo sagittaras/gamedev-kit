@@ -32,7 +32,13 @@ namespace Sagittaras.Conditions
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return _id.GetHashCode();
+            return _id?.GetHashCode() ?? 0;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return _id ?? string.Empty;
         }
         
         public static bool operator ==(ConditionType left, ConditionType right)
