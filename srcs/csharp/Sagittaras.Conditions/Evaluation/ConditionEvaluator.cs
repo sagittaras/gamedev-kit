@@ -8,6 +8,10 @@ namespace Sagittaras.Conditions.Evaluation
     ///     Evaluates conditions by resolving their subject from the context and passing it to the handler
     ///     registered for the condition type.
     /// </summary>
+    /// <remarks>
+    ///     Evaluator is immutable once created and can be safely shared. Use <see cref="ConditionEvaluatorBuilder{TContext,TSubject}"/>
+    ///     to register handlers and resolvers and create the evaluator.
+    /// </remarks>
     /// <typeparam name="TContext">Context of the evaluation.</typeparam>
     /// <typeparam name="TSubject">Subject against which the conditions are evaluated.</typeparam>
     public class ConditionEvaluator<TContext, TSubject> : IConditionEvaluator<TContext>
@@ -15,33 +19,24 @@ namespace Sagittaras.Conditions.Evaluation
         /// <summary>
         ///     Handlers registered for each supported condition type.
         /// </summary>
-        private readonly Dictionary<ConditionType, IConditionHandler<TSubject>> _handlers = new();
+        private readonly Dictionary<ConditionType, IConditionHandler<TSubject>> _handlers;
 
         /// <summary>
         ///     Resolvers registered for each supported condition target.
         /// </summary>
-        private readonly Dictionary<ConditionTarget, ITargetResolver<TContext, TSubject>> _resolvers = new();
+        private readonly Dictionary<ConditionTarget, ITargetResolver<TContext, TSubject>> _resolvers;
 
         /// <summary>
-        ///     Registers the handler responsible for evaluation of the condition type.
+        ///     Creates the evaluator with the registered handlers and resolvers.
         /// </summary>
-        /// <param name="type">Condition type served by the handler.</param>
-        /// <param name="handler">Handler evaluating the condition type.</param>
-        /// <exception cref="System.ArgumentException">Thrown when the condition type already has a handler.</exception>
-        public void RegisterHandler(ConditionType type, IConditionHandler<TSubject> handler)
+        /// <param name="handlers">Handlers registered for each supported condition type. Evaluator takes ownership of the dictionary.</param>
+        /// <param name="resolvers">Resolvers registered for each supported condition target. Evaluator takes ownership of the dictionary.</param>
+        internal ConditionEvaluator(
+            Dictionary<ConditionType, IConditionHandler<TSubject>> handlers,
+            Dictionary<ConditionTarget, ITargetResolver<TContext, TSubject>> resolvers)
         {
-            _handlers.Add(type, handler);
-        }
-
-        /// <summary>
-        ///     Registers the resolver responsible for resolution of the condition target.
-        /// </summary>
-        /// <param name="target">Condition target served by the resolver.</param>
-        /// <param name="resolver">Resolver finding the subject for the condition target.</param>
-        /// <exception cref="System.ArgumentException">Thrown when the condition target already has a resolver.</exception>
-        public void RegisterResolver(ConditionTarget target, ITargetResolver<TContext, TSubject> resolver)
-        {
-            _resolvers.Add(target, resolver);
+            _handlers = handlers;
+            _resolvers = resolvers;
         }
 
         /// <inheritdoc />
