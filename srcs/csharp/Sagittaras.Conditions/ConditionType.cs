@@ -8,10 +8,14 @@ namespace Sagittaras.Conditions
     public readonly struct ConditionType : IEquatable<ConditionType>
     {
         /// <summary>
-        ///     Unique numerical identifier of the condition type.
+        ///     Unique identifier of the condition type.
         /// </summary>
         private readonly string _id;
-        
+
+        /// <summary>
+        ///     Creates a condition type with the given identifier.
+        /// </summary>
+        /// <param name="id">Unique identifier of the condition type.</param>
         public ConditionType(string id)
         {
             _id = id;
@@ -40,12 +44,24 @@ namespace Sagittaras.Conditions
         {
             return _id ?? string.Empty;
         }
-        
+
+        /// <summary>
+        ///     Determines whether two condition types are equal.
+        /// </summary>
+        /// <param name="left">The first condition type to compare.</param>
+        /// <param name="right">The second condition type to compare.</param>
+        /// <returns>Returns true if both types have the same identifier; otherwise false.</returns>
         public static bool operator ==(ConditionType left, ConditionType right)
         {
             return left.Equals(right);
         }
 
+        /// <summary>
+        ///     Determines whether two condition types are not equal.
+        /// </summary>
+        /// <param name="left">The first condition type to compare.</param>
+        /// <param name="right">The second condition type to compare.</param>
+        /// <returns>Returns true if the types have different identifiers; otherwise false.</returns>
         public static bool operator !=(ConditionType left, ConditionType right)
         {
             return !left.Equals(right);
