@@ -6,6 +6,7 @@
     <a href="./timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
     <a href="./messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
     <a href="./progression/index.md"><img src="https://img.shields.io/badge/Sagittaras.Progression-orange?style=flat-square" alt="Sagittaras.Progression"/></a>
+    <a href="./conditions/index.md"><img src="https://img.shields.io/badge/Sagittaras.Conditions-darkcyan?style=flat-square" alt="Sagittaras.Conditions"/></a>
 </p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
@@ -178,6 +179,38 @@ level = result;
 ```
 
 > 📦 [Documentation](./progression/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+
+---
+
+### Sagittaras.Conditions
+
+Data-driven conditions describing requirements of game entities. A condition is plain data — what to check, on
+whom, against which value — so requirements can live in your content files instead of in code. Checks are
+registered once as handlers, subjects are picked from the evaluation context by resolvers, and a `ConditionManager`
+combines evaluators of different contexts (spells, quests, items) into a single entry point.
+
+```csharp
+public record CastContext(IUnit Caster, IUnit? Target);
+
+public class LevelHandler : ComparisonHandler<IUnit>
+{
+    protected override int GetActualValue(ICondition condition, IUnit subject) => subject.Level;
+}
+
+IConditionEvaluator<CastContext> evaluator = new ConditionEvaluatorBuilder<CastContext, IUnit>()
+    .WithHandler(GameConditions.Level, new LevelHandler())
+    .WithResolver(GameConditions.Caster, context => context.Caster)
+    .WithResolver(GameConditions.Target, context => context.Target)
+    .Build();
+
+// Spell is an IConditional - every condition it carries must be satisfied.
+if (evaluator.Evaluate(spell, new CastContext(caster, target)))
+{
+    Cast(spell);
+}
+```
+
+> 📦 [Documentation](./conditions/index.md) · **Dependencies:** none
 
 ---
 
