@@ -27,6 +27,11 @@ public record TestUnit(int Level);
 public record CastContext(TestUnit Caster, TestUnit? Target = null);
 
 /// <summary>
+///     Evaluation context of a different type, used to verify dispatching by the context type.
+/// </summary>
+public record QuestContext(TestUnit Player);
+
+/// <summary>
 ///     Plain data implementation of the condition.
 /// </summary>
 public record TestCondition(
@@ -60,6 +65,18 @@ public class CasterResolver : ITargetResolver<CastContext, TestUnit>
     public bool TryResolve(CastContext context, out TestUnit subject)
     {
         subject = context.Caster;
+        return true;
+    }
+}
+
+/// <summary>
+///     Resolves the player of the quest context.
+/// </summary>
+public class PlayerResolver : ITargetResolver<QuestContext, TestUnit>
+{
+    public bool TryResolve(QuestContext context, out TestUnit subject)
+    {
+        subject = context.Player;
         return true;
     }
 }
