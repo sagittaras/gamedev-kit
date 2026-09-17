@@ -2,8 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <Nullable>enable</Nullable>
         <LangVersion>9</LangVersion>
+        <Nullable>enable</Nullable>
+        <Title>Conditions</Title>
+        <Authors>Sagittaras Games</Authors>
+        <Description>Data-driven conditions describing requirements of game entities and their evaluation.</Description>
+        <PackageProjectUrl>https://github.com/sagittaras/gamedev-kit</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/sagittaras/gamedev-kit</RepositoryUrl>
+        <Version>1.0.0</Version>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
