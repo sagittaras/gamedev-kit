@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Conditions", "Sagittaras.Conditions\Sagittaras.Conditions.csproj", "{D6B50ABD-9B37-40C0-8F5D-8EAE14196462}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Tests.Conditions", "Sagittaras.Tests.Conditions\Sagittaras.Tests.Conditions.csproj", "{B3F880A0-367D-4DBD-BC42-133C9A06F584}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,7 @@ Global
 		{AEF77EFA-90F6-4A86-805F-234DC1F65CE6} = {A5BAF6A9-F37C-423F-A221-C076220DD8D8}
 		{B2E8B1E5-65D4-4BFC-9324-8BA86C200313} = {AEF77EFA-90F6-4A86-805F-234DC1F65CE6}
 		{D6B50ABD-9B37-40C0-8F5D-8EAE14196462} = {4DBB2821-5236-477C-9C6F-0D8B7CBB53BB}
+		{B3F880A0-367D-4DBD-BC42-133C9A06F584} = {202AAC9D-C0E9-4F2B-B483-407B109268A6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{50CF4466-AE11-421B-9A67-CF352E270584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -90,5 +93,9 @@ Global
 		{D6B50ABD-9B37-40C0-8F5D-8EAE14196462}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6B50ABD-9B37-40C0-8F5D-8EAE14196462}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6B50ABD-9B37-40C0-8F5D-8EAE14196462}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3F880A0-367D-4DBD-BC42-133C9A06F584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3F880A0-367D-4DBD-BC42-133C9A06F584}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3F880A0-367D-4DBD-BC42-133C9A06F584}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3F880A0-367D-4DBD-BC42-133C9A06F584}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
