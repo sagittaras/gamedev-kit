@@ -33,17 +33,20 @@ We believe that game development deserves much more openness! 💙
 
 ## Getting Started
 
-Each package is distributed as a compiled DLL via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
-To add a package to your Unity project:
+Each package is versioned and released on its own via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**
+— a release is titled after its package (e.g. `Sagittaras.Dices 1.1.3`) and tagged `<package>/<version>`
+(e.g. `dices/1.1.3`). The release carries a single zip archive with the compiled `.dll`, its `.pdb` (debug
+symbols) and `.xml` (IntelliSense documentation), plus the DLLs of the kit packages it depends on — every
+archive is complete on its own. To add a package to your Unity project:
 
-1. Download the desired `.dll` from the latest release.
-2. Place it in your project under `Assets/Plugins/`.
-3. Unity will automatically detect and reference the assembly.
+1. Download `Sagittaras.<Package>-<version>.zip` from the package's latest release.
+2. Extract it into your project under `Assets/Plugins/`.
+3. Unity will automatically detect and reference the assemblies.
 
-> If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
-
-> **Check dependencies.** Some packages require other packages from this kit to function. Before importing
-> a package, review its dependencies in the [documentation](.docs/index.md) and include all required DLLs.
+> If you use multiple packages, extract all archives into the same `Assets/Plugins/` folder. A change in
+> a shared dependency (e.g. `Sagittaras.GuardClauses`) also produces a new release of every package that
+> depends on it, so the latest release of each package always ships the latest dependency — just keep all
+> your packages up to date.
 
 ## What's Inside
 

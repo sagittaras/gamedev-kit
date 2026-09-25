@@ -1,47 +1,81 @@
 name: Release
 
+# Release is triggered manually from main ("Run workflow"). Every package is versioned on its own
+# by Nerdbank.GitVersioning — major.minor lives in the package's version.json, the patch is the
+# number of commits touching the package (or its kit dependencies, see pathFilters). A package gets
+# its own draft release only when its computed version has no tag yet; unchanged packages are skipped.
 on:
-  push:
-    tags:
-      - '*.*.*'
+  workflow_dispatch:
 
 jobs:
   make-release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          # nbgv computes the version from the git height, which needs the full history.
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
-      
-      - name: Restore & Build
+          dotnet-version: '10.0.x'
+
+      - name: Install nbgv
+        run: dotnet tool install --global nbgv --version 3.10.94
+
+      - name: Restore, Build & Test
         working-directory: srcs/csharp
         run: |
           dotnet restore
           dotnet build --configuration Release --no-restore
-      
-      - name: Collect Artifacts
-        working-directory: srcs/csharp
-        run: |
-          mkdir -p ../../artifacts
-          find . \( \
-            -path "*/bin/Release/netstandard2.1/*.dll" \
-            -o -path "*/bin/Release/netstandard2.1/*.pdb" \
-            -o -path "*/bin/Release/netstandard2.1/*.xml" \
-            \) ! -name "*.Tests.*" \
-            -exec cp {} ../../artifacts/ \;
+          dotnet test --configuration Release --no-build
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            artifacts/*.dll
-            artifacts/*.pdb
-            artifacts/*.xml
-          generate_release_notes: true
-          draft: true
+      # One zip and one release per package. The zip holds the package's DLL, PDB and XML docs plus
+      # the DLLs of the kit packages it depends on, so it can be dropped into Assets/Plugins/ on its own.
+      - name: Package & Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts
+          drafts=$(gh release list --limit 100 --json tagName,isDraft --jq '.[] | select(.isDraft) | .tagName')
+
+          for manifest in srcs/csharp/*/version.json; do
+            dir=$(dirname "$manifest")
+            name=$(basename "$dir")
+            slug=$(echo "${name#Sagittaras.}" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
+            version=$(nbgv get-version --project "$dir" --variable SimpleVersion)
+            tag="$slug/$version"
+
+            if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null || grep -qxF "$tag" <<< "$drafts"; then
+              echo "::notice::$name $version is already released — skipping."
+              continue
+            fi
+
+            archive="$PWD/artifacts/$name-$version.zip"
+            (cd "$dir/bin/Release/netstandard2.1" && zip -q "$archive" *.dll *.pdb *.xml)
+            zip -qj "$archive" LICENSE
+
+            previous=$(git tag --list "$slug/*" --sort=-v:refname | head -n 1)
+            if [[ -n $previous ]]; then
+              mapfile -t paths < <(jq -r '.pathFilters[]' "$manifest")
+              {
+                echo "## Changes since ${previous#$slug/}"
+                echo
+                git -C "$dir" log --no-merges --pretty='- %s (%h)' "$previous..HEAD" -- "${paths[@]}"
+              } > notes.md
+            else
+              echo "First independently versioned release of $name." > notes.md
+            fi
+
+            gh release create "$tag" "$archive" \
+              --draft \
+              --target "$GITHUB_SHA" \
+              --title "$name $version" \
+              --notes-file notes.md
+            echo "::notice::Drafted $name $version."
+          done
