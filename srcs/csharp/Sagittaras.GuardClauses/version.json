@@ -5,6 +5,7 @@
   "pathFilters": [
     ".",
     "../../unity/Packages/com.sagittaras.gamedevkit.guard-clauses",
-    ":!../../unity/Packages/com.sagittaras.gamedevkit.guard-clauses/Plugins"
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.guard-clauses/Plugins",
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.guard-clauses/Plugins.meta"
   ]
 }

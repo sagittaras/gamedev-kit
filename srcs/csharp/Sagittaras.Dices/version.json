@@ -6,6 +6,7 @@
     ".",
     "../Sagittaras.GuardClauses",
     "../../unity/Packages/com.sagittaras.gamedevkit.dices",
-    ":!../../unity/Packages/com.sagittaras.gamedevkit.dices/Plugins"
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.dices/Plugins",
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.dices/Plugins.meta"
   ]
 }
