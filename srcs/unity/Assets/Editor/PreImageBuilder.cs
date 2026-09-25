@@ -17,11 +17,26 @@ namespace Sagittaras.DevelopmentKit.Editor
     ///     srcs/csharp (see Directory.Build.targets) for the whole kit or for a single package, and reimports
     ///     the refreshed Plugins/ folders once it finishes.
     /// </summary>
+    /// <remarks>
+    ///     Unity has no public API for menu items created at runtime, so every package has its own item below.
+    ///     A package skeleton without one is reported on every domain reload.
+    /// </remarks>
     internal static class PreImageBuilder
     {
         private const string PackagePrefix = "com.sagittaras.gamedevkit.";
-        private const string BuildAllMenu = "Tools/Sagittaras/Build All Pre-images";
-        private const string BuildPackageMenu = "Assets/Sagittaras/Build Package Pre-image";
+        private const string BuildMenu = "Tools/Sagittaras/Build Pre-image/";
+        private const string BuildAllMenu = BuildMenu + "All Packages";
+        private const string PackageContextMenu = "Assets/Sagittaras/Build Package Pre-image";
+
+        /// <summary>
+        ///     Priority of "All Packages", listed first in the Build Pre-image menu.
+        /// </summary>
+        private const int AllPriority = 0;
+
+        /// <summary>
+        ///     Priority of the package items — more than 10 above "All Packages", so Unity separates them.
+        /// </summary>
+        private const int PackagePriority = 20;
 
         /// <summary>
         ///     Whether a build is running — only one at a time, both builds write into the same Plugins/ folders.
@@ -33,38 +48,68 @@ namespace Sagittaras.DevelopmentKit.Editor
         /// </summary>
         private static string CSharpDirectory => Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "csharp"));
 
-        [MenuItem(BuildAllMenu)]
+        [MenuItem(BuildAllMenu, priority = AllPriority)]
         private static void BuildAll()
         {
             Build("GameDevKit.sln", "all packages");
         }
 
+        [MenuItem(BuildMenu + "Sagittaras.Dices", priority = PackagePriority)]
+        private static void BuildDices()
+        {
+            BuildProject("Sagittaras.Dices");
+        }
+
+        [MenuItem(BuildMenu + "Sagittaras.GuardClauses", priority = PackagePriority)]
+        private static void BuildGuardClauses()
+        {
+            BuildProject("Sagittaras.GuardClauses");
+        }
+
         [MenuItem(BuildAllMenu, true)]
-        private static bool CanBuildAll()
+        [MenuItem(BuildMenu + "Sagittaras.Dices", true)]
+        [MenuItem(BuildMenu + "Sagittaras.GuardClauses", true)]
+        private static bool CanBuild()
         {
             return !_isBuilding;
         }
 
-        [MenuItem(BuildPackageMenu)]
+        [MenuItem(PackageContextMenu)]
         private static void BuildSelectedPackage()
         {
             string package = SelectedPackage() ?? throw new InvalidOperationException("No kit package is selected.");
-            string project = ProjectName(package);
-            string projectFile = Path.Combine(project, $"{project}.csproj");
-
-            if (!File.Exists(Path.Combine(CSharpDirectory, projectFile)))
-            {
-                Debug.LogError($"Package {package} has no project at srcs/csharp/{projectFile}.");
-                return;
-            }
-
-            Build(projectFile, package);
+            BuildProject(ProjectName(package));
         }
 
-        [MenuItem(BuildPackageMenu, true)]
+        [MenuItem(PackageContextMenu, true)]
         private static bool CanBuildSelectedPackage()
         {
             return !_isBuilding && SelectedPackage() != null;
+        }
+
+        /// <summary>
+        ///     Reports package skeletons that have no item in the Build Pre-image menu yet.
+        /// </summary>
+        [InitializeOnLoadMethod]
+        private static void ReportPackagesWithoutMenuItem()
+        {
+            string[] listed = TypeCache.GetMethodsWithAttribute<MenuItem>()
+                .Where(method => method.DeclaringType == typeof(PreImageBuilder))
+                .SelectMany(method => method.GetCustomAttributes(typeof(MenuItem), false).Cast<MenuItem>())
+                .Select(item => item.menuItem)
+                .Where(path => path.StartsWith(BuildMenu, StringComparison.Ordinal))
+                .Select(path => path.Substring(BuildMenu.Length))
+                .ToArray();
+
+            string packages = Path.Combine(Application.dataPath, "..", "Packages");
+            foreach (string skeleton in Directory.GetDirectories(packages, PackagePrefix + "*"))
+            {
+                string project = ProjectName(Path.GetFileName(skeleton));
+                if (File.Exists(Path.Combine(skeleton, "package.json")) && !listed.Contains(project))
+                {
+                    Debug.LogWarning($"Package {Path.GetFileName(skeleton)} has no item in {BuildMenu.TrimEnd('/')} — add {project} to {nameof(PreImageBuilder)}.");
+                }
+            }
         }
 
         /// <summary>
@@ -89,6 +134,18 @@ namespace Sagittaras.DevelopmentKit.Editor
             return "Sagittaras." + string.Concat(slug.Split('-').Select(part => char.ToUpperInvariant(part[0]) + part.Substring(1)));
         }
 
+        private static void BuildProject(string project)
+        {
+            string projectFile = Path.Combine(project, $"{project}.csproj");
+            if (!File.Exists(Path.Combine(CSharpDirectory, projectFile)))
+            {
+                Debug.LogError($"Project {project} does not exist at srcs/csharp/{projectFile}.");
+                return;
+            }
+
+            Build(projectFile, project);
+        }
+
         private static async void Build(string target, string label)
         {
             _isBuilding = true;
@@ -97,14 +154,16 @@ namespace Sagittaras.DevelopmentKit.Editor
 
             try
             {
-                using Process process = new();
-                process.StartInfo = new ProcessStartInfo("dotnet", $"build \"{target}\" -c Release -p:UpdateUnityPackage=true")
+                using Process process = new()
                 {
-                    WorkingDirectory = CSharpDirectory,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
+                    StartInfo = new ProcessStartInfo("dotnet", $"build \"{target}\" -c Release -p:UpdateUnityPackage=true")
+                    {
+                        WorkingDirectory = CSharpDirectory,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                    },
                 };
                 process.OutputDataReceived += (_, e) => Append(output, e.Data);
                 process.ErrorDataReceived += (_, e) => Append(output, e.Data);
