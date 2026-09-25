@@ -1,8 +1,9 @@
 name: Release
 
-# Release is triggered manually from main ("Run workflow"). The version is not typed anywhere —
-# Nerdbank.GitVersioning derives it from version.json and the git height, and the workflow
-# creates the matching tag together with the draft release.
+# Release is triggered manually from main ("Run workflow"). Every package is versioned on its own
+# by Nerdbank.GitVersioning — major.minor lives in the package's version.json, the patch is the
+# number of commits touching the package (or its kit dependencies, see pathFilters). A package gets
+# its own draft release only when its computed version has no tag yet; unchanged packages are skipped.
 on:
   workflow_dispatch:
 
@@ -24,16 +25,8 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Compute Version
-        id: version
-        run: |
-          dotnet tool install --global nbgv --version 3.10.94
-          VERSION=$(nbgv get-version --variable SimpleVersion)
-          if git rev-parse --quiet --verify "refs/tags/$VERSION" > /dev/null; then
-            echo "::error::Tag $VERSION already exists — there is nothing new on main to release."
-            exit 1
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Install nbgv
+        run: dotnet tool install --global nbgv --version 3.10.94
 
       - name: Restore, Build & Test
         working-directory: srcs/csharp
@@ -42,31 +35,47 @@ jobs:
           dotnet build --configuration Release --no-restore
           dotnet test --configuration Release --no-build
 
-      # One zip per package: its DLL, PDB and XML docs plus the DLLs of the kit packages it
-      # depends on, so every archive can be dropped into Assets/Plugins/ on its own.
-      - name: Package
-        working-directory: srcs/csharp
+      # One zip and one release per package. The zip holds the package's DLL, PDB and XML docs plus
+      # the DLLs of the kit packages it depends on, so it can be dropped into Assets/Plugins/ on its own.
+      - name: Package & Release
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/artifacts"
-          for project in */Sagittaras.*.csproj; do
-            name=$(basename "$project" .csproj)
-            [[ $name == Sagittaras.Tests.* ]] && continue
-            (
-              cd "$(dirname "$project")/bin/Release/netstandard2.1"
-              zip -q "$GITHUB_WORKSPACE/artifacts/$name-$VERSION.zip" *.dll *.pdb *.xml
-            )
-            zip -qj "$GITHUB_WORKSPACE/artifacts/$name-$VERSION.zip" "$GITHUB_WORKSPACE/LICENSE"
-          done
-          ls -l "$GITHUB_WORKSPACE/artifacts"
+          mkdir -p artifacts
+          drafts=$(gh release list --limit 100 --json tagName,isDraft --jq '.[] | select(.isDraft) | .tagName')
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }}
-          target_commitish: ${{ github.sha }}
-          files: artifacts/*.zip
-          generate_release_notes: true
-          draft: true
+          for manifest in srcs/csharp/*/version.json; do
+            dir=$(dirname "$manifest")
+            name=$(basename "$dir")
+            slug=$(echo "${name#Sagittaras.}" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
+            version=$(nbgv get-version --project "$dir" --variable SimpleVersion)
+            tag="$slug/$version"
+
+            if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null || grep -qxF "$tag" <<< "$drafts"; then
+              echo "::notice::$name $version is already released — skipping."
+              continue
+            fi
+
+            archive="$PWD/artifacts/$name-$version.zip"
+            (cd "$dir/bin/Release/netstandard2.1" && zip -q "$archive" *.dll *.pdb *.xml)
+            zip -qj "$archive" LICENSE
+
+            previous=$(git tag --list "$slug/*" --sort=-v:refname | head -n 1)
+            if [[ -n $previous ]]; then
+              mapfile -t paths < <(jq -r '.pathFilters[]' "$manifest")
+              {
+                echo "## Changes since ${previous#$slug/}"
+                echo
+                git -C "$dir" log --no-merges --pretty='- %s (%h)' "$previous..HEAD" -- "${paths[@]}"
+              } > notes.md
+            else
+              echo "First independently versioned release of $name." > notes.md
+            fi
+
+            gh release create "$tag" "$archive" \
+              --draft \
+              --target "$GITHUB_SHA" \
+              --title "$name $version" \
+              --notes-file notes.md
+            echo "::notice::Drafted $name $version."
+          done
