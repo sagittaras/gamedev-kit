@@ -12,13 +12,15 @@ And looking ahead — a pure C# core keeps the door open for **Godot** distribut
 
 ## Can I use the packages outside of Unity?
 
-Yes. The core packages are pure .NET assemblies — download the DLL from [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases) and reference it in your `.csproj` like any other assembly.
+Yes. The core packages are pure .NET assemblies — download the package archive from [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases), extract it and reference the DLL in your `.csproj` like any other assembly.
 
 We don't have a public NuGet feed yet, but it's on our radar.
 
 ## Are packages versioned independently?
 
-No — everything is distributed together through a single release on the main branch. Check [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases) for the latest version and changelog.
+No — everything is distributed together through a single release on the main branch, and all assemblies of a release carry the same version. Check [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases) for the latest version and changelog.
+
+The version is computed by [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning): `major.minor` comes from [`version.json`](../version.json) and the patch number is the git height — the number of commits since `major.minor` last changed. Patch numbers of consecutive releases therefore aren't sequential (e.g. `1.3.4` may follow `1.3.1`); a higher number is always newer.
 
 ## How do I know when a new version is released?
 

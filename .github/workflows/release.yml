@@ -1,47 +1,72 @@
 name: Release
 
+# Release is triggered manually from main ("Run workflow"). The version is not typed anywhere —
+# Nerdbank.GitVersioning derives it from version.json and the git height, and the workflow
+# creates the matching tag together with the draft release.
 on:
-  push:
-    tags:
-      - '*.*.*'
+  workflow_dispatch:
 
 jobs:
   make-release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          # nbgv computes the version from the git height, which needs the full history.
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
-      
-      - name: Restore & Build
+          dotnet-version: '10.0.x'
+
+      - name: Compute Version
+        id: version
+        run: |
+          dotnet tool install --global nbgv --version 3.10.94
+          VERSION=$(nbgv get-version --variable SimpleVersion)
+          if git rev-parse --quiet --verify "refs/tags/$VERSION" > /dev/null; then
+            echo "::error::Tag $VERSION already exists — there is nothing new on main to release."
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Restore, Build & Test
         working-directory: srcs/csharp
         run: |
           dotnet restore
           dotnet build --configuration Release --no-restore
-      
-      - name: Collect Artifacts
+          dotnet test --configuration Release --no-build
+
+      # One zip per package: its DLL, PDB and XML docs plus the DLLs of the kit packages it
+      # depends on, so every archive can be dropped into Assets/Plugins/ on its own.
+      - name: Package
         working-directory: srcs/csharp
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          mkdir -p ../../artifacts
-          find . \( \
-            -path "*/bin/Release/netstandard2.1/*.dll" \
-            -o -path "*/bin/Release/netstandard2.1/*.pdb" \
-            -o -path "*/bin/Release/netstandard2.1/*.xml" \
-            \) ! -name "*.Tests.*" \
-            -exec cp {} ../../artifacts/ \;
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          for project in */Sagittaras.*.csproj; do
+            name=$(basename "$project" .csproj)
+            [[ $name == Sagittaras.Tests.* ]] && continue
+            (
+              cd "$(dirname "$project")/bin/Release/netstandard2.1"
+              zip -q "$GITHUB_WORKSPACE/artifacts/$name-$VERSION.zip" *.dll *.pdb *.xml
+            )
+            zip -qj "$GITHUB_WORKSPACE/artifacts/$name-$VERSION.zip" "$GITHUB_WORKSPACE/LICENSE"
+          done
+          ls -l "$GITHUB_WORKSPACE/artifacts"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/*.dll
-            artifacts/*.pdb
-            artifacts/*.xml
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          files: artifacts/*.zip
           generate_release_notes: true
           draft: true

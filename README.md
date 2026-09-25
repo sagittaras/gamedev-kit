@@ -33,17 +33,18 @@ We believe that game development deserves much more openness! 💙
 
 ## Getting Started
 
-Each package is distributed as a compiled DLL via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
+Each package is distributed as a zip archive via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
+The archive contains the compiled `.dll` together with its `.pdb` (debug symbols) and `.xml` (IntelliSense
+documentation), plus the DLLs of the kit packages it depends on — every archive is complete on its own.
 To add a package to your Unity project:
 
-1. Download the desired `.dll` from the latest release.
-2. Place it in your project under `Assets/Plugins/`.
-3. Unity will automatically detect and reference the assembly.
+1. Download the desired `Sagittaras.<Package>-<version>.zip` from the latest release.
+2. Extract it into your project under `Assets/Plugins/`.
+3. Unity will automatically detect and reference the assemblies.
 
-> If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
-
-> **Check dependencies.** Some packages require other packages from this kit to function. Before importing
-> a package, review its dependencies in the [documentation](.docs/index.md) and include all required DLLs.
+> If you use multiple packages, extract all archives into the same `Assets/Plugins/` folder. Shared
+> dependencies (e.g. `Sagittaras.GuardClauses.dll`) are identical across archives of the same release,
+> so overwriting them is safe.
 
 ## What's Inside
 
