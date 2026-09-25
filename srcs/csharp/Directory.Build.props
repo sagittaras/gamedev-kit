@@ -6,7 +6,7 @@
     </ItemGroup>
 
     <!-- The Unity package pre-image commits its PDB: deterministic source paths keep the local disk layout out of it. -->
-    <PropertyGroup Condition="'$(UpdateUnityPackage)' == 'true'">
+    <PropertyGroup Condition="'$(UpdateUnityPackage)' == 'true' Or '$(UpdateUnityPackage)' == 'force'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
