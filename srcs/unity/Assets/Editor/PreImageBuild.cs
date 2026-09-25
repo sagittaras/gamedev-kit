@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -135,6 +136,9 @@ namespace Sagittaras.DevelopmentKit.Editor
                     WorkingDirectory = CSharpDirectory,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
+                    // dotnet writes UTF-8; without this the output is decoded with the system's OEM code page.
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                 },
