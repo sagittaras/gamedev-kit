@@ -35,7 +35,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		..\..\.github\workflows\release.yml = ..\..\.github\workflows\release.yml
 		..\..\.github\workflows\catalog.yml = ..\..\.github\workflows\catalog.yml
+		..\..\.github\workflows\upm.yml = ..\..\.github\workflows\upm.yml
 		..\..\.github\scripts\upm-gate.sh = ..\..\.github\scripts\upm-gate.sh
+		..\..\.github\scripts\upm-sync.sh = ..\..\.github\scripts\upm-sync.sh
 	EndProjectSection
 EndProject
 Global
