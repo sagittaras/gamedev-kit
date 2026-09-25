@@ -12,7 +12,7 @@ And looking ahead — a pure C# core keeps the door open for **Godot** distribut
 
 ## Can I use the packages outside of Unity?
 
-Yes. The core packages are pure .NET assemblies — download the package archive from [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases), extract it and reference the DLL in your `.csproj` like any other assembly.
+Yes. The core packages are pure .NET assemblies — the OpenUPM packages are just Unity's wrapping of them. Download the package archive from [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases), extract it and reference the DLL in your `.csproj` like any other assembly.
 
 We don't have a public NuGet feed yet, but it's on our radar.
 
@@ -23,6 +23,16 @@ Yes. Every package has its own version and its own releases, tagged `<package>/<
 The version is computed by [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning): `major.minor` comes from the package's own `version.json` and the patch number is the git height — the number of commits touching the package since `major.minor` last changed. Commits to a kit package it depends on count too, so e.g. a fix in `Sagittaras.GuardClauses` also bumps `Sagittaras.Dices`, whose archive bundles it. Patch numbers of consecutive releases therefore aren't sequential (e.g. `1.1.4` may follow `1.1.1`); a higher number is always newer.
 
 Releases up to `1.2.1` predate this model — back then all packages were released together under one shared version.
+
+## Why is a version on GitHub Releases missing on OpenUPM?
+
+A package on OpenUPM carries the same version as its GitHub release — but a Unity package is published only
+after it has been verified in Unity. When a release goes out before its Unity package is refreshed, the zip
+ships anyway and the release notes say the version was not published to OpenUPM. It can still get there later,
+under the same version, once the Unity package catches up.
+
+The `upm/<package>` branches and `upm/<package>/<version>` tags in the repository hold exactly what OpenUPM
+builds from — one commit per published version. They are generated, so don't base any work on them.
 
 ## How do I know when a new version is released?
 

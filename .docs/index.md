@@ -15,17 +15,30 @@ our engineering.
 
 ## Installation
 
-Each package is distributed as a compiled DLL via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
+Each package is distributed as a compiled DLL, in Unity preferably through **OpenUPM**.
+
+### Unity Package Manager (OpenUPM)
+
+Packages with a Unity package are published on [OpenUPM](https://openupm.com) as `com.sagittaras.gamedevkit.<package>`
+(see the [README](../README.md#getting-started) for which ones) and require Unity 2021.3 or newer. Add the scoped
+registry — name `OpenUPM`, URL `https://package.openupm.com`, scope `com.sagittaras.gamedevkit` — in
+**Project Settings → Package Manager**, or run `openupm add com.sagittaras.gamedevkit.<package>` with
+[openupm-cli](https://github.com/openupm/openupm-cli). Dependencies between the packages are installed
+automatically.
+
+### GitHub Releases
+
+Every package also has its zip archive on **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
 To add a package to your Unity project:
 
-1. Download the desired `.dll` from the latest release.
-2. Place it in your project under `Assets/Plugins/`.
-3. Unity will automatically detect and reference the assembly.
+1. Download the package's archive from its latest release.
+2. Extract it into your project under `Assets/Plugins/`.
+3. Unity will automatically detect and reference the assemblies.
 
-> If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
+> If you use multiple packages, extract all archives into the same `Assets/Plugins/` folder. Each archive
+> already contains the DLLs of the kit packages it depends on.
 
-> **Check dependencies.** Some packages require other packages from this kit to function. Before importing
-> a package, review its dependencies listed in the documentation and include all required DLLs.
+> Don't install the same package both ways — an assembly from OpenUPM must not also sit in `Assets/Plugins/`.
 
 ### `.pdb` and `.xml` files
 
@@ -43,7 +56,7 @@ coming from Unity's own C# scripting and haven't worked much with precompiled .N
   far more useful.
 
 Drop both files in the same `Assets/Plugins/` folder as the `.dll` — Unity picks them up automatically, no
-extra configuration needed.
+extra configuration needed. The OpenUPM packages ship both files already.
 
 ---
 
