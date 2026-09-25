@@ -1,0 +1,74 @@
+name: Catalog
+
+# Maintains the "latest" release: a single place holding the newest published zip of every package
+# under a version-less name, so https://github.com/<repo>/releases/download/latest/Sagittaras.<Package>.zip
+# always points at the current version. The catalog is rebuilt from scratch on every run, so running
+# it manually repairs any drift.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: catalog
+  cancel-in-progress: false
+
+env:
+  CATALOG_TAG: latest
+
+jobs:
+  update-catalog:
+    if: github.event_name == 'workflow_dispatch' || github.event.release.tag_name != 'latest'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Rebuild Catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          # Newest published release of every package (tags are <slug>/<version>).
+          tags=$(gh release list --limit 1000 --exclude-drafts --exclude-pre-releases --json tagName --jq '.[].tagName' \
+            | grep '/' \
+            | sort -t/ -k1,1 -k2,2V \
+            | awk -F/ '{ newest[$1] = $0 } END { for (slug in newest) print newest[slug] }' \
+            | sort)
+
+          if [[ -z $tags ]]; then
+            echo "::notice::No package has been published yet — nothing to catalog."
+            exit 0
+          fi
+
+          mkdir -p assets
+          {
+            echo "Newest published version of every package. The download links below never change —"
+            echo "they always serve the current version."
+            echo
+            echo "| Package | Version | Download |"
+            echo "| --- | --- | --- |"
+          } > notes.md
+
+          for tag in $tags; do
+            version=${tag#*/}
+            gh release download "$tag" --pattern '*.zip' --dir "work/$tag"
+            for archive in "work/$tag"/*.zip; do
+              name=$(basename "$archive" "-$version.zip")
+              cp "$archive" "assets/$name.zip"
+              echo "| $name | [$version](https://github.com/$GH_REPO/releases/tag/$tag) | [$name.zip](https://github.com/$GH_REPO/releases/download/$CATALOG_TAG/$name.zip) |" >> notes.md
+            done
+          done
+
+          if gh release view "$CATALOG_TAG" > /dev/null 2>&1; then
+            gh release edit "$CATALOG_TAG" --notes-file notes.md --latest
+          else
+            gh release create "$CATALOG_TAG" --title "Latest Packages" --notes-file notes.md --latest --target "$GITHUB_SHA"
+          fi
+
+          gh release upload "$CATALOG_TAG" assets/*.zip --clobber
+
+          # Drop archives of packages that no longer have a release.
+          for asset in $(gh release view "$CATALOG_TAG" --json assets --jq '.assets[].name'); do
+            [[ -f "assets/$asset" ]] || gh release delete-asset "$CATALOG_TAG" "$asset" --yes
+          done

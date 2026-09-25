@@ -6,7 +6,7 @@
 
 <p align="center">
     <a href="LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/sagittaras/gamedev-kit?style=flat-square"></a>
-    <a href="https://github.com/sagittaras/gamedev-kit/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/sagittaras/gamedev-kit?style=flat-square"></a>
+    <a href="https://github.com/sagittaras/gamedev-kit/releases/tag/latest"><img alt="Latest Packages" src="https://img.shields.io/badge/release-latest%20packages-blue?style=flat-square"></a>
     <a href="https://github.com/sagittaras/gamedev-kit/actions/workflows/release.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/sagittaras/gamedev-kit/release.yml?style=flat-square"></a>
     <a href="https://github.com/sponsors/sagittaras"><img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Sponsors-Support-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white"></a>
 </p>
@@ -37,9 +37,22 @@ Each package is versioned and released on its own via **[GitHub Releases](https:
 — a release is titled after its package (e.g. `Sagittaras.Dices 1.1.3`) and tagged `<package>/<version>`
 (e.g. `dices/1.1.3`). The release carries a single zip archive with the compiled `.dll`, its `.pdb` (debug
 symbols) and `.xml` (IntelliSense documentation), plus the DLLs of the kit packages it depends on — every
-archive is complete on its own. To add a package to your Unity project:
+archive is complete on its own.
 
-1. Download `Sagittaras.<Package>-<version>.zip` from the package's latest release.
+The newest version of every package is always available in the **[Latest Packages](https://github.com/sagittaras/gamedev-kit/releases/tag/latest)**
+release, which also lists the current versions. Its download links never change:
+
+| Package | Download |
+| --- | --- |
+| Sagittaras.GuardClauses | [Sagittaras.GuardClauses.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.GuardClauses.zip) |
+| Sagittaras.Dices | [Sagittaras.Dices.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Dices.zip) |
+| Sagittaras.Timing | [Sagittaras.Timing.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Timing.zip) |
+| Sagittaras.Messaging | [Sagittaras.Messaging.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Messaging.zip) |
+| Sagittaras.Progression | [Sagittaras.Progression.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Progression.zip) |
+
+To add a package to your Unity project:
+
+1. Download the package's archive — from the table above, or a specific version from its own release.
 2. Extract it into your project under `Assets/Plugins/`.
 3. Unity will automatically detect and reference the assemblies.
 

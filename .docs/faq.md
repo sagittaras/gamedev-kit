@@ -18,7 +18,7 @@ We don't have a public NuGet feed yet, but it's on our radar.
 
 ## Are packages versioned independently?
 
-Yes. Every package has its own version and its own releases, tagged `<package>/<version>` (e.g. `dices/1.1.3`) — check [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases) for the latest version of a package and its changelog. All releases are cut from the main branch.
+Yes. Every package has its own version and its own releases, tagged `<package>/<version>` (e.g. `dices/1.1.3`) with its own changelog. All releases are cut from the main branch. The [Latest Packages](https://github.com/sagittaras/gamedev-kit/releases/tag/latest) release gathers the newest version of every package in one place, under download links that never change.
 
 The version is computed by [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning): `major.minor` comes from the package's own `version.json` and the patch number is the git height — the number of commits touching the package since `major.minor` last changed. Commits to a kit package it depends on count too, so e.g. a fix in `Sagittaras.GuardClauses` also bumps `Sagittaras.Dices`, whose archive bundles it. Patch numbers of consecutive releases therefore aren't sequential (e.g. `1.1.4` may follow `1.1.1`); a higher number is always newer.
 

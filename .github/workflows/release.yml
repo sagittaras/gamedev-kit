@@ -74,6 +74,7 @@ jobs:
 
             gh release create "$tag" "$archive" \
               --draft \
+              --latest=false \
               --target "$GITHUB_SHA" \
               --title "$name $version" \
               --notes-file notes.md
