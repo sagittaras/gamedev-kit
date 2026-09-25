@@ -1,13 +1,13 @@
 {
   "dependencies": {
-    "com.sagittaras.dices": {
-      "version": "file:com.sagittaras.dices",
+    "com.sagittaras.gamedevkit.dices": {
+      "version": "file:com.sagittaras.gamedevkit.dices",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
     },
-    "com.sagittaras.guard-clauses": {
-      "version": "file:com.sagittaras.guard-clauses",
+    "com.sagittaras.gamedevkit.guard-clauses": {
+      "version": "file:com.sagittaras.gamedevkit.guard-clauses",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

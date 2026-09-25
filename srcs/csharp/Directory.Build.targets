@@ -1,0 +1,30 @@
+<Project>
+
+    <!--
+        Unity package pre-image. A package whose skeleton exists in srcs/unity/Packages/ ships its built assembly
+        from the skeleton's Plugins/ folder, committed exactly as it was verified in Unity. Refreshing it is opt-in:
+
+            dotnet build -c Release -p:UpdateUnityPackage=true
+
+        Commit the package sources first and build afterwards — nbgv stamps the DLL with the version of HEAD, and
+        the release gate accepts the pre-image only while that version matches the one computed for the package.
+    -->
+    <PropertyGroup>
+        <UnityPackageSlug>$([System.Text.RegularExpressions.Regex]::Replace($(MSBuildProjectName.Replace('Sagittaras.', '')), '([a-z0-9])([A-Z])', '$1-$2').ToLowerInvariant())</UnityPackageSlug>
+        <UnityPackageName>com.sagittaras.gamedevkit.$(UnityPackageSlug)</UnityPackageName>
+        <UnityPackageDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'unity', 'Packages', '$(UnityPackageName)'))</UnityPackageDir>
+    </PropertyGroup>
+
+    <Target Name="UpdateUnityPackage"
+            AfterTargets="Build"
+            Condition="'$(UpdateUnityPackage)' == 'true' And Exists('$(UnityPackageDir)package.json')">
+        <Error Condition="'$(Configuration)' != 'Release'"
+               Text="The Unity package pre-image of $(UnityPackageName) must be built in Release (use -c Release)." />
+
+        <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).xml"
+              DestinationFolder="$(UnityPackageDir)Plugins" />
+
+        <Message Importance="high" Text="$(UnityPackageName) pre-image updated to $(AssemblyInformationalVersion)" />
+    </Target>
+
+</Project>

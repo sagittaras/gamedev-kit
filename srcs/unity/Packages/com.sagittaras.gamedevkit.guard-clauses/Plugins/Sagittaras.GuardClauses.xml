@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.GuardClauses</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.GuardClauses.Extensions.GuardClauseBooleanExtension">
+            <summary>
+                Provides boolean value guard clauses.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseBooleanExtension.False(Sagittaras.GuardClauses.IGuardClause,System.Boolean,System.String)">
+            <summary>
+                Ensures that a given boolean value is not false.
+            </summary>
+            <param name="_">An instance of <see cref="T:Sagittaras.GuardClauses.IGuardClause"/>.</param>
+            <param name="value">The value to guard.</param>
+            <param name="message">Custom message to include in the exception.</param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when the provided value is false.
+            </exception>
+        </member>
+        <member name="T:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension">
+            <summary>
+                Provides comparison-based guard clauses.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.GreaterThan(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.String)">
+            <summary>
+                Ensures that a given value is less than a specified threshold.
+            </summary>
+            <param name="_">An instance of <see cref="T:Sagittaras.GuardClauses.IGuardClause"/> for method chaining.</param>
+            <param name="input">The value to check.</param>
+            <param name="threshold">The threshold value to compare against.</param>
+            <param name="message">A custom message to include in the exception.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                Thrown when the <paramref name="input"/> is not less than the <paramref name="threshold"/>.
+            </exception>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.GreaterThan(Sagittaras.GuardClauses.IGuardClause,System.Single,System.Single,System.String)">
+            <inheritdoc cref="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.GreaterThan(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.String)" />
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.GreaterThan(Sagittaras.GuardClauses.IGuardClause,System.Double,System.Double,System.String)">
+            <inheritdoc cref="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.GreaterThan(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.String)" />
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.LessThan(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.String)">
+            <summary>
+                Ensures that a given value is greater than or equal to a specified threshold.
+            </summary>
+            <param name="_">An instance of <see cref="T:Sagittaras.GuardClauses.IGuardClause"/> for method chaining.</param>
+            <param name="input">The value to check.</param>
+            <param name="threshold">The threshold value to compare against.</param>
+            <param name="message">A custom message to include in the exception.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                Thrown when the <paramref name="input"/> is less than the <paramref name="threshold"/>.
+            </exception>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.LessThan(Sagittaras.GuardClauses.IGuardClause,System.Single,System.Single,System.String)">
+            <inheritdoc cref="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.LessThan(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.String)" />
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.LessThan(Sagittaras.GuardClauses.IGuardClause,System.Double,System.Double,System.String)">
+            <inheritdoc cref="M:Sagittaras.GuardClauses.Extensions.GuardClauseComparisonExtension.LessThan(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.String)" />
+        </member>
+        <member name="T:Sagittaras.GuardClauses.Extensions.GuardClauseOutOfRangeExtension">
+            <summary>
+                Provides out-of-range guard clauses for integer values.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseOutOfRangeExtension.OutOfRange(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+                Ensures that an integer input value falls within the specified range.
+            </summary>
+            <param name="_">An instance of <see cref="T:Sagittaras.GuardClauses.IGuardClause"/> used to apply the guard clause.</param>
+            <param name="input">The integer value to validate.</param>
+            <param name="min">The minimum allowed value of the range, inclusive.</param>
+            <param name="max">The maximum allowed value of the range, inclusive.</param>
+            <param name="message">A custom message to include in the exception.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+                Thrown when the <paramref name="input"/> value is less than <paramref name="min"/> or greater than <paramref name="max"/>.
+            </exception>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseOutOfRangeExtension.OutOfRange(Sagittaras.GuardClauses.IGuardClause,System.Single,System.Single,System.Single,System.String)">
+            <inheritdoc cref="M:Sagittaras.GuardClauses.Extensions.GuardClauseOutOfRangeExtension.OutOfRange(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.Int32,System.String)" />
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseOutOfRangeExtension.OutOfRange(Sagittaras.GuardClauses.IGuardClause,System.Double,System.Double,System.Double,System.String)">
+            <inheritdoc cref="M:Sagittaras.GuardClauses.Extensions.GuardClauseOutOfRangeExtension.OutOfRange(Sagittaras.GuardClauses.IGuardClause,System.Int32,System.Int32,System.Int32,System.String)" />
+        </member>
+        <member name="T:Sagittaras.GuardClauses.Extensions.GuardClauseZeroExtension">
+            <summary>
+                Provides zero-based guard clauses.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseZeroExtension.DivisionByZero(Sagittaras.GuardClauses.IGuardClause,System.Int32)">
+            <summary>
+                Ensures that the provided integer input is not zero; otherwise, throws a <see cref="T:System.DivideByZeroException"/>.
+            </summary>
+            <param name="_">The guard clause instance. This parameter is often provided implicitly and is not directly used in the method logic.</param>
+            <param name="input">The integer input to validate against a division by zero.</param>
+            <exception cref="T:System.DivideByZeroException">Thrown when the input value is zero, as division by zero is not allowed.</exception>
+        </member>
+        <member name="M:Sagittaras.GuardClauses.Extensions.GuardClauseZeroExtension.LessThanZero(Sagittaras.GuardClauses.IGuardClause,System.Single,System.String)">
+            <summary>
+                Ensures that the provided integer input is not less than zero; otherwise, throws an <see cref="T:System.ArgumentOutOfRangeException"/>.
+            </summary>
+            <param name="_">The guard clause instance. This parameter is often provided implicitly and is not directly used in the method logic.</param>
+            <param name="input">The integer input to validate to ensure it is not less than zero.</param>
+            <param name="message">A custom message to include in the exception.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the input value is less than zero.</exception>
+        </member>
+        <member name="T:Sagittaras.GuardClauses.Guard">
+            <summary>
+                Entrypoint for using Guard Clauses defined as extension methods.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.GuardClauses.Guard.Against">
+            <summary>
+                An entry point for using guard clauses.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.GuardClauses.IGuardClause">
+            <summary>
+                Interface as an extension point for building guard clauses.
+            </summary>
+        </member>
+    </members>
+</doc>
