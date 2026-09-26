@@ -37,6 +37,8 @@ jobs:
 
       # One zip and one release per package. The zip holds the package's DLL, PDB and XML docs plus
       # the DLLs of the kit packages it depends on, so it can be dropped into Assets/Plugins/ on its own.
+      # Packages with a Unity skeleton also pass through .github/scripts/upm-gate.sh, which tells whether
+      # the committed pre-image is fresh enough to be published to OpenUPM once the release is published.
       - name: Package & Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -70,6 +72,13 @@ jobs:
               } > notes.md
             else
               echo "First independently versioned release of $name." > notes.md
+            fi
+
+            # A stale Unity pre-image does not block the release — the zip still ships, only OpenUPM skips this version.
+            if upm=$(bash .github/scripts/upm-gate.sh "$dir"); then upm_status=0; else upm_status=$?; fi
+            if [[ $upm_status -eq 1 ]]; then
+              echo "::warning::$name $version will not be published to OpenUPM: $upm"
+              printf '\n> [!WARNING]\n> Not published to OpenUPM: %s\n' "$upm" >> notes.md
             fi
 
             gh release create "$tag" "$archive" \

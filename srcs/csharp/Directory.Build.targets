@@ -1,0 +1,64 @@
+<Project>
+
+    <!--
+        Unity package pre-image. A package whose skeleton exists in srcs/unity/Packages/ ships its built assembly
+        from the skeleton's Plugins/ folder, committed exactly as it was verified in Unity. Refreshing it is opt-in:
+
+            dotnet build -c Release -p:UpdateUnityPackage=true
+
+        Commit the package sources first and build afterwards — nbgv stamps the DLL with the version of HEAD, and
+        the release gate accepts the pre-image only while that version matches the one computed for the package.
+        A pre-image already holding the built version is left untouched, so refreshing one package does not rewrite
+        its kit dependencies (the property flows to referenced projects too). -p:UpdateUnityPackage=force skips
+        that check and overwrites the pre-image regardless.
+    -->
+    <PropertyGroup>
+        <UnityPackageSlug>$([System.Text.RegularExpressions.Regex]::Replace($(MSBuildProjectName.Replace('Sagittaras.', '')), '([a-z0-9])([A-Z])', '$1-$2').ToLowerInvariant())</UnityPackageSlug>
+        <UnityPackageName>com.sagittaras.gamedevkit.$(UnityPackageSlug)</UnityPackageName>
+        <UnityPackageDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'unity', 'Packages', '$(UnityPackageName)'))</UnityPackageDir>
+    </PropertyGroup>
+
+    <!-- Reads the informational version nbgv stamped into an assembly; empty when the file does not exist. -->
+    <UsingTask TaskName="GetInformationalVersion"
+               TaskFactory="RoslynCodeTaskFactory"
+               AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+        <ParameterGroup>
+            <AssemblyPath ParameterType="System.String" Required="true" />
+            <Version ParameterType="System.String" Output="true" />
+        </ParameterGroup>
+        <Task>
+            <Code Type="Fragment" Language="cs"><![CDATA[
+                Version = System.IO.File.Exists(AssemblyPath)
+                    ? System.Diagnostics.FileVersionInfo.GetVersionInfo(AssemblyPath).ProductVersion ?? ""
+                    : "";
+            ]]></Code>
+        </Task>
+    </UsingTask>
+
+    <Target Name="UpdateUnityPackage"
+            AfterTargets="Build"
+            Condition="('$(UpdateUnityPackage)' == 'true' Or '$(UpdateUnityPackage)' == 'force') And Exists('$(UnityPackageDir)package.json')">
+        <Error Condition="'$(Configuration)' != 'Release'"
+               Text="The Unity package pre-image of $(UnityPackageName) must be built in Release (use -c Release)." />
+
+        <GetInformationalVersion AssemblyPath="$(UnityPackageDir)Plugins/$(TargetFileName)">
+            <Output TaskParameter="Version" PropertyName="_UnityPackageVersion" />
+        </GetInformationalVersion>
+
+        <!-- The commit id after '+' changes with every commit; only the version itself tells a stale pre-image. -->
+        <PropertyGroup>
+            <_UnityPackageVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(_UnityPackageVersion)', '\+.*$', ''))</_UnityPackageVersion>
+            <_UnityPackageBuiltVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(AssemblyInformationalVersion)', '\+.*$', ''))</_UnityPackageBuiltVersion>
+            <_UnityPackageUpToDate>false</_UnityPackageUpToDate>
+            <_UnityPackageUpToDate Condition="'$(UpdateUnityPackage)' != 'force' And '$(_UnityPackageVersion)' == '$(_UnityPackageBuiltVersion)'">true</_UnityPackageUpToDate>
+        </PropertyGroup>
+
+        <Copy Condition="!$(_UnityPackageUpToDate)"
+              SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).xml"
+              DestinationFolder="$(UnityPackageDir)Plugins" />
+
+        <Message Condition="!$(_UnityPackageUpToDate)" Importance="high" Text="$(UnityPackageName) pre-image updated to $(AssemblyInformationalVersion)" />
+        <Message Condition="$(_UnityPackageUpToDate)" Importance="high" Text="$(UnityPackageName) pre-image is already at $(_UnityPackageBuiltVersion) — left untouched" />
+    </Target>
+
+</Project>
