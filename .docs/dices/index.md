@@ -12,7 +12,8 @@ in the code rather than buried in magic numbers.
 |---|---|
 | [Sagittaras.GuardClauses](../guard-clauses/index.md) | ✅ |
 
-Make sure `Sagittaras.GuardClauses.dll` is present in `Assets/Plugins/` alongside `Sagittaras.Dices.dll`.
+Installed through OpenUPM, the dependency comes along automatically. The zip archive from GitHub Releases
+already bundles `Sagittaras.GuardClauses.dll` — keep it in `Assets/Plugins/` alongside `Sagittaras.Dices.dll`.
 
 ## Architecture
 

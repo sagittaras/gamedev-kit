@@ -1,0 +1,472 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Dices</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Dices.Adapters.SystemRandomAdapter">
+            <summary>
+                Provides a default implementation of <see cref="T:Sagittaras.Dices.IDiceBagAdapter"/> using <see cref="T:System.Random"/> class.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Adapters.SystemRandomAdapter.Next(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Adapters.SystemRandomAdapter.Reseed">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Dices.ChanceTable`1">
+            <summary>
+                Table of weighted probabilities for selecting entries based on their <see cref="T:Sagittaras.Dices.Probability.Chance"/>.
+            </summary>
+            <typeparam name="T">Type of the entries in the table.</typeparam>
+        </member>
+        <member name="F:Sagittaras.Dices.ChanceTable`1._diceBag">
+            <summary>
+                Dice bag used for generation of random chances.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.ChanceTable`1._probabilities">
+            <summary>
+                Represents a table of weighted probabilities for selecting entries based on their <see cref="T:Sagittaras.Dices.Probability.Chance"/>.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.ChanceTable`1._entries">
+            <summary>
+                Maintains a collection of entries corresponding to a chance table, where each entry
+                represents an item that can be selected based on its associated probability.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.ChanceTable`1.#ctor(System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{`0,Sagittaras.Dices.Probability.Chance}},Sagittaras.Dices.IDiceBag)">
+            <summary>
+                Creates a new instance of Chance Table.
+            </summary>
+            <param name="pairs">Pairs of entries and their associated chances.</param>
+            <param name="diceBag">Allows overriding the default instance of a dice bag.</param>
+        </member>
+        <member name="M:Sagittaras.Dices.ChanceTable`1.TryNext(`0@)">
+            <summary>
+                Attempts to randomly select an entry from the chance table based on weighted probabilities.
+            </summary>
+            <param name="entry">
+                The output parameter that receives the selected entry if the operation is successful;
+                otherwise, it is set to the default value of the specified type.
+            </param>
+            <returns>
+                Returns <c>true</c> if the selection was successful; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:Sagittaras.Dices.DiceBag">
+            <summary>
+                Provides functionality for rolling randomness-based probabilities and values, using various dice logic.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.DiceBag.#ctor">
+            <summary>
+                Creates a new default instance of DiceBag.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.DiceBag.#ctor(Sagittaras.Dices.IDiceBagAdapter)">
+            <summary>
+                Creates a new instance of DiceBag using the specified adapter.
+            </summary>
+            <param name="adapter">Custom adapter used for dice bag's randomization logic.</param>
+        </member>
+        <member name="P:Sagittaras.Dices.DiceBag.Instance">
+            <summary>
+                Represents a globally shared instance of the dice bag, providing a single point of access for randomization operations.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Dices.DiceBag.Adapter">
+            <summary>
+                Adapter providing the randomization mechanism for the dice bag.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.DiceBag.Reseed">
+            <summary>
+                Reseeds the underlying random number generator used within the dice bag,
+                generating a new sequence of random numbers by altering the adapter's internal state.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.DiceBag.Try(Sagittaras.Dices.Probability.Chance)">
+            <summary>
+                Evaluates whether a given chance succeeds based on the random probability mechanism of the dice bag.
+            </summary>
+            <param name="chance">The probability, represented as a <see cref="T:Sagittaras.Dices.Probability.Chance"/> instance, to evaluate against.</param>
+            <returns>Returns <c>true</c> if the random roll is within the provided chance's value; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.DiceBag.Next(Sagittaras.Dices.Ranges.RandomRange)">
+            <summary>
+                Generates a random integer within the specified range using the configured adapter.
+            </summary>
+            <param name="range">
+                The inclusive range, represented by a <see cref="T:Sagittaras.Dices.Ranges.RandomRange"/>,
+                within which the random number will be generated.
+            </param>
+            <returns>A randomly generated integer within the specified range.</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.DiceBag.Roll(Sagittaras.Dices.Rolling.DieRoll)">
+            <summary>
+                Rolls multi-side dice as specified by the given die roll configuration and calculates the resulting value.
+            </summary>
+            <param name="dieRoll">
+                The configuration for the dice roll, including the number of sides on the die and any base value to add
+                to the result.
+            </param>
+            <returns>The resulting integer value after performing the dice roll calculation, including the base value.</returns>
+        </member>
+        <member name="T:Sagittaras.Dices.Extensions.ChanceExtension">
+            <summary>
+                Provides extension methods for working with the <see cref="T:Sagittaras.Dices.Probability.Chance"/> structure, enabling operations such as
+                probabilistic tries, weighted picking between options, and normalization of chances in relation to a probability sum.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.ChanceExtension.Try(Sagittaras.Dices.Probability.Chance,Sagittaras.Dices.IDiceBag)">
+            <inheritdoc cref="M:Sagittaras.Dices.DiceBag.Try(Sagittaras.Dices.Probability.Chance)" />
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.ChanceExtension.WeightedPick``1(Sagittaras.Dices.Probability.Chance,``0,``0,Sagittaras.Dices.IDiceBag)">
+            <summary>
+                Picks one of the two provided elements based on the given chance.
+            </summary>
+            <param name="chance">The probability to select the first element.</param>
+            <param name="a">The first element to be picked.</param>
+            <param name="b">The second element to be picked.</param>
+            <param name="diceBag">An optional custom dice bag for random number generation. If not provided, the default instance is used.</param>
+            <typeparam name="T">The type of elements to pick from.</typeparam>
+            <returns>Returns the selected element based on the weighted chance.</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.ChanceExtension.Normalize(Sagittaras.Dices.Probability.Chance,System.Int32)">
+            <summary>
+                Normalizes the current instance of <see cref="T:Sagittaras.Dices.Probability.Chance"/> based on the provided probability sum.
+            </summary>
+            <param name="chance">The <see cref="T:Sagittaras.Dices.Probability.Chance"/> instance to normalize.</param>
+            <param name="probabilitySum">The total sum of probabilities used for normalization.</param>
+            <returns>A new <see cref="T:Sagittaras.Dices.Probability.Chance"/> instance representing the normalized probability.</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.DiceBagAdapterExtension.NextDieSide(Sagittaras.Dices.IDiceBagAdapter,Sagittaras.Dices.Rolling.DieRoll)">
+            <summary>
+                Generates a random integer value representing the outcome of rolling a die with the specified number of sides.
+            </summary>
+            <param name="adapter">The dice bag adapter used to generate the random integer value.</param>
+            <param name="dieRoll">The die roll configuration, including the number of sides on the die.</param>
+            <returns>A random integer value between 1 and the number of die sides (inclusive).</returns>
+        </member>
+        <member name="T:Sagittaras.Dices.Extensions.DiceBagExtension">
+            <summary>
+                Provides extension methods for the <see cref="T:Sagittaras.Dices.IDiceBag"/> interface, offering additional functionality
+                for simulating probabilistic scenarios and selecting weighted outcomes.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.DiceBagExtension.FlipCoin``1(Sagittaras.Dices.IDiceBag,``0,``0)">
+            <summary>
+                Simulates a coin flip between two possible values and returns one of them based on a 50% probability.
+            </summary>
+            <typeparam name="T">The type of the values to be returned by the coin flip.</typeparam>
+            <param name="diceBag">The dice bag used for generating the random coin flip outcome.</param>
+            <param name="a">The value to return if the coin flip is successful on the first option.</param>
+            <param name="b">The value to return if the coin flip is successful on the second option.</param>
+            <returns>
+                Returns either <paramref name="a"/> or <paramref name="b"/>, with a 50% probability of selecting each.
+            </returns>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.DiceBagExtension.WeightedPick``1(Sagittaras.Dices.IDiceBag,Sagittaras.Dices.Probability.Chance,``0,``0)">
+            <summary>
+                Selects one of two options based on a weighted probability.
+            </summary>
+            <typeparam name="T">The type of the values to be evaluated and returned.</typeparam>
+            <param name="diceBag">The dice bag used to determine the outcome using the given probability.</param>
+            <param name="chance">The probability value representing the likelihood of selecting <paramref name="a"/>.</param>
+            <param name="a">The value to return if the weighted probability evaluation succeeds.</param>
+            <param name="b">The value to return if the weighted probability evaluation fails.</param>
+            <returns>
+                Returns <paramref name="a"/> with a probability based on <paramref name="chance"/>, otherwise returns <paramref name="b"/>.
+            </returns>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.DiceBagExtension.NextChance(Sagittaras.Dices.IDiceBag)">
+            <summary>
+                Generates a new random <see cref="T:Sagittaras.Dices.Probability.Chance"/> value within the predefined range.
+            </summary>
+            <returns>
+                Returns a randomly generated <see cref="T:Sagittaras.Dices.Probability.Chance"/> value between <see cref="F:Sagittaras.Dices.Probability.Chance.MinValue"/> and <see cref="F:Sagittaras.Dices.Probability.Chance.MaxValue"/>.
+            </returns>
+        </member>
+        <member name="T:Sagittaras.Dices.Extensions.DieRollExtension">
+            <summary>
+                Provides extension methods to enhance the functionality of the <see cref="T:Sagittaras.Dices.Rolling.DieRoll"/> structure,
+                enabling simplified interaction with dice rolling mechanisms through the <see cref="T:Sagittaras.Dices.IDiceBag"/> interface.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.DieRollExtension.Roll(Sagittaras.Dices.Rolling.DieRoll,Sagittaras.Dices.IDiceBag)">
+            <inheritdoc cref="M:Sagittaras.Dices.DiceBag.Roll(Sagittaras.Dices.Rolling.DieRoll)" />
+        </member>
+        <member name="T:Sagittaras.Dices.Extensions.RandomRangeExtension">
+            <summary>
+                Provides extension methods for generating random integers based on a <see cref="T:Sagittaras.Dices.Ranges.RandomRange"/> object.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Extensions.RandomRangeExtension.Next(Sagittaras.Dices.Ranges.RandomRange,Sagittaras.Dices.IDiceBag)">
+            <inheritdoc cref="M:Sagittaras.Dices.DiceBag.Next(Sagittaras.Dices.Ranges.RandomRange)" />
+        </member>
+        <member name="T:Sagittaras.Dices.IDiceBag">
+            <summary>
+                Provides functionality for rolling randomness-based probabilities and values, using various dice logic.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.IDiceBag.Reseed">
+            <summary>
+                Reseeds the underlying random number generator used within the dice bag,
+                generating a new sequence of random numbers by altering the adapter's internal state.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.IDiceBag.Try(Sagittaras.Dices.Probability.Chance)">
+            <summary>
+                Evaluates whether a given chance succeeds based on the random probability mechanism of the dice bag.
+            </summary>
+            <param name="chance">The probability, represented as a <see cref="T:Sagittaras.Dices.Probability.Chance"/> instance, to evaluate against.</param>
+            <returns>Returns <c>true</c> if the random roll is within the provided chance's value; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.IDiceBag.Next(Sagittaras.Dices.Ranges.RandomRange)">
+            <summary>
+                Generates a random integer within the specified range using the configured adapter.
+            </summary>
+            <param name="range">
+                The inclusive range, represented by a <see cref="T:Sagittaras.Dices.Ranges.RandomRange"/>,
+                within which the random number will be generated.
+            </param>
+            <returns>A randomly generated integer within the specified range.</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.IDiceBag.Roll(Sagittaras.Dices.Rolling.DieRoll)">
+            <summary>
+                Rolls multi-side dice as specified by the given die roll configuration and calculates the resulting value.
+            </summary>
+            <param name="dieRoll">
+                The configuration for the dice roll, including the number of sides on the die and any base value to add
+                to the result.
+            </param>
+            <returns>The resulting integer value after performing the dice roll calculation, including the base value.</returns>
+        </member>
+        <member name="T:Sagittaras.Dices.IDiceBagAdapter">
+            <summary>
+                Allows for providing custom randomization algorithms for the <see cref="T:Sagittaras.Dices.DiceBag"/> class.
+            </summary>
+            <remarks>
+                Adapter can be used to provide a standard Random class or custom predictive algorithms
+                for test cases.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Dices.IDiceBagAdapter.Default">
+            <summary>
+                Represents the default implementation of the <see cref="T:Sagittaras.Dices.IDiceBagAdapter"/> interface
+                used to generate random numbers within the <see cref="T:Sagittaras.Dices.DiceBag"/> class.
+            </summary>
+            <remarks>
+                The default adapter is an instance of <see cref="T:Sagittaras.Dices.Adapters.SystemRandomAdapter"/>, which uses
+                the standard <see cref="T:System.Random"/> class for number generation.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Dices.IDiceBagAdapter.Next(System.Int32,System.Int32)">
+            <summary>
+                Generates a random integer within the specified range.
+            </summary>
+            <param name="min">The inclusive lower bound of the random number.</param>
+            <param name="max">The exclusive upper bound of the random number.</param>
+            <returns>A randomly generated integer within the range [min, max).</returns>
+        </member>
+        <member name="M:Sagittaras.Dices.IDiceBagAdapter.Reseed">
+            <summary>
+                Reseeds the underlying random number generator to produce a new sequence
+                of random numbers, enabling changes in the algorithm's state or behavior.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Dices.Probability.Chance">
+            <summary>
+                Representation of a chance or probability, encapsulating values from 0 to 100% in a scalable manner.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.MinValue">
+            <summary>
+                Minimum possible value representing 0% chance.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.MaxValue">
+            <summary>
+                Maximum integer value representing 100% chance.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.Factor">
+            <summary>
+                Factor derived from the maximum value, representing 1% chance.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.Min">
+            <summary>
+                Represents the minimum possible chance value, equivalent to 0% probability.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.Max">
+            <summary>
+                Represents the maximum possible chance value, equivalent to 100% probability.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.Half">
+            <summary>
+                Represents the half-chance value, equivalent to 50% probability.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Probability.Chance.Range">
+            <summary>
+                Represents a range of possible chance values.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.#ctor(System.Int32)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Dices.Probability.Chance"/> from integer value.
+            </summary>
+            <param name="value">An integer value between <see cref="F:Sagittaras.Dices.Probability.Chance.MinValue"/> and <see cref="F:Sagittaras.Dices.Probability.Chance.MaxValue"/>, representing the probability.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">The number is out of <see cref="F:Sagittaras.Dices.Probability.Chance.MinValue"/> and <see cref="F:Sagittaras.Dices.Probability.Chance.MaxValue"/> range.</exception>
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.#ctor(System.Single)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Dices.Probability.Chance"/> from floating point value.
+            </summary>
+            <param name="value">A probability chance as a floating point value.</param>
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.#ctor(System.Double)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Dices.Probability.Chance"/> from floating point value.
+            </summary>
+            <param name="value">A probability chance as a floating point value.</param>
+        </member>
+        <member name="P:Sagittaras.Dices.Probability.Chance.Value">
+            <summary>
+                Value represented as a whole integer number.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.Equals(Sagittaras.Dices.Probability.Chance)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.CompareTo(Sagittaras.Dices.Probability.Chance)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Probability.Chance.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Dices.Ranges.RandomRange">
+            <summary>
+                Represents an inclusive roll between min and max value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Ranges.RandomRange.One">
+            <summary>
+                Represents a roll range with a fixed single value of 1.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Dices.Ranges.RandomRange.Angle">
+            <summary>
+                Represents a roll range spanning all possible angles in degrees.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.#ctor(System.Int32,System.Int32)">
+            <summary>
+                Creates a new <see cref="T:Sagittaras.Dices.Ranges.RandomRange"/> with the specified min and max values.
+            </summary>
+            <param name="min">Minimum inclusive value of the range.</param>
+            <param name="max">Maximum inclusive value of the range.</param>
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.#ctor(System.Int32)">
+            <summary>
+                Creates a new <see cref="T:Sagittaras.Dices.Ranges.RandomRange"/> with the specified value.
+            </summary>
+            <param name="value">Static value used for min and max.</param>
+        </member>
+        <member name="P:Sagittaras.Dices.Ranges.RandomRange.Min">
+            <summary>
+                Minimum inclusive value of the range.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Dices.Ranges.RandomRange.Max">
+            <summary>
+                Maximum inclusive value of the range.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.Equals(Sagittaras.Dices.Ranges.RandomRange)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Ranges.RandomRange.CompareTo(Sagittaras.Dices.Ranges.RandomRange)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Dices.Rolling.DieRoll">
+            <summary>
+                Represents a die roll configuration consisting of a base value and
+                the number of sides on the die. 
+            </summary>
+            <remarks>
+                This structure serves to model a rollable die in games or simulations, providing key properties
+                and operations relevant to its functionality.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Dices.Rolling.DieRoll.MinDieSides">
+            <summary>
+                Minimum number of sides a die can have.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Rolling.DieRoll.#ctor(System.Int32,System.Int32)">
+            <summary>
+                Creates a new <see cref="T:Sagittaras.Dices.Rolling.DieRoll"/> with the specified base value and die sides.
+            </summary>
+            <param name="baseValue">Base value for the die roll calculation.</param>
+            <param name="dieSides">Number of sides on a die.</param>
+        </member>
+        <member name="P:Sagittaras.Dices.Rolling.DieRoll.BaseValue">
+            <summary>
+                Base value for the die roll calculation.
+            </summary>
+            <remarks>
+                This value represents also the minimum guaranteed outcome of the roll.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Dices.Rolling.DieRoll.DieSides">
+            <summary>
+                Number of sides on a die.
+            </summary>
+            <remarks>
+                This property defines the range of possible outcomes for the die roll.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Dices.Rolling.DieRoll.MaxValue">
+            <summary>
+                Maximum possible outcome of the die roll.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Dices.Rolling.DieRoll.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Rolling.DieRoll.Equals(Sagittaras.Dices.Rolling.DieRoll)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Rolling.DieRoll.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Rolling.DieRoll.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Dices.Rolling.DieRoll.CompareTo(Sagittaras.Dices.Rolling.DieRoll)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

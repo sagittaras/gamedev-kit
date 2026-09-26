@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.dices",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Dice Rolling",
+  "description": "Dice rolling and randomness abstractions for game logic.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/dices/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=dices",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "dice",
+    "random",
+    "rng",
+    "tabletop"
+  ]
+}

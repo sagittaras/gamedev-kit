@@ -1,0 +1,16 @@
+{
+    "name": "Sagittaras.DevelopmentKit.Editor",
+    "rootNamespace": "Sagittaras.DevelopmentKit",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

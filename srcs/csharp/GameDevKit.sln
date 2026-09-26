@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\.gitignore = ..\..\.gitignore
 		..\..\version.json = ..\..\version.json
 		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Dices", "Sagittaras.Dices\Sagittaras.Dices.csproj", "{50CF4466-AE11-421B-9A67-CF352E270584}"
@@ -34,6 +35,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		..\..\.github\workflows\release.yml = ..\..\.github\workflows\release.yml
 		..\..\.github\workflows\catalog.yml = ..\..\.github\workflows\catalog.yml
+		..\..\.github\workflows\upm.yml = ..\..\.github\workflows\upm.yml
+		..\..\.github\scripts\upm-gate.sh = ..\..\.github\scripts\upm-gate.sh
+		..\..\.github\scripts\upm-sync.sh = ..\..\.github\scripts\upm-sync.sh
 	EndProjectSection
 EndProject
 Global
