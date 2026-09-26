@@ -86,7 +86,8 @@ publish() {
     git -C "$work" add -A
     git -C "$work" commit --quiet -m "$name $version" -m "Built from $source_commit."
     git -C "$work" tag "$tag"
-    git -C "$work" push --quiet origin "refs/heads/$branch" "refs/tags/$tag"
+    # Atomic: the tag marks the version as published, so it must never land without its branch (or vice versa).
+    git -C "$work" push --quiet --atomic origin "refs/heads/$branch" "refs/tags/$tag"
     git worktree remove --force "$work"
 
     echo "::notice::Published $name $version to OpenUPM as com.sagittaras.gamedevkit.$slug ($tag)."
