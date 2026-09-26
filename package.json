@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.guard-clauses",
+  "version": "1.1.2",
+  "displayName": "Sagittaras Guard Clauses",
+  "description": "Lightweight guard clause pattern for defensive programming.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/guard-clauses/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=guard-clauses",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "guard",
+    "guard-clauses",
+    "validation",
+    "defensive-programming"
+  ]
+}
