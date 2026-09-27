@@ -1,0 +1,41 @@
+name: Unity Packages
+
+# Keeps main releasable: every Unity package pre-image must match the version nbgv computes for its package
+# (see .github/scripts/upm-gate.sh), otherwise the release refuses to draft anything. A pull request that changes
+# a package without refreshing its pre-image fails here already.
+#
+# The check runs on the head commit of the pull request, not on GitHub's merge commit — the head carries exactly
+# the versions main gets when the branch goes in by fast-forward or "Rebase and merge", as the Unity packages require.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'srcs/**'
+      - '.github/scripts/**'
+  workflow_dispatch:
+
+jobs:
+  pre-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # nbgv computes the version from the git height, which needs the full history.
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install nbgv
+        run: dotnet tool install --global nbgv --version 3.10.94
+
+      - name: Check Pre-images
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/upm-check.sh

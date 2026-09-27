@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared helpers of the Unity package scripts (upm-gate.sh, upm-pack.sh, upm-sync.sh) — sourced, not run.
+# Shared helpers of the release and Unity package scripts — sourced, not run.
 # Package directories are the srcs/csharp/Sagittaras.<Package> folders; helpers needing the repository root use $root.
 
 readonly UPM_PACKAGE_PREFIX="com.sagittaras.gamedevkit."
