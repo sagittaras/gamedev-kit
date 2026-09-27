@@ -4,6 +4,8 @@ name: Release
 # by Nerdbank.GitVersioning — major.minor lives in the package's version.json, the patch is the
 # number of commits touching the package (or its kit dependencies, see pathFilters). A package gets
 # its own draft release only when its computed version has no tag yet; unchanged packages are skipped.
+# The Unity package pre-images must match the versions being released — the Unity Packages workflow
+# checks that on every pull request, and this workflow refuses to draft anything when they don't.
 on:
   workflow_dispatch:
 
@@ -38,74 +40,13 @@ jobs:
       - name: Install Unity UPM CLI
         run: bash .github/scripts/install-upm-cli.sh
 
-      # One zip and one release per package. The zip holds the package's DLL, PDB and XML docs plus
-      # the DLLs of the kit packages it depends on, so it can be dropped into Assets/Plugins/ on its own.
-      # Packages with a Unity skeleton also pass through .github/scripts/upm-gate.sh; when the committed
-      # pre-image is distributable, the release carries its signed Unity package too, which OpenUPM
-      # publishes unchanged once the release is published.
-      - name: Package & Release
+      # One draft per package due for release, with its zip archive and — for a Unity package — its signed
+      # Unity package, which OpenUPM publishes once the draft is published. Every Unity package due for
+      # release must pass the gate first; otherwise nothing is drafted (see release-drafts.sh).
+      - name: Draft Releases
         env:
           GH_TOKEN: ${{ github.token }}
           UPM_ORG_ID: ${{ secrets.UPM_ORG_ID }}
           UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
           UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
-        run: |
-          mkdir -p artifacts
-          drafts=$(gh release list --limit 100 --json tagName,isDraft --jq '.[] | select(.isDraft) | .tagName')
-
-          for manifest in srcs/csharp/*/version.json; do
-            dir=$(dirname "$manifest")
-            name=$(basename "$dir")
-            slug=$(echo "${name#Sagittaras.}" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
-            version=$(nbgv get-version --project "$dir" --variable SimpleVersion)
-            tag="$slug/$version"
-
-            if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null || grep -qxF "$tag" <<< "$drafts"; then
-              echo "::notice::$name $version is already released — skipping."
-              continue
-            fi
-
-            archive="$PWD/artifacts/$name-$version.zip"
-            (cd "$dir/bin/Release/netstandard2.1" && zip -q "$archive" *.dll *.pdb *.xml)
-            zip -qj "$archive" LICENSE
-
-            previous=$(git tag --list "$slug/*" --sort=-v:refname | head -n 1)
-            if [[ -n $previous ]]; then
-              mapfile -t paths < <(jq -r '.pathFilters[]' "$manifest")
-              {
-                echo "## Changes since ${previous#$slug/}"
-                echo
-                git -C "$dir" log --no-merges --pretty='- %s (%h)' "$previous..HEAD" -- "${paths[@]}"
-              } > notes.md
-            else
-              echo "First independently versioned release of $name." > notes.md
-            fi
-
-            # A Unity package that cannot ship does not block the release — the zip still goes out. The signed
-            # tarball can be attached to the draft later by the OpenUPM workflow, before the draft is published.
-            assets=("$archive")
-            upm_problem=""
-            if upm=$(bash .github/scripts/upm-gate.sh "$dir"); then upm_status=0; else upm_status=$?; fi
-            if [[ $upm_status -eq 0 ]]; then
-              if tarball=$(bash .github/scripts/upm-pack.sh "$dir" "$PWD/artifacts"); then
-                assets+=("$tarball")
-              else
-                upm_problem="the Unity package could not be signed."
-              fi
-            elif [[ $upm_status -eq 1 ]]; then
-              upm_problem=$upm
-            fi
-
-            if [[ -n $upm_problem ]]; then
-              echo "::warning::$name $version has no signed Unity package for OpenUPM: $upm_problem Fix it and run the OpenUPM workflow before publishing the draft."
-              printf '\n> [!WARNING]\n> Drafted without the signed Unity package for OpenUPM: %s\n' "$upm_problem" >> notes.md
-            fi
-
-            gh release create "$tag" "${assets[@]}" \
-              --draft \
-              --latest=false \
-              --target "$GITHUB_SHA" \
-              --title "$name $version" \
-              --notes-file notes.md
-            echo "::notice::Drafted $name $version."
-          done
+        run: bash .github/scripts/release-drafts.sh artifacts

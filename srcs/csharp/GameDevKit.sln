@@ -30,17 +30,25 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sagittaras.Tests.Progression", "Sagittaras.Tests.Progression\Sagittaras.Tests.Progression.csproj", "{5230CF28-F6EC-4D1E-8237-C8B40F0E9240}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{AEF77EFA-90F6-4A86-805F-234DC1F65CE6}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\FUNDING.yml = ..\..\.github\FUNDING.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{B2E8B1E5-65D4-4BFC-9324-8BA86C200313}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\.github\workflows\release.yml = ..\..\.github\workflows\release.yml
 		..\..\.github\workflows\catalog.yml = ..\..\.github\workflows\catalog.yml
-		..\..\.github\workflows\upm.yml = ..\..\.github\workflows\upm.yml
+		..\..\.github\workflows\release.yml = ..\..\.github\workflows\release.yml
+		..\..\.github\workflows\unity-packages.yml = ..\..\.github\workflows\unity-packages.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{9BFD7B25-DD4A-4BFE-A477-60F38EB309DA}"
+	ProjectSection(SolutionItems) = preProject
 		..\..\.github\scripts\install-upm-cli.sh = ..\..\.github\scripts\install-upm-cli.sh
-		..\..\.github\scripts\upm-lib.sh = ..\..\.github\scripts\upm-lib.sh
+		..\..\.github\scripts\release-drafts.sh = ..\..\.github\scripts\release-drafts.sh
+		..\..\.github\scripts\upm-check.sh = ..\..\.github\scripts\upm-check.sh
 		..\..\.github\scripts\upm-gate.sh = ..\..\.github\scripts\upm-gate.sh
+		..\..\.github\scripts\upm-lib.sh = ..\..\.github\scripts\upm-lib.sh
 		..\..\.github\scripts\upm-pack.sh = ..\..\.github\scripts\upm-pack.sh
-		..\..\.github\scripts\upm-sync.sh = ..\..\.github\scripts\upm-sync.sh
 	EndProjectSection
 EndProject
 Global
@@ -59,6 +67,7 @@ Global
 		{5230CF28-F6EC-4D1E-8237-C8B40F0E9240} = {202AAC9D-C0E9-4F2B-B483-407B109268A6}
 		{AEF77EFA-90F6-4A86-805F-234DC1F65CE6} = {A5BAF6A9-F37C-423F-A221-C076220DD8D8}
 		{B2E8B1E5-65D4-4BFC-9324-8BA86C200313} = {AEF77EFA-90F6-4A86-805F-234DC1F65CE6}
+		{9BFD7B25-DD4A-4BFE-A477-60F38EB309DA} = {AEF77EFA-90F6-4A86-805F-234DC1F65CE6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{50CF4466-AE11-421B-9A67-CF352E270584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
