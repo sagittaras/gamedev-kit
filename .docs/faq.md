@@ -1,14 +1,12 @@
 # Frequently Asked Questions
 
-## Why do you distribute packages instead of just sharing the source code?
+## Why do you distribute compiled packages instead of source code?
 
-The source code is available — the repository is open and forks are welcome. But distributed packages offer more than just files to copy.
+The source code is available — the repository is open and forks are welcome. But a distributed package offers more than files to copy: in Unity, each package is a **signed** Unity package on OpenUPM, so Unity can verify where it comes from, the Package Manager resolves its dependencies on other kit packages, and you see when an update is out. You don't lose the source either — the debug symbols carry Source Link, so your IDE steps into the package's code straight from GitHub.
 
-Our development doesn't happen in Unity alone. The core libraries are pure .NET assemblies, usable outside of Unity by simply referencing the DLL in your `.csproj`. We distribute packages internally via NuGet — a public feed is something we'd like to open up in the future.
+Our development doesn't happen in Unity alone. The core libraries are pure .NET assemblies, compiled once and usable outside of Unity by simply referencing the DLL in your `.csproj`.
 
-For Unity packages, we want to keep a clear domain boundary between the core logic and the Unity layer. This allows us to ship **Editor Tooling** alongside each package — tools that only make sense in the context of the Unity editor, and that raw source files simply can't provide.
-
-And looking ahead — a pure C# core keeps the door open for **Godot** distribution. If we get there, nothing needs to be rearchitected.
+The Unity package is a thin layer over that core: engine-specific parts live next to it, never inside it, so tooling for the Unity editor can grow per package without touching the core. And looking ahead — a pure C# core keeps the door open for **Godot** distribution. If we get there, nothing needs to be rearchitected.
 
 ## Can I use the packages outside of Unity?
 
@@ -30,7 +28,9 @@ The Unity packages came later than the packages themselves. Versions released be
 
 ## Unity says the package is signed by an organization I don't belong to. Is that a problem?
 
-No. Since Unity 6.3, the Package Manager checks package signatures, and our packages are signed by the Sagittaras Games organization, so Unity can tell that a package really comes from us and hasn't been changed since. Only members of that organization see it as signed by their own organization — everyone else gets this notice, which is expected for any package signed by someone else.
+No. Since Unity 6.3, the Package Manager checks package signatures, and our packages are signed by our Unity organization, so Unity can tell that a package really comes from us and hasn't been changed since. Only members of that organization see it as signed by their own organization — everyone else gets this notice, which is expected for any package signed by someone else.
+
+The organization is named **Sagittaras Games**, but it started out as **Zechy** — so the first signed versions carry that name instead: GuardClauses `1.1.2`, Dices `1.1.2`, Messaging `1.1.2`, Progression `1.1.3` and Timing `1.1.3`. It is the same organization under its earlier name, and every later version is signed as Sagittaras Games.
 
 ## How do I know when a new version is released?
 
