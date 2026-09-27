@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.messaging",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Mediator",
+  "description": "Mediator Pattern created for game development.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/messaging/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=messaging",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "mediator",
+    "messaging",
+    "pub-sub",
+    "events"
+  ]
+}

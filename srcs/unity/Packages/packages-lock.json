@@ -12,6 +12,12 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.sagittaras.gamedevkit.messaging": {
+      "version": "file:com.sagittaras.gamedevkit.messaging",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.sagittaras.gamedevkit.progression": {
       "version": "file:com.sagittaras.gamedevkit.progression",
       "depth": 0,
