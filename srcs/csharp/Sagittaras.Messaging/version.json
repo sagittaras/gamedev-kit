@@ -2,5 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/main/src/NerdBank.GitVersioning/version.schema.json",
   "inherit": true,
   "version": "1.1",
-  "pathFilters": ["."]
+  "pathFilters": [
+    ".",
+    "../../unity/Packages/com.sagittaras.gamedevkit.messaging",
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.messaging/Plugins",
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.messaging/Plugins.meta"
+  ]
 }

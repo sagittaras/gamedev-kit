@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Messaging</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Messaging.Collections.ContractSubscriberCollection">
+            <summary>
+                Result of <see cref="M:Sagittaras.Messaging.Collections.SubscriberCollection.Get(System.Type)"/>, containing all registered subscribers for a given contract.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Messaging.Collections.ContractSubscriberCollection.Empty">
+            <summary>
+                Represents an empty collection of subscribers.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Messaging.Collections.ContractSubscriberCollection.Count">
+            <summary>
+                Number of available subscribers in the collection.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.ContractSubscriberCollection.Invoke(Sagittaras.Messaging.IMediatorContract,System.Action{Sagittaras.Messaging.Subscribers.SubscriberException})">
+            <summary>
+                Invokes all subscribers for the given contract.
+            </summary>
+            <param name="contract">Contract containing context of the action.</param>
+            <param name="onException">Action callback allowing processing of subscriber exceptions.</param>
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.ContractSubscriberCollection.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.ContractSubscriberCollection.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Messaging.Collections.SubscriberCollection">
+            <summary>
+                Maintains a collection of subscribers to <see cref="T:Sagittaras.Messaging.IMediatorContract"/> types.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Messaging.Collections.SubscriberCollection._subscribers">
+            <summary>
+                Map of <see cref="T:Sagittaras.Messaging.Subscribers.IMediatorSubscriber"/> by the type of their contract.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Messaging.Collections.SubscriberCollection._subscribersByHashCode">
+            <summary>
+                Map of <see cref="T:Sagittaras.Messaging.Subscribers.IMediatorSubscriber"/> by their hash code.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Messaging.Collections.SubscriberCollection.Count">
+            <summary>
+                Total number of registered subscribers.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.SubscriberCollection.Add(Sagittaras.Messaging.Subscribers.IMediatorSubscriber)">
+            <summary>
+                Adds a new <see cref="T:Sagittaras.Messaging.Subscribers.IMediatorSubscriber"/> to the collection.
+            </summary>
+            <param name="subscriber">Instance of a new subscriber to be added.</param>
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.SubscriberCollection.Remove(System.Delegate)">
+            <summary>
+                Removes a subscriber from the collection based on its callback delegate.
+            </summary>
+            <param name="callback">Callback delegate to recognize subscriber.</param>
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.SubscriberCollection.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Collections.SubscriberCollection.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Messaging.IMediator">
+            <summary>
+                Provides loosely coupled communication between game components via publish/subscribe contracts.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Messaging.IMediator.Subscribe``1(System.Action{``0})">
+            <summary>
+                Subscribes a callback to a mediator contract.
+            </summary>
+            <param name="callback">Callback to be invoked when the contract is received.</param>
+            <typeparam name="TContract">Type of contract used in communication.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Messaging.IMediator.Unsubscribe``1(System.Action{``0})">
+            <summary>
+                Unsubscribes a callback from a mediator contract.
+            </summary>
+            <param name="callback">Callback to be unsubscribed.</param>
+            <typeparam name="TContract">Type of contract used in communication.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Messaging.IMediator.Publish``1(``0)">
+            <summary>
+                Publishes a contract to all subscribed callbacks.
+            </summary>
+            <param name="contract">The contract to be published to subscribers.</param>
+            <typeparam name="TContract">Type of contract being published.</typeparam>
+        </member>
+        <member name="T:Sagittaras.Messaging.IMediatorContract">
+            <summary>
+                Marks objects as contract shared through mediator.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Messaging.Mediator">
+            <inheritdoc />
+        </member>
+        <member name="F:Sagittaras.Messaging.Mediator._subscribers">
+            <inheritdoc cref="T:Sagittaras.Messaging.Collections.SubscriberCollection" />
+        </member>
+        <member name="E:Sagittaras.Messaging.Mediator.ExceptionRaised">
+            <summary>
+                Event fired each time when a subscriber throws an exception during invocation.
+            </summary>
+            <remarks>
+                Helps with logging of the exceptions during runtime, as Mediator itself has no native support for runtime.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Messaging.Mediator.Instance">
+            <summary>
+                Provides global access to the mediator for subscribing to, unsubscribing from, and publishing message contracts.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Messaging.Mediator.Subscribe``1(System.Action{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Mediator.Unsubscribe``1(System.Action{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Mediator.Publish``1(``0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Mediator.SubscriberOnException(Sagittaras.Messaging.Subscribers.SubscriberException)">
+            <summary>
+                Raises the <see cref="E:Sagittaras.Messaging.Mediator.ExceptionRaised"/> event when a subscriber throws an exception during invocation.
+            </summary>
+            <param name="e">The <see cref="T:Sagittaras.Messaging.Subscribers.SubscriberException"/> instance containing information about the exception.</param>
+        </member>
+        <member name="T:Sagittaras.Messaging.Subscribers.IMediatorSubscriber">
+            <summary>
+                Describes a non-generic wrapper for a mediator subscriber.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Messaging.Subscribers.IMediatorSubscriber.ContractType">
+            <summary>
+                Type of <see cref="T:Sagittaras.Messaging.IMediatorContract"/> served by this subscriber.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Messaging.Subscribers.IMediatorSubscriber.Method">
+            <summary>
+                Gets information about the callback method associated with the subscriber.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.IMediatorSubscriber.Invoke(Sagittaras.Messaging.IMediatorContract)">
+            <summary>
+                Invokes the action callback associated with the given contract.
+            </summary>
+            <param name="contract">Contract carrying the context of mediator's action.</param>
+        </member>
+        <member name="T:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.#ctor(System.Action{`0})">
+            <summary>
+                Creates a new wrapper for the given callback.
+            </summary>
+            <param name="callback">Action callback for a given contract type.</param>
+        </member>
+        <member name="P:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.ContractType">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.Method">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.Invoke(Sagittaras.Messaging.IMediatorContract)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.Equals(Sagittaras.Messaging.Subscribers.IMediatorSubscriber)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.MediatorSubscriber`1.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Messaging.Subscribers.SubscriberException">
+            <summary>
+                Represents an exception that occurs when a mediator subscriber encounters an error during invocation.
+            </summary>
+            <remarks>
+                This exception is thrown to encapsulate errors occurring in the execution of a subscriber's method.
+                It provides detailed context about the subscriber and the underlying exception.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.SubscriberException.#ctor(Sagittaras.Messaging.IMediatorContract,Sagittaras.Messaging.Subscribers.IMediatorSubscriber,System.Exception)">
+            <summary>
+                Represents an exception that occurs when a mediator subscriber encounters an error during invocation.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Messaging.Subscribers.SubscriberException.Contract">
+            <summary>
+                Instance of <see cref="T:Sagittaras.Messaging.IMediatorContract"/> which caused the exception.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Messaging.Subscribers.SubscriberException.Subscriber">
+            <summary>
+                Instance of <see cref="T:Sagittaras.Messaging.Subscribers.IMediatorSubscriber"/> which caused the exception.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Messaging.Subscribers.SubscriberException.GetExceptionMessage(Sagittaras.Messaging.Subscribers.IMediatorSubscriber,System.Exception)">
+            <summary>
+                Constructs a detailed exception message for a mediator subscriber that caused an exception during invocation.
+            </summary>
+            <param name="subscriber">The mediator subscriber that caused the exception.</param>
+            <param name="innerException">The exception that was thrown during the invocation of the subscriber.</param>
+            <returns>A string containing a detailed description of the exception, including the subscriber's identity and message from the inner exception.</returns>
+        </member>
+    </members>
+</doc>
