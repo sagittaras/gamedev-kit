@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.timing",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Timing API",
+  "description": "Lightweight timer primitives for interval tracking, cooldown management, and callback scheduling in game loops.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/timing/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=timing",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "timer",
+    "cooldown",
+    "interval",
+    "game-loop"
+  ]
+}

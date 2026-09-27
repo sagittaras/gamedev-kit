@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.progression",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Progression",
+  "description": "Level and experience progression for games.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/progression/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=progression",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "progression",
+    "level",
+    "experience",
+    "rpg"
+  ]
+}

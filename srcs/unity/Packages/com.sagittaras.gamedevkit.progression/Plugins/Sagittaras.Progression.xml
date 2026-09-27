@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Progression</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Progression.Experience">
+            <summary>
+                Represents a specific value in a player's progression towards the next level.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.Experience.CompareTo(Sagittaras.Progression.Experience)">
+            <inheritdoc />
+        </member>
+        <member name="F:Sagittaras.Progression.Experience.Zero">
+            <summary>
+                A zero experience value.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.Experience.#ctor(System.Int32)">
+            <summary>
+                Creates a new experience value.
+            </summary>
+            <param name="value">Value of the experience.</param>
+        </member>
+        <member name="P:Sagittaras.Progression.Experience.Value">
+            <summary>
+                A current experience value expressed by this value type.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.Experience.Equals(Sagittaras.Progression.Experience)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Progression.Experience.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Progression.Experience.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Progression.Formulas.ExponentialScalingFormula">
+            <summary>
+                Represents the default formula used to calculate the experience required to level up in the progression system.
+            </summary>
+            <remarks>
+                This formula calculates the experience based on a base value and an exponential multiplier. It provides
+                a structured approach for defining progression curves within the game.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Progression.Formulas.ExponentialScalingFormula._baseValue">
+            <summary>
+                Experience points required to advance from level 1 to level 2, as a base value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Progression.Formulas.ExponentialScalingFormula._multiplier">
+            <summary>
+                Exponential multiplier applied per level.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.Formulas.ExponentialScalingFormula.#ctor(System.Int32,System.Single)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Progression.Formulas.ExponentialScalingFormula"/>.
+            </summary>
+            <param name="baseValue">Experience points required to advance from level 1 to level 2.</param>
+            <param name="multiplier">Exponential multiplier applied per level.</param>
+        </member>
+        <member name="M:Sagittaras.Progression.Formulas.ExponentialScalingFormula.Calculate(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Progression.IExperienceFormula">
+            <summary>
+                A formula that calculates the experience required to reach a certain level.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Progression.IExperienceFormula.Default">
+            <summary>
+                Default formula used for <see cref="T:Sagittaras.Progression.Level"/> creation.
+            </summary>
+            <remarks>
+                The default is used when no other formula is specified.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Progression.IExperienceFormula.Calculate(System.Int32)">
+            <summary>
+                Calculates the experience required to reach the next level.
+            </summary>
+            <param name="currentLevel">Current player's level.</param>
+            <returns>Threshold required to reach the next level.</returns>
+        </member>
+        <member name="T:Sagittaras.Progression.Level">
+            <summary>
+                Carries a value representing the current level and the progress towards the next one. 
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Progression.Level.MinValue">
+            <summary>
+                A default minimal level value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Progression.Level._formula">
+            <summary>
+                The experience formula used to calculate the experience required for level progression.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.Level.#ctor(System.Int32,Sagittaras.Progression.IExperienceFormula,System.Nullable{Sagittaras.Progression.Experience})">
+            <summary>
+                Creates a new <see cref="T:Sagittaras.Progression.Level"/> instance.
+            </summary>
+            <param name="level">Current level value.</param>
+            <param name="formula">Formula used to calculate the threshold for level progression.</param>
+            <param name="overflow">Overflow experience value from the previous level.</param>
+        </member>
+        <member name="P:Sagittaras.Progression.Level.Value">
+            <summary>
+                Current level value.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Progression.Level.Progress">
+            <inheritdoc cref="T:Sagittaras.Progression.Progress" />
+        </member>
+        <member name="M:Sagittaras.Progression.Level.Gain(Sagittaras.Progression.Experience)">
+            <summary>
+                Adds a new experience gain to the current level.
+            </summary>
+            <param name="experience">Experience added to the current level.</param>
+            <returns>
+                Struct containing the result of the operation, indicating whether the level was gained.
+            </returns>
+        </member>
+        <member name="M:Sagittaras.Progression.Level.LevelUp">
+            <summary>
+                Makes a new instance of level.
+            </summary>
+            <returns>New instance of level with corresponding progression value.</returns>
+        </member>
+        <member name="T:Sagittaras.Progression.LevelGainResult">
+            <summary>
+                Result of <see cref="M:Sagittaras.Progression.Level.Gain(Sagittaras.Progression.Experience)"/> operation.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.LevelGainResult.#ctor(Sagittaras.Progression.Level,System.Int32)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Progression.LevelGainResult"/>.
+            </summary>
+            <param name="level">Newest instance of level value.</param>
+            <param name="levelsGained">Number of levels gained during the <see cref="M:Sagittaras.Progression.Level.Gain(Sagittaras.Progression.Experience)"/> call.</param>
+        </member>
+        <member name="P:Sagittaras.Progression.LevelGainResult.Level">
+            <summary>
+                Instance of a newly gained level.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Progression.LevelGainResult.LevelsGained">
+            <summary>
+                Number of levels gained.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Progression.LevelGainResult.LeveledUp">
+            <summary>
+                Indicates whether there was a change to the level.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Progression.Progress">
+            <summary>
+                Represents a player's progression towards the next level.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Progression.Progress.#ctor(Sagittaras.Progression.Experience,Sagittaras.Progression.Experience)">
+            <summary>
+                Creates a new progression instance.
+            </summary>
+            <param name="threshold">Threshold required to reach to advance to the next level.</param>
+            <param name="value">Current value of experience.</param>
+        </member>
+        <member name="M:Sagittaras.Progression.Progress.#ctor(Sagittaras.Progression.Experience)">
+            <summary>
+                Creates a new progression instance.
+            </summary>
+            <param name="threshold">Threshold required to reach to advance to the next level.</param>
+        </member>
+        <member name="P:Sagittaras.Progression.Progress.Value">
+            <summary>
+                Current value of experience.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Progression.Progress.Threshold">
+            <summary>
+                Threshold value of experience required to reach the next level.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Progression.Progress.Reached">
+            <summary>
+                Indicates whether the progression has reached the threshold.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -12,6 +12,18 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.sagittaras.gamedevkit.progression": {
+      "version": "file:com.sagittaras.gamedevkit.progression",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.sagittaras.gamedevkit.timing": {
+      "version": "file:com.sagittaras.gamedevkit.timing",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.2d.animation": {
       "version": "16.0.1",
       "depth": 0,

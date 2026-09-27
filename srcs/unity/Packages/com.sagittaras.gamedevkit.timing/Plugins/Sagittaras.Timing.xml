@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Timing</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Timing.CallbackTimer">
+            <summary>
+                Timer invoking a callback action at the rate of specified duration.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Timing.CallbackTimer._callback">
+            <summary>
+                Callback to be invoked when the <see cref="F:Sagittaras.Timing.CallbackTimer._timer"/> reaches the duration.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Timing.CallbackTimer._timer">
+            <summary>
+                Internal timer controlling the interval between each <see cref="F:Sagittaras.Timing.CallbackTimer._callback"/> call.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Timing.CallbackTimer.#ctor(System.Single,System.Action,System.Boolean)">
+            <summary>
+                Creates a new callback timer with a specified duration.
+            </summary>
+            <param name="duration">Duration in a number of seconds between each call of the callback action.</param>
+            <param name="callback">Callback action to be invoked once the internal timer reaches the accumulation.</param>
+            <param name="startImmediately">Indicates whether the first call of <see cref="M:Sagittaras.Timing.CallbackTimer.TryUse(System.Single)"/> should be successful, or the accumulation of time is required from the beginning.</param>
+        </member>
+        <member name="M:Sagittaras.Timing.CallbackTimer.#ctor(System.TimeSpan,System.Action,System.Boolean)">
+            <summary>
+                Creates a new callback timer configured through <see cref="T:System.TimeSpan"/> instance.
+            </summary>
+            <param name="duration">Instance of <see cref="T:System.TimeSpan"/> configuring the rate of callback calls in time.</param>
+            <param name="callback">Callback action to be invoked once the internal timer reaches the accumulation.</param>
+            <param name="startImmediately">Indicates whether the first call of <see cref="M:Sagittaras.Timing.CallbackTimer.TryUse(System.Single)"/> should be successful, or the accumulation of time is required from the beginning.</param>
+        </member>
+        <member name="P:Sagittaras.Timing.CallbackTimer.Duration">
+            <summary>
+                Duration between each call of the configured callback.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Timing.CallbackTimer.Remaining">
+            <summary>
+                Remaining time until the next callback invocation.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Timing.CallbackTimer.TryUse(System.Single)">
+            <summary>
+                Updates the internal timer's accumulation and try to use the callback.
+            </summary>
+            <remarks>
+                Once the configured duration elapses, the callback is invoked.
+            </remarks>
+            <param name="deltaTime">Delta time to update internal timer.</param>
+        </member>
+        <member name="T:Sagittaras.Timing.Cooldown">
+            <summary>
+                Timer tracking and managing a cooldown period, allowing controlled execution of time-dependent actions.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Timing.Cooldown.#ctor(System.Single,System.Boolean)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Timing.Cooldown"/> with the specified duration.
+            </summary>
+            <param name="duration">The duration of the cooldown in seconds.</param>
+            <param name="startsOnCooldown">Prevents the cooldown to be immediately ready.</param>
+        </member>
+        <member name="M:Sagittaras.Timing.Cooldown.#ctor(System.TimeSpan,System.Boolean)">
+            <summary>
+                Creates a new instance of <see cref="T:Sagittaras.Timing.Cooldown"/> configured by <see cref="T:System.TimeSpan"/> instance.
+            </summary>
+            <param name="duration">Instance of <see cref="T:System.TimeSpan"/> configuring the duration of the cooldown.</param>
+            <param name="startsOnCooldown">Prevents the cooldown to be immediately ready.</param>
+        </member>
+        <member name="P:Sagittaras.Timing.Cooldown.Duration">
+            <summary>
+                Duration of the cooldown in seconds.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Timing.Cooldown.Remaining">
+            <summary>
+                Currently remaining time of the cooldown in seconds.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Timing.Cooldown.IsReady">
+            <summary>
+                Indicates whether the cooldown is ready to be used.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Timing.Cooldown.ElapsedTime">
+            <summary>
+                Watches the accumulation of time between <see cref="M:Sagittaras.Timing.Cooldown.Update(System.Single)"/> calls.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Timing.Cooldown.Update(System.Single)">
+            <summary>
+                Updates the accumulation towards the cooldown duration.
+            </summary>
+            <param name="deltaTime">Delta by which the accumulation of time is increased.</param>
+        </member>
+        <member name="M:Sagittaras.Timing.Cooldown.Reset">
+            <summary>
+                Resets the accumulated time marking the <see cref="T:Sagittaras.Timing.Cooldown"/> as not ready.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Timing.IntervalTimer">
+            <summary>
+                Watches the specified interval duration during each call of <see cref="M:Sagittaras.Timing.IntervalTimer.TryTick(System.Single)"/>.
+            </summary>
+            <remarks>
+                Timer is accumulating specified delta time during each call of <see cref="M:Sagittaras.Timing.IntervalTimer.TryTick(System.Single)"/>,
+                once the accumulated time reaches the specified interval duration, the method returns true.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Timing.IntervalTimer.#ctor(System.Single,System.Boolean)">
+            <summary>
+                Creates a new timer configured by the number of seconds.
+            </summary>
+            <param name="interval">Length of a single interval in the number of seconds.</param>
+            <param name="startImmediately">Indicates whether the timer should at first <see cref="M:Sagittaras.Timing.IntervalTimer.TryTick(System.Single)"/> return true.</param>
+        </member>
+        <member name="M:Sagittaras.Timing.IntervalTimer.#ctor(System.TimeSpan,System.Boolean)">
+            <summary>
+                Creates a new timer configured by instance of <see cref="T:System.TimeSpan"/>.
+            </summary>
+            <param name="interval">Instance of <see cref="T:System.TimeSpan"/> configuring the length of a single interval.</param>
+            <param name="startImmediately">Indicates whether the timer should at first <see cref="M:Sagittaras.Timing.IntervalTimer.TryTick(System.Single)"/> return true.</param>
+        </member>
+        <member name="P:Sagittaras.Timing.IntervalTimer.Interval">
+            <summary>
+                Interval of the timer in seconds.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Timing.IntervalTimer.Remaining">
+            <summary>
+                Remaining time until the next successful interval tick.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Timing.IntervalTimer.ElapsedTime">
+            <summary>
+                Tracks the amount of time elapsed since the last interval tick.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Timing.IntervalTimer.TryTick(System.Single)">
+            <summary>
+                Increments the accumulated time by the specified delta.
+            </summary>
+            <remarks>
+                Once the accumulated time reaches the <see cref="P:Sagittaras.Timing.IntervalTimer.Interval"/>, it is being reset.
+            </remarks>
+            <param name="deltaTime">Delta by which the timer is updated.</param>
+            <returns>True when accumulated time reaches the <see cref="P:Sagittaras.Timing.IntervalTimer.Interval"/>. Otherwise, false.</returns>
+        </member>
+    </members>
+</doc>
