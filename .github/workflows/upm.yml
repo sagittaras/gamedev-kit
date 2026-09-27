@@ -1,15 +1,13 @@
 name: OpenUPM
 
-# Publishes the Unity package pre-images for OpenUPM, which builds packages from git tags. Every package with
-# a Unity skeleton (srcs/unity/Packages/com.sagittaras.gamedevkit.<slug>) gets an orphan branch upm/<slug> holding
-# just the package, tagged upm/<slug>/<version>; OpenUPM watches those tags (gitTagPrefix "upm/<slug>/").
+# OpenUPM publishes the signed Unity packages unchanged from GitHub Release assets (trackingMode: githubRelease):
+# it finds a version by its <slug>/<version> tag and takes the com.sagittaras.gamedevkit.<slug>-<version>.tgz asset
+# of that release. release.yml signs and attaches the tarball itself whenever the pre-image passes the gate.
 #
-# The workflow is a sync — see .github/scripts/upm-sync.sh. On a published release it runs at the release's
-# commit. Run it manually from main to catch up a version released with a stale pre-image: refreshing Plugins/
-# afterwards keeps the version, so no new release comes, but the sync publishes the now verified pre-image.
+# This workflow is the catch-up — see .github/scripts/upm-sync.sh. When a release is drafted with a stale pre-image,
+# refresh the pre-image on main (committing Plugins/ keeps the version), run this workflow, and publish the draft
+# afterwards: OpenUPM waits for the asset of an already published release only for 3 days.
 on:
-  release:
-    types: [published]
   workflow_dispatch:
 
 concurrency:
@@ -18,9 +16,7 @@ concurrency:
 
 jobs:
   sync:
-    if: >-
-      (github.event_name == 'release' && github.event.release.tag_name != 'latest') ||
-      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -28,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # nbgv computes the version from the git height, which needs the full history (and the tags).
+          # nbgv computes the version from the git height, which needs the full history.
           fetch-depth: 0
 
       - name: Setup .NET
@@ -39,8 +35,13 @@ jobs:
       - name: Install nbgv
         run: dotnet tool install --global nbgv --version 3.10.94
 
-      - name: Sync OpenUPM Packages
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          bash .github/scripts/upm-sync.sh
+      - name: Install Unity UPM CLI
+        run: bash .github/scripts/install-upm-cli.sh
+
+      - name: Attach Signed Unity Packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPM_ORG_ID: ${{ secrets.UPM_ORG_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
+        run: bash .github/scripts/upm-sync.sh
