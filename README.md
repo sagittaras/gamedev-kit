@@ -33,28 +33,20 @@ We believe that game development deserves much more openness! 💙
 
 ## Getting Started
 
-| Package | Unity package | Version |
-| --- | --- | --- |
-| Sagittaras.GuardClauses | [com.sagittaras.gamedevkit.guard-clauses](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.guard-clauses?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) |
-| Sagittaras.Dices | [com.sagittaras.gamedevkit.dices](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.dices?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) |
-| Sagittaras.Timing | [com.sagittaras.gamedevkit.timing](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.timing?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) |
-| Sagittaras.Messaging | [com.sagittaras.gamedevkit.messaging](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.messaging?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) |
-| Sagittaras.Progression | [com.sagittaras.gamedevkit.progression](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.progression?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) |
-
 The packages are signed Unity packages on [OpenUPM](https://openupm.com) and require Unity 2021.3 or newer. See
 [Installation](.docs/index.md#installation) for adding them to your project — through the
 [Package Manager](.docs/index.md#package-manager), or [without it](.docs/index.md#without-the-package-manager) for a
 plain .NET project.
 
-## What's Inside
+Each package name leads to its documentation, and [Docs](.docs/index.md) gives an overview of all of them with examples.
 
-<a href="./.docs/guard-clauses/index.md"><img src="https://img.shields.io/badge/Sagittaras.GuardClauses-darkgreen?style=flat-square" alt="Sagittaras.GuardClauses"/></a>
-<a href="./.docs/dices/index.md"><img src="https://img.shields.io/badge/Sagittaras.Dices-blueviolet?style=flat-square" alt="Sagittaras.Dices"/></a>
-<a href="./.docs/timing/index.md"><img src="https://img.shields.io/badge/Sagittaras.Timing-blue?style=flat-square" alt="Sagittaras.Timing"/></a>
-<a href="./.docs/messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
-<a href="./.docs/progression/index.md"><img src="https://img.shields.io/badge/Sagittaras.Progression-orange?style=flat-square" alt="Sagittaras.Progression"/></a>
-
-See [Docs](.docs/index.md) for what's inside and how to use it.
+| Package | Namespace | Unity package | Version |
+| --- | --- | --- | --- |
+| [Sagittaras Guard Clauses](.docs/guard-clauses/index.md) | `Sagittaras.GuardClauses` | `com.sagittaras.gamedevkit.guard-clauses` | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.guard-clauses?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) |
+| [Sagittaras Dice Rolling](.docs/dices/index.md) | `Sagittaras.Dices` | `com.sagittaras.gamedevkit.dices` | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.dices?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) |
+| [Sagittaras Timing API](.docs/timing/index.md) | `Sagittaras.Timing` | `com.sagittaras.gamedevkit.timing` | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.timing?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) |
+| [Sagittaras Mediator](.docs/messaging/index.md) | `Sagittaras.Messaging` | `com.sagittaras.gamedevkit.messaging` | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.messaging?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) |
+| [Sagittaras Progression](.docs/progression/index.md) | `Sagittaras.Progression` | `com.sagittaras.gamedevkit.progression` | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.progression?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) |
 
 ## What's Comming
 
