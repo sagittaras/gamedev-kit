@@ -33,10 +33,6 @@ We believe that game development deserves much more openness! 💙
 
 ## Getting Started
 
-Every package is a Unity package on **[OpenUPM](https://openupm.com)**, versioned and released on its own. Unity's
-Package Manager then takes care of updates and of the dependencies between the packages. The packages are signed by
-Sagittaras Games and require Unity 2021.3 or newer.
-
 | Package | Unity package | Version |
 | --- | --- | --- |
 | Sagittaras.GuardClauses | [com.sagittaras.gamedevkit.guard-clauses](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.guard-clauses?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) |
@@ -45,25 +41,10 @@ Sagittaras Games and require Unity 2021.3 or newer.
 | Sagittaras.Messaging | [com.sagittaras.gamedevkit.messaging](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.messaging?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) |
 | Sagittaras.Progression | [com.sagittaras.gamedevkit.progression](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.progression?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) |
 
-Install a package with [openupm-cli](https://github.com/openupm/openupm-cli):
-
-```bash
-openupm add com.sagittaras.gamedevkit.dices
-```
-
-Or add the OpenUPM scoped registry once in **Project Settings → Package Manager → Scoped Registries** — name
-`OpenUPM`, URL `https://package.openupm.com`, scope `com.sagittaras.gamedevkit` — and install the packages from
-**My Registries** in the Package Manager window.
-
-### Without the Package Manager
-
-Every version also has its own **[GitHub Release](https://github.com/sagittaras/gamedev-kit/releases)**, tagged
-`<package>/<version>` (e.g. `dices/1.1.3`). Besides the Unity package, it carries a zip archive with the compiled
-`.dll`, its `.pdb` (debug symbols) and `.xml` (IntelliSense documentation), plus the DLLs of the kit packages it
-depends on — reference them from a plain .NET project, or extract the archive under `Assets/Plugins/` in Unity.
-
-> Don't install the same package both ways — an assembly from OpenUPM must not also sit in `Assets/Plugins/`,
-> otherwise Unity reports duplicate assemblies.
+The packages are signed Unity packages on [OpenUPM](https://openupm.com) and require Unity 2021.3 or newer. See
+[Installation](.docs/index.md#installation) for adding them to your project — through the
+[Package Manager](.docs/index.md#package-manager), or [without it](.docs/index.md#without-the-package-manager) for a
+plain .NET project.
 
 ## What's Inside
 
