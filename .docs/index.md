@@ -15,23 +15,24 @@ our engineering.
 
 ## Installation
 
-Each package is distributed as a compiled DLL via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**.
-To add a package to your Unity project:
+Every package is a signed Unity package on [OpenUPM](https://openupm.com), named `com.sagittaras.gamedevkit.<package>`
+(see the [README](../README.md#getting-started) for the list) and requiring Unity 2021.3 or newer. Install it with
+[openupm-cli](https://github.com/openupm/openupm-cli) — `openupm add com.sagittaras.gamedevkit.<package>` — or add the
+scoped registry in **Project Settings → Package Manager** (name `OpenUPM`, URL `https://package.openupm.com`, scope
+`com.sagittaras.gamedevkit`). The Package Manager installs the dependencies between the packages for you.
 
-1. Download the desired `.dll` from the latest release.
-2. Place it in your project under `Assets/Plugins/`.
-3. Unity will automatically detect and reference the assembly.
+### Without the Package Manager
 
-> If you use multiple packages, place all DLLs in the same `Assets/Plugins/` folder.
-
-> **Check dependencies.** Some packages require other packages from this kit to function. Before importing
-> a package, review its dependencies listed in the documentation and include all required DLLs.
+Every version also has its **[GitHub Release](https://github.com/sagittaras/gamedev-kit/releases)** with a zip archive
+of the compiled assemblies, including the DLLs of the kit packages it depends on. Reference them from a plain .NET
+project, or extract the archive under `Assets/Plugins/` in Unity — but never install the same package through OpenUPM
+and `Assets/Plugins/` at once, or Unity reports duplicate assemblies.
 
 ### `.pdb` and `.xml` files
 
-Alongside every `.dll`, each release also publishes a matching `.pdb` and `.xml` file. Neither is required for
-the package to work — Unity runs fine with just the `.dll` — but both are worth grabbing, especially if you're
-coming from Unity's own C# scripting and haven't worked much with precompiled .NET assemblies before:
+Alongside every `.dll`, each package also ships a matching `.pdb` and `.xml` file — the Unity package includes them,
+and so does the zip archive. Neither is required for the package to work, but both are worth keeping, especially if
+you're coming from Unity's own C# scripting and haven't worked much with precompiled .NET assemblies before:
 
 - **`.xml`** is the assembly's documentation file. It carries the same `<summary>` descriptions you'd see in
   this documentation, but surfaced directly in your IDE — hover over any type or method from the package (e.g.
@@ -42,8 +43,9 @@ coming from Unity's own C# scripting and haven't worked much with precompiled .N
   `.dll`, stack traces resolve to the actual file and line, which makes bug reports (and your own debugging)
   far more useful.
 
-Drop both files in the same `Assets/Plugins/` folder as the `.dll` — Unity picks them up automatically, no
-extra configuration needed.
+With the zip archive, drop both files in the same `Assets/Plugins/` folder as the `.dll` — Unity picks them up
+automatically, no extra configuration needed. The `.pdb` also carries Source Link, so Rider or Visual Studio can step
+into the package's source straight from GitHub.
 
 ---
 

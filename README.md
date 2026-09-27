@@ -6,7 +6,7 @@
 
 <p align="center">
     <a href="LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/sagittaras/gamedev-kit?style=flat-square"></a>
-    <a href="https://github.com/sagittaras/gamedev-kit/releases/tag/latest"><img alt="Latest Packages" src="https://img.shields.io/badge/release-latest%20packages-blue?style=flat-square"></a>
+    <a href="https://openupm.com/contributors/sagittaras/"><img alt="OpenUPM" src="https://img.shields.io/badge/OpenUPM-com.sagittaras.gamedevkit-3b84f6?style=flat-square"></a>
     <a href="https://github.com/sagittaras/gamedev-kit/actions/workflows/release.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/sagittaras/gamedev-kit/release.yml?style=flat-square"></a>
     <a href="https://github.com/sponsors/sagittaras"><img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Sponsors-Support-ea4aaa?style=flat-square&logo=githubsponsors&logoColor=white"></a>
 </p>
@@ -33,33 +33,37 @@ We believe that game development deserves much more openness! 💙
 
 ## Getting Started
 
-Each package is versioned and released on its own via **[GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases)**
-— a release is titled after its package (e.g. `Sagittaras.Dices 1.1.3`) and tagged `<package>/<version>`
-(e.g. `dices/1.1.3`). The release carries a single zip archive with the compiled `.dll`, its `.pdb` (debug
-symbols) and `.xml` (IntelliSense documentation), plus the DLLs of the kit packages it depends on — every
-archive is complete on its own.
+Every package is a Unity package on **[OpenUPM](https://openupm.com)**, versioned and released on its own. Unity's
+Package Manager then takes care of updates and of the dependencies between the packages. The packages are signed by
+Sagittaras Games and require Unity 2021.3 or newer.
 
-The newest version of every package is always available in the **[Latest Packages](https://github.com/sagittaras/gamedev-kit/releases/tag/latest)**
-release, which also lists the current versions. Its download links never change:
+| Package | Unity package | Version |
+| --- | --- | --- |
+| Sagittaras.GuardClauses | [com.sagittaras.gamedevkit.guard-clauses](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.guard-clauses?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) |
+| Sagittaras.Dices | [com.sagittaras.gamedevkit.dices](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.dices?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) |
+| Sagittaras.Timing | [com.sagittaras.gamedevkit.timing](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.timing?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) |
+| Sagittaras.Messaging | [com.sagittaras.gamedevkit.messaging](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.messaging?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) |
+| Sagittaras.Progression | [com.sagittaras.gamedevkit.progression](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) | [![openupm](https://img.shields.io/npm/v/com.sagittaras.gamedevkit.progression?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square)](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) |
 
-| Package | Download |
-| --- | --- |
-| Sagittaras.GuardClauses | [Sagittaras.GuardClauses.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.GuardClauses.zip) |
-| Sagittaras.Dices | [Sagittaras.Dices.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Dices.zip) |
-| Sagittaras.Timing | [Sagittaras.Timing.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Timing.zip) |
-| Sagittaras.Messaging | [Sagittaras.Messaging.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Messaging.zip) |
-| Sagittaras.Progression | [Sagittaras.Progression.zip](https://github.com/sagittaras/gamedev-kit/releases/download/latest/Sagittaras.Progression.zip) |
+Install a package with [openupm-cli](https://github.com/openupm/openupm-cli):
 
-To add a package to your Unity project:
+```bash
+openupm add com.sagittaras.gamedevkit.dices
+```
 
-1. Download the package's archive — from the table above, or a specific version from its own release.
-2. Extract it into your project under `Assets/Plugins/`.
-3. Unity will automatically detect and reference the assemblies.
+Or add the OpenUPM scoped registry once in **Project Settings → Package Manager → Scoped Registries** — name
+`OpenUPM`, URL `https://package.openupm.com`, scope `com.sagittaras.gamedevkit` — and install the packages from
+**My Registries** in the Package Manager window.
 
-> If you use multiple packages, extract all archives into the same `Assets/Plugins/` folder. A change in
-> a shared dependency (e.g. `Sagittaras.GuardClauses`) also produces a new release of every package that
-> depends on it, so the latest release of each package always ships the latest dependency — just keep all
-> your packages up to date.
+### Without the Package Manager
+
+Every version also has its own **[GitHub Release](https://github.com/sagittaras/gamedev-kit/releases)**, tagged
+`<package>/<version>` (e.g. `dices/1.1.3`). Besides the Unity package, it carries a zip archive with the compiled
+`.dll`, its `.pdb` (debug symbols) and `.xml` (IntelliSense documentation), plus the DLLs of the kit packages it
+depends on — reference them from a plain .NET project, or extract the archive under `Assets/Plugins/` in Unity.
+
+> Don't install the same package both ways — an assembly from OpenUPM must not also sit in `Assets/Plugins/`,
+> otherwise Unity reports duplicate assemblies.
 
 ## What's Inside
 

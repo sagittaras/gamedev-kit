@@ -9,7 +9,7 @@ primitives that accumulate time across frames. Reducing the _cooldown boilerplat
 |---|---|
 | [Sagittaras.GuardClauses](../guard-clauses/index.md) | ✅ |
 
-Make sure `Sagittaras.GuardClauses.dll` is present in `Assets/Plugins/` alongside `Sagittaras.Timing.dll`.
+Installed through OpenUPM, the dependency comes along automatically. The zip archive from GitHub Releases already bundles `Sagittaras.GuardClauses.dll` — keep it in `Assets/Plugins/` alongside `Sagittaras.Timing.dll`.
 
 ## Getting Started
 

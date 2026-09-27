@@ -36,7 +36,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{AEF77E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{B2E8B1E5-65D4-4BFC-9324-8BA86C200313}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\.github\workflows\catalog.yml = ..\..\.github\workflows\catalog.yml
 		..\..\.github\workflows\release.yml = ..\..\.github\workflows\release.yml
 		..\..\.github\workflows\unity-packages.yml = ..\..\.github\workflows\unity-packages.yml
 	EndProjectSection

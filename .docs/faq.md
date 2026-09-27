@@ -18,15 +18,23 @@ We don't have a public NuGet feed yet, but it's on our radar.
 
 ## Are packages versioned independently?
 
-Yes. Every package has its own version and its own releases, tagged `<package>/<version>` (e.g. `dices/1.1.3`) with its own changelog. All releases are cut from the main branch. The [Latest Packages](https://github.com/sagittaras/gamedev-kit/releases/tag/latest) release gathers the newest version of every package in one place, under download links that never change.
+Yes. Every package has its own version and its own releases, tagged `<package>/<version>` (e.g. `dices/1.1.3`) with its own changelog. All releases are cut from the main branch, and each one publishes the same version to OpenUPM.
 
-The version is computed by [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning): `major.minor` comes from the package's own `version.json` and the patch number is the git height — the number of commits touching the package since `major.minor` last changed. Commits to a kit package it depends on count too, so e.g. a fix in `Sagittaras.GuardClauses` also bumps `Sagittaras.Dices`, whose archive bundles it. Patch numbers of consecutive releases therefore aren't sequential (e.g. `1.1.4` may follow `1.1.1`); a higher number is always newer.
+The version is computed by [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning): `major.minor` comes from the package's own `version.json` and the patch number is the git height — the number of commits touching the package since `major.minor` last changed. Commits to a kit package it depends on count too, so e.g. a fix in `Sagittaras.GuardClauses` also bumps `Sagittaras.Dices`, which depends on it. Patch numbers of consecutive releases therefore aren't sequential (e.g. `1.1.4` may follow `1.1.1`); a higher number is always newer.
 
 Releases up to `1.2.1` predate this model — back then all packages were released together under one shared version.
 
+## Why are older versions missing on OpenUPM?
+
+The Unity packages came later than the packages themselves. Versions released before a package got its Unity package are available only as zip archives on [GitHub Releases](https://github.com/sagittaras/gamedev-kit/releases); every release since then is on OpenUPM too.
+
+## Unity says the package is signed by an organization I don't belong to. Is that a problem?
+
+No. Since Unity 6.3, the Package Manager checks package signatures, and our packages are signed by the Sagittaras Games organization, so Unity can tell that a package really comes from us and hasn't been changed since. Only members of that organization see it as signed by their own organization — everyone else gets this notice, which is expected for any package signed by someone else.
+
 ## How do I know when a new version is released?
 
-Watch the repository on GitHub and select **Releases only** — you'll get a notification whenever a new version is published.
+In Unity, the Package Manager window shows when a newer version of an installed package is available on OpenUPM. You can also watch the repository on GitHub and select **Releases only** — you'll get a notification whenever a new version is published.
 
 ## Can I contribute?
 
