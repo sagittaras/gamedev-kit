@@ -35,13 +35,20 @@ jobs:
           dotnet build --configuration Release --no-restore
           dotnet test --configuration Release --no-build
 
+      - name: Install Unity UPM CLI
+        run: bash .github/scripts/install-upm-cli.sh
+
       # One zip and one release per package. The zip holds the package's DLL, PDB and XML docs plus
       # the DLLs of the kit packages it depends on, so it can be dropped into Assets/Plugins/ on its own.
-      # Packages with a Unity skeleton also pass through .github/scripts/upm-gate.sh, which tells whether
-      # the committed pre-image is fresh enough to be published to OpenUPM once the release is published.
+      # Packages with a Unity skeleton also pass through .github/scripts/upm-gate.sh; when the committed
+      # pre-image is distributable, the release carries its signed Unity package too, which OpenUPM
+      # publishes unchanged once the release is published.
       - name: Package & Release
         env:
           GH_TOKEN: ${{ github.token }}
+          UPM_ORG_ID: ${{ secrets.UPM_ORG_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_ID: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_ID }}
+          UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ secrets.UPM_SERVICE_ACCOUNT_KEY_SECRET }}
         run: |
           mkdir -p artifacts
           drafts=$(gh release list --limit 100 --json tagName,isDraft --jq '.[] | select(.isDraft) | .tagName')
@@ -74,14 +81,27 @@ jobs:
               echo "First independently versioned release of $name." > notes.md
             fi
 
-            # A stale Unity pre-image does not block the release — the zip still ships, only OpenUPM skips this version.
+            # A Unity package that cannot ship does not block the release — the zip still goes out. The signed
+            # tarball can be attached to the draft later by the OpenUPM workflow, before the draft is published.
+            assets=("$archive")
+            upm_problem=""
             if upm=$(bash .github/scripts/upm-gate.sh "$dir"); then upm_status=0; else upm_status=$?; fi
-            if [[ $upm_status -eq 1 ]]; then
-              echo "::warning::$name $version will not be published to OpenUPM: $upm"
-              printf '\n> [!WARNING]\n> Not published to OpenUPM: %s\n' "$upm" >> notes.md
+            if [[ $upm_status -eq 0 ]]; then
+              if tarball=$(bash .github/scripts/upm-pack.sh "$dir" "$PWD/artifacts"); then
+                assets+=("$tarball")
+              else
+                upm_problem="the Unity package could not be signed."
+              fi
+            elif [[ $upm_status -eq 1 ]]; then
+              upm_problem=$upm
             fi
 
-            gh release create "$tag" "$archive" \
+            if [[ -n $upm_problem ]]; then
+              echo "::warning::$name $version has no signed Unity package for OpenUPM: $upm_problem Fix it and run the OpenUPM workflow before publishing the draft."
+              printf '\n> [!WARNING]\n> Drafted without the signed Unity package for OpenUPM: %s\n' "$upm_problem" >> notes.md
+            fi
+
+            gh release create "$tag" "${assets[@]}" \
               --draft \
               --latest=false \
               --target "$GITHUB_SHA" \

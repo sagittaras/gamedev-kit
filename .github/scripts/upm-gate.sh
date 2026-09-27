@@ -8,27 +8,18 @@
 #   1. every file of the skeleton has its .meta — Unity has imported it,
 #   2. the DLL in Plugins/ carries the version nbgv computes for the package — nothing touching the package changed
 #      since the pre-image was built (Plugins/ is excluded from pathFilters, so committing it keeps the version),
-#   3. every kit dependency at its current version is already on OpenUPM (upm/<slug>/<version> tag) or passes
-#      this gate itself — otherwise the package.json would depend on a version that never gets published.
+#   3. every kit dependency at its current version is on OpenUPM — its <slug>/<version> release carries the signed
+#      Unity package — or, when that version is not released yet, passes this gate itself, so it gets signed in the
+#      same release run. Otherwise the package.json would depend on a version that never reaches OpenUPM.
 #
 # Exit code: 0 distributable (prints the version), 1 not distributable (prints the reason),
 #            2 the package has no Unity skeleton, so it is not a Unity package at all.
-# Requires git, nbgv and pwsh on PATH (all present on GitHub-hosted runners once nbgv is installed).
+# Requires git, nbgv, gh and pwsh on PATH (all present on GitHub-hosted runners once nbgv is installed).
 
 set -uo pipefail
 
 root=$(git rev-parse --show-toplevel)
-
-package_slug() {
-    local name=${1##*/}
-    echo "${name#Sagittaras.}" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]'
-}
-
-package_version() {
-    local version
-    version=$(nbgv get-version --project "$1" --variable AssemblyInformationalVersion) || return 1
-    echo "${version%%+*}"
-}
+source "$root/.github/scripts/upm-lib.sh"
 
 assembly_version() {
     local version
@@ -36,12 +27,17 @@ assembly_version() {
     echo "${version%%+*}"
 }
 
+informational_version() {
+    local version
+    version=$(nbgv get-version --project "$1" --variable AssemblyInformationalVersion) || return 1
+    echo "${version%%+*}"
+}
+
 check() {
     local dir=${1%/}
     local name=${dir##*/}
-    local slug skeleton version dll built file ref dep_dir dep_name dep_slug dep_version reason
-    slug=$(package_slug "$name")
-    skeleton="$root/srcs/unity/Packages/com.sagittaras.gamedevkit.$slug"
+    local skeleton version dll built file dep_dir dep_name dep_version status reason
+    skeleton=$(package_skeleton "$name")
 
     if [[ ! -f $skeleton/package.json ]]; then
         echo "$name has no Unity package skeleton."
@@ -55,7 +51,7 @@ check() {
         fi
     done < <(find "$skeleton" -mindepth 1 ! -name '*.meta')
 
-    version=$(package_version "$dir") || { echo "$name version could not be computed."; return 1; }
+    version=$(informational_version "$dir") || { echo "$name version could not be computed."; return 1; }
     dll="$skeleton/Plugins/$name.dll"
     if [[ ! -f $dll ]]; then
         echo "$name pre-image has no Plugins/$name.dll."
@@ -68,20 +64,32 @@ check() {
         return 1
     fi
 
-    while IFS= read -r ref; do
-        dep_dir="$dir/$(dirname "${ref//\\//}")"
-        dep_name=$(basename "$(dirname "${ref//\\//}")")
-        dep_slug=$(package_slug "$dep_name")
+    while IFS= read -r dep_dir; do
+        dep_name=${dep_dir##*/}
         dep_version=$(package_version "$dep_dir") || { echo "$dep_name version could not be computed."; return 1; }
 
-        if git rev-parse --quiet --verify "refs/tags/upm/$dep_slug/$dep_version" > /dev/null; then
-            continue
-        fi
-        if ! reason=$(check "$dep_dir"); then
-            echo "$name depends on $dep_name $dep_version, which is not distributable: $reason"
-            return 1
-        fi
-    done < <(sed -n 's/.*<ProjectReference Include="\([^"]*\)".*/\1/p' "$dir/$name.csproj")
+        status=0
+        has_signed_tarball "$(package_slug "$dep_name")" "$dep_version" || status=$?
+        case $status in
+            0)
+                continue
+                ;;
+            1)
+                echo "$name depends on $dep_name $dep_version, which was released without its signed Unity package — attach it with the OpenUPM workflow first."
+                return 1
+                ;;
+            2)
+                if ! reason=$(check "$dep_dir"); then
+                    echo "$name depends on $dep_name $dep_version, which is not distributable: $reason"
+                    return 1
+                fi
+                ;;
+            *)
+                echo "$name depends on $dep_name $dep_version, whose release could not be looked up."
+                return 1
+                ;;
+        esac
+    done < <(kit_dependencies "$dir")
 
     echo "$version"
 }
