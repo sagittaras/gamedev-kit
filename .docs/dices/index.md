@@ -6,6 +6,16 @@ like `DieRoll`, `Chance`, and `RandomRange`, and let `DiceBag` resolve them. The
 each type carries its own meaning and constraints, so the intent behind a random operation is visible directly
 in the code rather than buried in magic numbers.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Dices` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/)) | `com.sagittaras.gamedevkit.dices` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Dices/)) | `Sagittaras.Dices` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 | Package | Required |

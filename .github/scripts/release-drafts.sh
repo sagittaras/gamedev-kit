@@ -4,16 +4,17 @@
 #   release-drafts.sh <artifacts-dir>
 #
 # A package is released when its version (nbgv, see its version.json) has neither a <slug>/<version> tag nor a draft.
-# Every release carries the zip archive — the package's DLL, PDB and XML plus the DLLs of its kit dependencies, for
-# Assets/Plugins/ or a plain .NET project. A package with a Unity skeleton carries its signed Unity package as well,
-# which OpenUPM publishes once the draft is published.
+# Every release carries its NuGet package with the symbol package, which the NuGet workflow pushes to nuget.org once
+# the draft is published, and the zip archive — the package's DLL, PDB and XML plus the DLLs of its kit dependencies,
+# for Assets/Plugins/ or a .NET project without NuGet. A package with a Unity skeleton carries its signed Unity package
+# as well, which OpenUPM publishes once the draft is published.
 #
 # The Unity packages are the precondition of a release: when any Unity package due for release is not distributable
 # (upm-gate.sh) or cannot be signed, nothing is drafted at all. Refresh the pre-images, verify them in Unity, commit
 # Plugins/ and run the release again — committing Plugins/ keeps the versions.
 #
-# Expects the solution built in Release. Requires the tools of upm-gate.sh and upm-pack.sh, zip, and gh with write
-# access to the releases.
+# Expects the solution built in Release. Requires the tools of upm-gate.sh, upm-pack.sh and nuget-pack.sh, zip, and gh
+# with write access to the releases.
 
 set -euo pipefail
 
@@ -78,7 +79,7 @@ if [[ $distributable != true ]]; then
     exit 1
 fi
 
-# The assets of every release, before the first draft — a failed signature stops the release as a whole, too.
+# The assets of every release, before the first draft — a failed pack or signature stops the release as a whole, too.
 declare -A assets
 for dir in "${packages[@]}"; do
     name=${dir##*/}
@@ -88,6 +89,12 @@ for dir in "${packages[@]}"; do
     (cd "$dir/bin/Release/netstandard2.1" && zip -q "$archive" ./*.dll ./*.pdb ./*.xml)
     zip -qj "$archive" LICENSE
     assets[$dir]=$archive
+
+    if ! nuget=$(bash .github/scripts/nuget-pack.sh "$dir" "$artifacts"); then
+        echo "::error::$name $version could not be packed for NuGet — nothing was drafted."
+        exit 1
+    fi
+    assets[$dir]+=$'\n'$nuget
 
     if has_unity_package "$name"; then
         if ! tarball=$(bash .github/scripts/upm-pack.sh "$dir" "$artifacts"); then

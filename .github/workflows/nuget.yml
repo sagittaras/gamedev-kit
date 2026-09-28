@@ -1,0 +1,63 @@
+name: NuGet
+
+# Pushes the NuGet package of a release to nuget.org once its draft is published — the same moment OpenUPM picks up
+# the signed Unity package. The package is the release asset the Release workflow packed and verified (see
+# nuget-pack.sh), pushed unchanged together with its symbol package.
+#
+# Authentication is Trusted Publishing: nuget.org trusts this workflow file of this repository (a policy under the
+# account's Trusted Publishing) and exchanges the job's OIDC token for an API key valid for one hour, so no long-lived
+# key is stored. The secret NUGET_USER holds the nuget.org account name (not its e-mail).
+#
+# Run it manually with a release tag to retry a failed push; versions already on nuget.org are skipped.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. dices/1.1.5'
+        required: true
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+
+    steps:
+      # Releases cut before the NuGet feed carry no NuGet package — there is nothing to push.
+      - name: Download Packages
+        id: download
+        run: |
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -q '\.nupkg$'; then
+              echo "::notice::$TAG carries no NuGet package — nothing to push."
+              echo "found=false" >> "$GITHUB_OUTPUT"
+              exit 0
+          fi
+
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir packages --pattern '*.nupkg' --pattern '*.snupkg'
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      # The key is requested right before the push — it expires in an hour and each OIDC token yields one key.
+      - name: NuGet Login
+        id: login
+        if: steps.download.outputs.found == 'true'
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      # dotnet nuget push takes the .snupkg next to each .nupkg along to the symbol server.
+      - name: Push Packages
+        if: steps.download.outputs.found == 'true'
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "packages/*.nupkg" \
+              --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          echo "::notice::Pushed $(basename -a packages/*.nupkg | paste -sd ' ') to nuget.org."

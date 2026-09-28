@@ -18,7 +18,7 @@ our engineering.
 ### Package Manager
 
 Every package is a signed Unity package on [OpenUPM](https://openupm.com), named `com.sagittaras.gamedevkit.<package>`
-(see the [README](../README.md#getting-started) for the list) and requiring Unity 2021.3 or newer. The Package Manager
+(each package's documentation gives its exact name) and requiring Unity 2021.3 or newer. The Package Manager
 installs the dependencies between the packages for you. Add a package in one of two ways.
 
 **With [openupm-cli](https://github.com/openupm/openupm-cli)** — run in your Unity project's folder:
@@ -37,11 +37,24 @@ openupm add com.sagittaras.gamedevkit.<package>
 
 Then install the packages from **My Registries** in the Package Manager window.
 
-### Without the Package Manager
+### NuGet
+
+Outside of Unity, every package is on [NuGet](https://www.nuget.org/profiles/sagittaras) under its namespace
+(`Sagittaras.<Package>`, as each package's documentation lists it), targeting .NET Standard 2.1.
+NuGet installs the dependencies between the packages for you:
+
+```bash
+dotnet add package Sagittaras.<Package>
+```
+
+Symbols are on the NuGet symbol server, with Source Link — Rider or Visual Studio step into the package's source
+straight from GitHub. The Unity Package Manager doesn't read NuGet packages; in Unity, use OpenUPM above.
+
+### Without a Package Manager
 
 Every version also has its **[GitHub Release](https://github.com/sagittaras/gamedev-kit/releases)** with a zip archive
-of the compiled assemblies, including the DLLs of the kit packages it depends on. Reference them from a plain .NET
-project, or extract the archive under `Assets/Plugins/` in Unity — but never install the same package through OpenUPM
+of the compiled assemblies, including the DLLs of the kit packages it depends on. Reference them from a .NET project,
+or extract the archive under `Assets/Plugins/` in Unity — but never install the same package through OpenUPM
 and `Assets/Plugins/` at once, or Unity reports duplicate assemblies.
 
 #### `.pdb` and `.xml` files
@@ -100,7 +113,7 @@ if (table.TryNext(out string? loot))
 }
 ```
 
-> 📦 [Documentation](./dices/index.md) · **Unity:** [`com.sagittaras.gamedevkit.dices`](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+> 📦 [Documentation](./dices/index.md) · **Unity:** [`com.sagittaras.gamedevkit.dices`](https://openupm.com/packages/com.sagittaras.gamedevkit.dices/) · **NuGet:** [`Sagittaras.Dices`](https://www.nuget.org/packages/Sagittaras.Dices/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 
@@ -120,7 +133,7 @@ public void SetHealth(int value, int max)
 }
 ```
 
-> 📦 [Documentation](./guard-clauses/index.md) · **Unity:** [`com.sagittaras.gamedevkit.guard-clauses`](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) · **Dependencies:** none
+> 📦 [Documentation](./guard-clauses/index.md) · **Unity:** [`com.sagittaras.gamedevkit.guard-clauses`](https://openupm.com/packages/com.sagittaras.gamedevkit.guard-clauses/) · **NuGet:** [`Sagittaras.GuardClauses`](https://www.nuget.org/packages/Sagittaras.GuardClauses/) · **Dependencies:** none
 
 ---
 
@@ -146,7 +159,7 @@ if (gcd.IsReady)
 }
 ```
 
-> 📦 [Documentation](./timing/index.md) · **Unity:** [`com.sagittaras.gamedevkit.timing`](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+> 📦 [Documentation](./timing/index.md) · **Unity:** [`com.sagittaras.gamedevkit.timing`](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/) · **NuGet:** [`Sagittaras.Timing`](https://www.nuget.org/packages/Sagittaras.Timing/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 
@@ -172,7 +185,7 @@ void OnPlayerDied(PlayerDied contract)
 }
 ```
 
-> 📦 [Documentation](./messaging/index.md) · **Unity:** [`com.sagittaras.gamedevkit.messaging`](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) · **Dependencies:** none
+> 📦 [Documentation](./messaging/index.md) · **Unity:** [`com.sagittaras.gamedevkit.messaging`](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/) · **NuGet:** [`Sagittaras.Messaging`](https://www.nuget.org/packages/Sagittaras.Messaging/) · **Dependencies:** none
 
 ---
 
@@ -195,7 +208,7 @@ if (result.LeveledUp)
 level = result;
 ```
 
-> 📦 [Documentation](./progression/index.md) · **Unity:** [`com.sagittaras.gamedevkit.progression`](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+> 📦 [Documentation](./progression/index.md) · **Unity:** [`com.sagittaras.gamedevkit.progression`](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/) · **NuGet:** [`Sagittaras.Progression`](https://www.nuget.org/packages/Sagittaras.Progression/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 

@@ -5,6 +5,16 @@ Instead of components holding direct references to each other, they exchange **c
 through a central `IMediator`. Publishers don't need to know who (if anyone) is listening, and subscribers don't
 need to know who published.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Messaging` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.messaging/)) | `com.sagittaras.gamedevkit.messaging` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Messaging/)) | `Sagittaras.Messaging` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 This package has no dependencies on other packages from the kit.

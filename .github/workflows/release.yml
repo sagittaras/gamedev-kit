@@ -40,9 +40,10 @@ jobs:
       - name: Install Unity UPM CLI
         run: bash .github/scripts/install-upm-cli.sh
 
-      # One draft per package due for release, with its zip archive and — for a Unity package — its signed
-      # Unity package, which OpenUPM publishes once the draft is published. Every Unity package due for
-      # release must pass the gate first; otherwise nothing is drafted (see release-drafts.sh).
+      # One draft per package due for release, with its NuGet package, its zip archive and — for a Unity package —
+      # its signed Unity package. Once the draft is published, the NuGet workflow pushes the NuGet package to
+      # nuget.org and OpenUPM publishes the Unity package. Every Unity package due for release must pass the gate
+      # first; otherwise nothing is drafted (see release-drafts.sh).
       - name: Draft Releases
         env:
           GH_TOKEN: ${{ github.token }}
