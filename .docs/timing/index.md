@@ -3,6 +3,16 @@
 `Sagittaras.Timing` is a delta-time based timing library for game loops. It provides lightweight timer
 primitives that accumulate time across frames. Reducing the _cooldown boilerplate_ in the code.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Timing` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.timing/)) | `com.sagittaras.gamedevkit.timing` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Timing/)) | `Sagittaras.Timing` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 | Package | Required |

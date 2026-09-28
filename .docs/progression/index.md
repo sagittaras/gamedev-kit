@@ -5,6 +5,16 @@ tracking experience and level progress (`Experience`, `Progress`, `Level`), and 
 that decides how much experience is required to reach the next level — so the progression curve is a single
 pluggable piece rather than something scattered across your gameplay code.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Progression` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.progression/)) | `com.sagittaras.gamedevkit.progression` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Progression/)) | `Sagittaras.Progression` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 | Package | Required |
