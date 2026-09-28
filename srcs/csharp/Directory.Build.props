@@ -5,8 +5,25 @@
         <PackageReference Include="Nerdbank.GitVersioning" Version="3.10.94" PrivateAssets="all" />
     </ItemGroup>
 
-    <!-- The Unity package pre-image commits its PDB: deterministic source paths keep the local disk layout out of it. -->
-    <PropertyGroup Condition="'$(UpdateUnityPackage)' == 'true' Or '$(UpdateUnityPackage)' == 'force'">
+    <!--
+        NuGet metadata shared by every released package; Title and Description stay in its csproj. The symbol package
+        carries the PDB with Source Link, the same one the zip archive and the Unity package ship.
+    -->
+    <PropertyGroup Condition="Exists('$(MSBuildProjectDirectory)/version.json')">
+        <Authors>Sagittaras Games</Authors>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/sagittaras/gamedev-kit</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/sagittaras/gamedev-kit</RepositoryUrl>
+        <PackageTags>gamedev;game-development;unity</PackageTags>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <!--
+        Deterministic source paths keep the local disk layout out of the PDB — the Unity package pre-image commits it,
+        and the release builds on GitHub Actions ship it in the zip archive and the symbol package.
+    -->
+    <PropertyGroup Condition="'$(UpdateUnityPackage)' == 'true' Or '$(UpdateUnityPackage)' == 'force' Or '$(GITHUB_ACTIONS)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 

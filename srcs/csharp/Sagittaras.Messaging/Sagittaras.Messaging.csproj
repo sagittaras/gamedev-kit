@@ -5,11 +5,7 @@
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
         <Title>Mediator</Title>
-        <Authors>Sagittaras Games</Authors>
         <Description>Mediator Pattern created for game development.</Description>
-        <PackageProjectUrl>https://github.com/sagittaras/gamedev-kit</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/sagittaras/gamedev-kit</RepositoryUrl>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
