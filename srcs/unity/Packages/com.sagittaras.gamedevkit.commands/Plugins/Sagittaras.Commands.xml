@@ -1,0 +1,2414 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Commands</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Commands.AsyncCommand">
+            <summary>
+                A command whose work has to be awaited.
+            </summary>
+            <remarks>
+                Written exactly like a <see cref="T:Sagittaras.Commands.Command"/> - parameters declared in the constructor, values
+                read back through the same handles - and reached only through the awaiting entrypoint of the
+                manager. Reach for it when the work genuinely leaves the calling frame, such as loading a scene
+                or asking the game server; anything answering right away is better off synchronous.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.AsyncCommand.#ctor(System.String,System.String)">
+            <summary>
+                Creates a command answering to the given name.
+            </summary>
+            <param name="name">Name of the command, serving as its calling sign.</param>
+            <param name="description">Short description of the command's usage.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.AsyncCommand.InvokeAsync(Sagittaras.Commands.Invocation.ICommandInput,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Commands.Building.CommandRegistryBuilder">
+            <summary>
+                Collects the commands and hands out the manager serving them.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Building.CommandRegistryBuilder._commands">
+            <summary>
+                Commands reachable by naming them first.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Building.CommandRegistryBuilder._parser">
+            <summary>
+                Parser reading the lines of input, or null while the default one is to be used.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Building.CommandRegistryBuilder._withHelp">
+            <summary>
+                Whether the built-in help is added when the manager is built.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.Add(Sagittaras.Commands.ICommand)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.WithParser(Sagittaras.Commands.Parsing.ICommandParser)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.WithHelp">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.Build">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.WithHelpCommand(Sagittaras.Commands.ICommand[])">
+            <summary>
+                Adds the built-in help over the commands, as the last of them.
+            </summary>
+            <param name="commands">Commands the help describes.</param>
+            <returns>Returns the commands with the help behind them.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when a command already bears the name of the help.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.Validate(Sagittaras.Commands.ICommand)">
+            <summary>
+                Checks over the command and everything below it.
+            </summary>
+            <remarks>
+                The bases of the package keep a command from being built wrongly in the first place, but
+                nothing stops an <see cref="T:Sagittaras.Commands.ICommand"/> of somebody else's making from arriving here, and a
+                command the parser could resolve but nobody could run is worth hearing about now.
+            </remarks>
+            <param name="command">Command to check over.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown when the command or one below it could never be reached or run.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.RequireOptionalArgumentsLast(Sagittaras.Commands.ICommand)">
+            <summary>
+                Ensures no required argument of the command stands behind an optional one.
+            </summary>
+            <remarks>
+                Values go to the arguments in the order they are declared, and the parser cannot know the line
+                meant to leave an optional argument out until it runs out of values. An optional argument in front
+                of a required one would therefore always take the value meant for the required one, and the
+                required one would be reported missing on a line that held everything the command needs.
+            </remarks>
+            <param name="command">Command whose arguments are checked.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown when a required argument stands behind an optional one.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.CommandRegistryBuilder.Holds(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},System.String)">
+            <summary>
+                Tells whether the commands already hold one of the given name.
+            </summary>
+            <remarks>
+                Names are told apart the way the input is matched against them, which ignores the case.
+            </remarks>
+            <param name="commands">Commands to look through.</param>
+            <param name="name">Name to look for.</param>
+            <returns>Returns true when a command of that name is already held; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Building.ICommandRegistryBuilder">
+            <summary>
+                Collects the commands a console offers and builds the <see cref="T:Sagittaras.Commands.ICommandManager"/> serving them.
+            </summary>
+            <remarks>
+                <para>
+                    Registration is deliberately the expensive half. Whatever can be said about a command before
+                    anybody types anything - that it can be run at all, that it does not hold subcommands and
+                    positional arguments at once, that its optional arguments come last, that no two siblings answer
+                    to the same name - is decided here, once during the boot, so that a console line is only ever
+                    matched.
+                </para>
+                <para>
+                    Commands arrive fully formed, with their own subcommands and parameters already declared.
+                    There is nothing to compose here on purpose: a command is a type, so the hierarchy is read
+                    from the constructors of those types rather than assembled twice.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.ICommandRegistryBuilder.Add(Sagittaras.Commands.ICommand)">
+            <summary>
+                Registers a command reachable by naming it first.
+            </summary>
+            <remarks>
+                The whole subtree below it is checked over as well, so a command that could never be reached
+                or never be run is heard about here and not from a console line that fails to do anything.
+            </remarks>
+            <param name="command">Command to register.</param>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when a command of the same name is already registered, or when the command or one below
+                it cannot be run, holds subcommands next to positional arguments, declares a required argument
+                behind an optional one, or holds two subcommands of the same name.
+            </exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.ICommandRegistryBuilder.WithParser(Sagittaras.Commands.Parsing.ICommandParser)">
+            <summary>
+                Replaces the way the lines of input are read.
+            </summary>
+            <remarks>
+                The place to hand in a parser of another syntax, or the default one carrying a converter that
+                knows the types of the game - <c>new CommandParser(new MyValueConverter())</c>.
+            </remarks>
+            <param name="parser">Parser reading the lines of input.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.ICommandRegistryBuilder.WithHelp">
+            <summary>
+                Adds the built-in help to the commands the manager is built with.
+            </summary>
+            <remarks>
+                The help is created by <see cref="M:Sagittaras.Commands.Building.ICommandRegistryBuilder.Build"/>, when every command it is to describe is known, and it
+                describes those - including the ones registered after this call. It answers to
+                <see cref="F:Sagittaras.Commands.Help.HelpCommand.CommandName"/>, so no registered command may bear that name.
+            </remarks>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Building.ICommandRegistryBuilder.Build">
+            <summary>
+                Creates the manager from the current registrations.
+            </summary>
+            <remarks>
+                Registrations are copied, so further changes of the builder do not affect already created
+                managers.
+            </remarks>
+            <returns>Returns the manager serving the registered commands.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when the help was asked for but a registered command already bears its name.</exception>
+        </member>
+        <member name="T:Sagittaras.Commands.Command">
+             <summary>
+                 A command doing its work within the call that invoked it.
+             </summary>
+             <remarks>
+                 <para>
+                     The shape most commands are written in. Parameters are declared in the constructor and read
+                     back in <see cref="M:Sagittaras.Commands.Command.Invoke(Sagittaras.Commands.Invocation.ICommandInput)"/> through the very same handles:
+                 </para>
+                 <code>
+                     public class SpawnEntityCommand : Command
+                     {
+                         private static readonly Argument&lt;string&gt; Entity = new("entity", "Entity to spawn");
+                         private static readonly Option&lt;int&gt; Count = new("count", "How many to spawn", 1, "c");
+            
+                         public SpawnEntityCommand() : base("entity", "Spawns an entity into the active scene")
+                         {
+                             Accepts(Entity, Count);
+                         }
+            
+                         public override ICommandOutput Invoke(ICommandInput input)
+                         {
+                             return CommandOutput.Success($"Spawned {input.GetValue&lt;int&gt;(Count)}x {input.GetValue&lt;string&gt;(Entity)}");
+                         }
+                     }
+                 </code>
+                 <para>
+                     A command written this way cannot hold subcommands - branches of the hierarchy are
+                     <see cref="T:Sagittaras.Commands.CommandGroup"/>, which is what keeps a token behind the command from meaning two
+                     things at once. Work that has to be awaited belongs to <see cref="T:Sagittaras.Commands.AsyncCommand"/> instead.
+                 </para>
+             </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Command.#ctor(System.String,System.String)">
+            <summary>
+                Creates a command answering to the given name.
+            </summary>
+            <param name="name">Name of the command, serving as its calling sign.</param>
+            <param name="description">Short description of the command's usage.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.Command.Invoke(Sagittaras.Commands.Invocation.ICommandInput)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Commands.CommandBase">
+            <summary>
+                Holds what every command has - a name, a description and the parameters it declares.
+            </summary>
+            <remarks>
+                <para>
+                    Not implemented directly. A command is written as a <see cref="T:Sagittaras.Commands.Command"/> or an
+                    <see cref="T:Sagittaras.Commands.AsyncCommand"/> when it does the work itself, or as a <see cref="T:Sagittaras.Commands.CommandGroup"/>
+                    when it only holds others.
+                </para>
+                <para>
+                    Everything is declared in the constructor and nothing changes afterwards. Registration is
+                    where the cost belongs, and a command reached from a console line is then only read.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.CommandBase._arguments">
+            <summary>
+                Positional arguments, in the order the input is expected to carry them.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.CommandBase._options">
+            <summary>
+                Named options, in the order they were declared.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.CommandBase.#ctor(System.String,System.String)">
+            <summary>
+                Creates a command answering to the given name.
+            </summary>
+            <param name="name">Name of the command, serving as its calling sign.</param>
+            <param name="description">Short description of the command's usage.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the name is empty or holds white space.</exception>
+        </member>
+        <member name="P:Sagittaras.Commands.CommandBase.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.CommandBase.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.CommandBase.Subcommands">
+            <inheritdoc />
+            <remarks>
+                Empty unless the command is a <see cref="T:Sagittaras.Commands.CommandGroup"/>, which is the only shape a branch of
+                the hierarchy is written in.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.CommandBase.Arguments">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.CommandBase.Options">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandBase.Accepts(Sagittaras.Commands.Parameters.IParameter[])">
+            <summary>
+                Declares the parameters the command reads its values from.
+            </summary>
+            <remarks>
+                Takes both kinds at once, as the difference between them is a matter of how the input is read
+                and not of what the command does with the value. Arguments keep the order they are declared
+                in, because that is the order the input is expected in; options are order-free.
+            </remarks>
+            <param name="parameters">Parameters to declare.</param>
+            <exception cref="T:System.ArgumentException">Thrown when a parameter is neither an argument nor an option.</exception>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when a positional argument is declared by a command that already holds subcommands - a
+                token behind it would be both a subcommand name and the value of the argument.
+            </exception>
+        </member>
+        <member name="T:Sagittaras.Commands.CommandGroup">
+            <summary>
+                A branch of the hierarchy, reached by naming one of the commands it holds.
+            </summary>
+            <remarks>
+                <para>
+                    Subcommands are added in the constructor, which makes the branch a type of its own with
+                    somewhere to keep its description and its options:
+                </para>
+                <code>
+                    public class SpawnCommand : CommandGroup
+                    {
+                        public SpawnCommand() : base("spawn", "Spawns things into the active scene")
+                        {
+                            Add(new SpawnEntityCommand());
+                            Add(new SpawnItemCommand());
+                        }
+                    }
+                </code>
+                <para>
+                    A group declares no positional arguments - that is the whole point of it being a group - but
+                    options are fine, as they cannot be mistaken for the name of a subcommand. Being named
+                    without one of them is not an error of the input as much as an unfinished thought, and
+                    <see cref="M:Sagittaras.Commands.CommandGroup.Invoke(Sagittaras.Commands.Invocation.ICommandInput)"/> answers it with what the group offers.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.CommandGroup._subcommands">
+            <summary>
+                Commands reached by naming them behind this one.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.CommandGroup.#ctor(System.String,System.String)">
+            <summary>
+                Creates a group answering to the given name.
+            </summary>
+            <param name="name">Name of the command, serving as its calling sign.</param>
+            <param name="description">Short description of what the group gathers.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.CommandGroup.Subcommands">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandGroup.Invoke(Sagittaras.Commands.Invocation.ICommandInput)">
+            <summary>
+                Answers the group being named without one of its subcommands.
+            </summary>
+            <remarks>
+                Reports what the group offers, as there is nothing else it could have been asked for. A group
+                with something better to say - a state of its own, a default subcommand - overrides this.
+            </remarks>
+            <param name="input">Values bound for this invocation.</param>
+            <returns>Returns the <see cref="T:Sagittaras.Commands.Invocation.UsageOutput"/> of the group.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.CommandGroup.Add(Sagittaras.Commands.ICommand)">
+            <summary>
+                Adds a command reached by naming it behind this one.
+            </summary>
+            <remarks>
+                Names are told apart the way the input is matched against them, which ignores the case - so
+                two siblings differing only by it would leave one of them unreachable.
+            </remarks>
+            <param name="subcommand">Command to add.</param>
+            <exception cref="T:System.InvalidOperationException">
+                Thrown when the group already declares a positional argument, or already holds a command of
+                the same name.
+            </exception>
+        </member>
+        <member name="M:Sagittaras.Commands.CommandGroup.HoldsName(System.String)">
+            <summary>
+                Tells whether the group already holds a command of the given name.
+            </summary>
+            <param name="name">Name to look for.</param>
+            <returns>Returns true when a subcommand of that name is already held; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.CommandManager">
+            <summary>
+                Holds the registered commands and reaches them through the parser it was built with.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.CommandManager._parser">
+            <summary>
+                Parser reading the lines of input against the registered commands.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.#ctor(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},Sagittaras.Commands.Parsing.ICommandParser)">
+            <summary>
+                Creates a manager over the registered commands.
+            </summary>
+            <param name="commands">Commands the first token of an input is resolved against.</param>
+            <param name="parser">Parser reading the lines of input.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.CommandManager.Commands">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.Parse(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.Execute(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.Execute(Sagittaras.Commands.Parsing.IParseResult)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.ExecuteAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.ExecuteAsync(Sagittaras.Commands.Parsing.IParseResult,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.CommandManager.Refuse(Sagittaras.Commands.Parsing.IParseResult)">
+            <summary>
+                Answers an input the parser could not make sense of.
+            </summary>
+            <param name="result">Result of parsing an input.</param>
+            <returns>Returns the <see cref="T:Sagittaras.Commands.Parsing.RefusalOutput"/> carrying the failed parsing.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Help.HelpCommand">
+            <summary>
+                The built-in help - the commands there are when named alone, everything about one when a path follows.
+            </summary>
+            <remarks>
+                <para>
+                    The path behind it can be as long as the hierarchy is deep, and positional arguments come in a
+                    fixed number. So rather than taking the path as values, the help holds a mirror of the whole
+                    hierarchy as its subcommands: <c>help spawn entity</c> is walked by the parser like any other
+                    line, and gets everything the parser gives any other line - names matched ignoring the case, the
+                    tokens stamped for highlighting, a mistyped name reported and pointed at.
+                </para>
+                <para>
+                    Created by <see cref="M:Sagittaras.Commands.Building.ICommandRegistryBuilder.WithHelp"/> when the manager is built, as it
+                    has to know every command registered by then; the mirror is of those, and later registrations
+                    never reach it - the same way they never reach the manager itself.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Help.HelpCommand.CommandName">
+            <summary>
+                Name the built-in help answers to.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Help.HelpCommand._commands">
+            <summary>
+                Commands the overview lists, the help itself among them.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpCommand.#ctor(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand})">
+            <summary>
+                Creates the help over the given commands.
+            </summary>
+            <param name="commands">Commands reachable by naming them first, the help itself not among them.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpCommand.Invoke(Sagittaras.Commands.Invocation.ICommandInput)">
+            <summary>
+                Answers the help named alone with the overview of the commands there are.
+            </summary>
+            <param name="input">Values bound for this invocation.</param>
+            <returns>Returns the overview.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Help.HelpOutput">
+            <summary>
+                What the built-in help answers with - either the commands there are, or everything about one of them.
+            </summary>
+            <remarks>
+                <para>
+                    Carries the commands themselves, so a console with an interface of its own can lay the help out
+                    its own way - a table of the arguments, the options coloured by kind, the subcommands as links -
+                    and one without it prints <see cref="P:Sagittaras.Commands.Invocation.CommandOutput.Content"/>, which says the same in plain text.
+                </para>
+                <para>
+                    A command does not know the branch it hangs under, so the help carries the whole
+                    <see cref="P:Sagittaras.Commands.Help.HelpOutput.Path"/> down to it. That is what lets the usage read <c>spawn entity &lt;entity&gt;</c>
+                    rather than <c>entity &lt;entity&gt;</c>, which could not be typed.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.#ctor(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},System.String)">
+            <summary>
+                Creates a help of the given parts.
+            </summary>
+            <param name="path">Commands leading to the one described, empty for the overview.</param>
+            <param name="commands">Commands the help lists.</param>
+            <param name="content">Plain reading of the help.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Help.HelpOutput.Path">
+            <summary>
+                Commands leading from the top of the hierarchy down to the one described.
+            </summary>
+            <remarks>
+                Empty for the overview of all the commands.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Help.HelpOutput.Command">
+            <summary>
+                Command the help describes, or null for the overview.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Help.HelpOutput.Commands">
+            <summary>
+                Commands the help lists - all of them for the overview, the subcommands of a branch otherwise.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Overview(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand})">
+            <summary>
+                Creates the overview of the commands there are.
+            </summary>
+            <param name="commands">Commands reachable by naming them first.</param>
+            <returns>Returns the overview.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.About(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand})">
+            <summary>
+                Creates the help about a single command.
+            </summary>
+            <param name="path">Commands leading from the top of the hierarchy down to the one described, itself last.</param>
+            <returns>Returns the help about the last command of the path.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the path is empty.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Describe(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},Sagittaras.Commands.ICommand)">
+            <summary>
+                Writes out everything there is to know about the command.
+            </summary>
+            <param name="path">Commands leading down to the described one.</param>
+            <param name="command">Command to describe.</param>
+            <returns>Returns the plain reading of the help.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Usage(System.String,Sagittaras.Commands.ICommand)">
+            <summary>
+                Spells the way the command is typed, with a placeholder for everything it takes.
+            </summary>
+            <remarks>
+                A required argument reads <c>&lt;name&gt;</c> and an optional one <c>[name]</c>; the options stand
+                behind the arguments, where the parser expects the path to have ended.
+            </remarks>
+            <param name="spelled">Path of the command, spelled.</param>
+            <param name="command">Command to spell the usage of.</param>
+            <returns>Returns the usage line.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Label(Sagittaras.Commands.Parameters.IOption)">
+            <summary>
+                Names an option by every calling sign it answers to, the way the input spells them.
+            </summary>
+            <param name="option">Option to name.</param>
+            <returns>Returns the calling signs, and a placeholder for the value when the option takes one.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Prefixed(System.String)">
+            <summary>
+                Spells a name with the prefix it is usually typed with - one dash for a single letter, two otherwise.
+            </summary>
+            <param name="name">Name of the option.</param>
+            <returns>Returns the name with its prefix.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Explain(Sagittaras.Commands.Parameters.IArgument)">
+            <summary>
+                Explains an argument, with the value it falls back to when it may be left out.
+            </summary>
+            <param name="argument">Argument to explain.</param>
+            <returns>Returns the explanation.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.Explain(Sagittaras.Commands.Parameters.IOption)">
+            <summary>
+                Explains an option, with the value it falls back to unless it is a flag.
+            </summary>
+            <remarks>
+                A flag is off until named, which says nothing worth repeating.
+            </remarks>
+            <param name="option">Option to explain.</param>
+            <returns>Returns the explanation.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.WithDefault(System.String,System.Object)">
+            <summary>
+                Adds the default to a description, spelled the way the input would spell it.
+            </summary>
+            <remarks>
+                Spelled with the invariant culture, as the input is read with it - a default shown as <c>1,5</c>
+                would be refused if typed back.
+            </remarks>
+            <param name="description">Description of the parameter.</param>
+            <param name="value">Default of the parameter.</param>
+            <returns>Returns the description, with the default behind it when there is one.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.AppendSection(System.Text.StringBuilder,System.String,System.Collections.Generic.IEnumerable{System.ValueTuple{System.String,System.String}})">
+            <summary>
+                Adds a titled section of rows, separated from what comes before by an empty line.
+            </summary>
+            <param name="content">Help being written.</param>
+            <param name="title">Title of the section.</param>
+            <param name="rows">Rows of the section, a label and its explanation each.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpOutput.AppendRows(System.Text.StringBuilder,System.Collections.Generic.IReadOnlyList{System.ValueTuple{System.String,System.String}})">
+            <summary>
+                Adds rows with the explanations lined up behind the longest label.
+            </summary>
+            <param name="content">Help being written.</param>
+            <param name="rows">Rows to add, a label and its explanation each.</param>
+        </member>
+        <member name="T:Sagittaras.Commands.Help.HelpTopic">
+            <summary>
+                A mirror of a registered command within the help, answering with everything about the command it
+                mirrors.
+            </summary>
+            <remarks>
+                <para>
+                    It bears the name and the description of the mirrored command, so the parser walks
+                    <c>help spawn entity</c> the same way it walks <c>spawn entity</c>, and it mirrors the subcommands
+                    the same way. It declares no parameters of its own - what follows the path of a help is nothing
+                    to read - and it answers about the command it mirrors, never about itself, so a console receives
+                    the real command with its real parameters.
+                </para>
+                <para>
+                    The mirror of the help itself mirrors nothing further; the help holds mirrors, and a mirror of a
+                    mirror would describe a command with none of the parameters of the one it stands for.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Help.HelpTopic._path">
+            <summary>
+                Commands leading down to the mirrored one, itself last.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpTopic.#ctor(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},System.Boolean)">
+            <summary>
+                Creates a mirror of the last command of the path.
+            </summary>
+            <param name="path">Commands leading down to the mirrored one, itself last.</param>
+            <param name="mirrorSubcommands">Whether the subcommands of the mirrored command are mirrored too.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.Help.HelpTopic.Invoke(Sagittaras.Commands.Invocation.ICommandInput)">
+            <summary>
+                Answers with everything about the mirrored command.
+            </summary>
+            <param name="input">Values bound for this invocation.</param>
+            <returns>Returns the help about the mirrored command.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.IAsyncCommand">
+            <summary>
+                A command whose answer has to be awaited.
+            </summary>
+            <remarks>
+                For work that genuinely leaves the calling frame - loading a scene, asking the game server,
+                waiting for the next frame. A command is either this or <see cref="T:Sagittaras.Commands.ISyncCommand"/>, never both,
+                and being asynchronous costs it the synchronous entrypoint of the manager: blocking on the
+                result would deadlock on the very thread a developer console tends to live on.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.IAsyncCommand.InvokeAsync(Sagittaras.Commands.Invocation.ICommandInput,System.Threading.CancellationToken)">
+            <summary>
+                Runs the command over the values it was given.
+            </summary>
+            <remarks>
+                Bound the same way and under the same guarantees as <see cref="M:Sagittaras.Commands.ISyncCommand.Invoke(Sagittaras.Commands.Invocation.ICommandInput)"/> -
+                what reaches this point is an input the parser has already made sense of.
+            </remarks>
+            <param name="input">Values bound for this invocation.</param>
+            <param name="cancellationToken">Token cancelling the invocation, raised when the console abandons it.</param>
+            <returns>Returns the result of the invocation.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.ICommand">
+            <summary>
+                Describes a single, available command.
+            </summary>
+            <remarks>
+                <para>
+                    The interface is description only - everything the parser needs to recognize the command on
+                    the input, and nothing about running it. Invoking belongs to <see cref="T:Sagittaras.Commands.ISyncCommand"/> and
+                    <see cref="T:Sagittaras.Commands.IAsyncCommand"/>, so it is one of those two a command implements; this one is the
+                    common base they are both reached through.
+                </para>
+                <para>
+                    Keeping the two apart is what lets the parser resolve an input without ever being able to
+                    run what it resolved, and lets a command be invoked without a parser having been involved at
+                    all - a button in the editor tooling or a startup script composes an
+                    <see cref="T:Sagittaras.Commands.Invocation.ICommandInput"/> of its own and calls the command directly.
+                </para>
+                <para>
+                    A command either holds <see cref="P:Sagittaras.Commands.ICommand.Subcommands"/> or declares <see cref="P:Sagittaras.Commands.ICommand.Arguments"/>, never
+                    both. <see cref="P:Sagittaras.Commands.ICommand.Options"/> are free of that rule, as they carry their own calling sign.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.ICommand.Name">
+            <summary>
+                Name of the command, serving as its calling sign.
+            </summary>
+            <remarks>
+                A single token, unique among the siblings it is resolved against - the commands of the
+                registry at the top level, the <see cref="P:Sagittaras.Commands.ICommand.Subcommands"/> of the parent below it. The full
+                path the input spells out is therefore never stated here, it is walked.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.ICommand.Description">
+            <summary>
+                Short description of the command's usage.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.ICommand.Subcommands">
+            <summary>
+                Commands reached by naming them behind this one.
+            </summary>
+            <remarks>
+                A command holding subcommands is a branch of the hierarchy, and reaching it without naming
+                one of them is not an error - the usual answer is the usage of what it offers.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.ICommand.Arguments">
+            <summary>
+                Values the command reads from their place in the input, in the order it expects them.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.ICommand.Options">
+            <summary>
+                Values the command reads by name, in any order.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Commands.ICommandManager">
+            <summary>
+                The entrypoint a console reaches the registered commands through.
+            </summary>
+            <remarks>
+                <para>
+                    Built once by <see cref="T:Sagittaras.Commands.Building.ICommandRegistryBuilder"/> and only read afterwards, so a
+                    line typed into the console costs a walk of the hierarchy and nothing else.
+                </para>
+                <para>
+                    What used to be the root of the hierarchy is the manager itself: it holds the commands the
+                    first token is resolved against, and the parsing is a service it asks. A console that only
+                    wants to run a line reaches for <c>Execute</c>; one that wants to show what a line means
+                    before committing to it parses first and runs the result it already has.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.ICommandManager.Commands">
+            <summary>
+                Commands the first token of an input is resolved against.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.ICommandManager.Parse(System.String)">
+            <summary>
+                Reads the input without running anything.
+            </summary>
+            <remarks>
+                Worth reaching for to answer a line before it is committed to - completing it, highlighting
+                it, telling what it would do - and to tell a synchronous command from an asynchronous one
+                before choosing how to run it.
+            </remarks>
+            <param name="input">Line of input, as it was typed.</param>
+            <returns>Returns what the parser made of the input, successful or not.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.ICommandManager.Execute(System.String)">
+            <summary>
+                Reads the input and runs what it resolved to.
+            </summary>
+            <remarks>
+                An input the parser could not make sense of is answered with a <see cref="T:Sagittaras.Commands.Parsing.RefusalOutput"/>
+                carrying the failed parsing, not with an exception - a console has somewhere to print either, can
+                point at the word that was wrong, and a typo is not worth a stack trace.
+            </remarks>
+            <param name="input">Line of input, as it was typed.</param>
+            <returns>Returns the result of the invocation, or the reason the input could not be read.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when the input resolves to an <see cref="T:Sagittaras.Commands.IAsyncCommand"/>.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.ICommandManager.Execute(Sagittaras.Commands.Parsing.IParseResult)">
+            <summary>
+                Runs what an already parsed input resolved to.
+            </summary>
+            <param name="result">Result of parsing an input.</param>
+            <returns>Returns the result of the invocation, or the reason the input could not be read.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when the result resolves to an <see cref="T:Sagittaras.Commands.IAsyncCommand"/>.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.ICommandManager.ExecuteAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+                Reads the input and awaits what it resolved to.
+            </summary>
+            <remarks>
+                Reaches both kinds of command - a synchronous one answers within the call and the task is
+                already completed - so a console with an awaiting loop needs nothing else. The synchronous
+                entrypoint deliberately refuses an <see cref="T:Sagittaras.Commands.IAsyncCommand"/> instead of blocking on it,
+                which on the thread a console tends to live on would deadlock rather than wait.
+            </remarks>
+            <param name="input">Line of input, as it was typed.</param>
+            <param name="cancellationToken">Token cancelling the invocation, raised when the console abandons it.</param>
+            <returns>Returns the result of the invocation, or the reason the input could not be read.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.ICommandManager.ExecuteAsync(Sagittaras.Commands.Parsing.IParseResult,System.Threading.CancellationToken)">
+            <summary>
+                Awaits what an already parsed input resolved to.
+            </summary>
+            <param name="result">Result of parsing an input.</param>
+            <param name="cancellationToken">Token cancelling the invocation, raised when the console abandons it.</param>
+            <returns>Returns the result of the invocation, or the reason the input could not be read.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Invocation.BoundValue">
+            <summary>
+                A value bound for a parameter, together with whether the input named it.
+            </summary>
+            <remarks>
+                Keeping the two in one place is what makes a value that was bound but never marked - or marked but
+                never bound - impossible to arrive at. Held apart, in a dictionary of values and a set of the
+                specified parameters, they had to be kept in step by every line that touched either.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.BoundValue.#ctor(System.Object,System.Boolean)">
+            <summary>
+                Creates a bound value.
+            </summary>
+            <param name="value">Value bound for the parameter.</param>
+            <param name="isSpecified">Whether the value came from the input rather than from the default.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.BoundValue.Value">
+            <summary>
+                Value bound for the parameter.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.BoundValue.IsSpecified">
+            <summary>
+                Whether the value came from the input rather than from the default of the parameter.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.BoundValue.Given(System.Object)">
+            <summary>
+                Binds a value the input named itself.
+            </summary>
+            <param name="value">Value the input carried.</param>
+            <returns>Returns the bound value, marked as specified.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.BoundValue.Defaulted(System.Object)">
+            <summary>
+                Binds the value a parameter falls back to.
+            </summary>
+            <param name="value">Default of the parameter.</param>
+            <returns>Returns the bound value, marked as not specified.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Invocation.CommandInput">
+            <summary>
+                The values a single invocation of a command was given.
+            </summary>
+            <remarks>
+                Built by the parser out of a line of input, or composed directly by whoever has the values
+                already - a button in the editor tooling, a startup script, a test. Either way the command sees
+                the same thing, which is what keeps the parsing out of the invocation.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Invocation.CommandInput._values">
+            <summary>
+                Values bound for the parameters of the command, each knowing whether the input named it.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.#ctor(Sagittaras.Commands.ICommand,System.Collections.Generic.IReadOnlyDictionary{Sagittaras.Commands.Parameters.IParameter,System.Object})">
+            <summary>
+                Composes an input for the command out of the values that are already known.
+            </summary>
+            <remarks>
+                Parameters left out fall back to their own default, and are reported as not specified. The given
+                values are held to the same rules a line of input is: they have to be of the declared type and
+                pass the validator of their parameter. Defaults are not judged, as nobody gave them.
+            </remarks>
+            <param name="command">Command the values are meant for.</param>
+            <param name="values">Values known for the parameters of the command.</param>
+            <exception cref="T:System.ArgumentException">
+                Thrown when a value is given for a parameter the command does not declare, when a required
+                argument is left without one, when a given value is not of the declared type, or when the
+                validator of its parameter refuses it.
+            </exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.#ctor(System.Collections.Generic.Dictionary{Sagittaras.Commands.Parameters.IParameter,Sagittaras.Commands.Invocation.BoundValue})">
+            <summary>
+                Creates an input out of what the binding arrived at.
+            </summary>
+            <param name="values">Values bound for the parameters of the command.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.IsSpecified(Sagittaras.Commands.Parameters.IParameter)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.GetValue``1(Sagittaras.Commands.Parameters.IParameter)">
+            <inheritdoc />
+            <exception cref="T:System.ArgumentException">Thrown when the parameter is not one this input was built for.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.TryGetValue``1(Sagittaras.Commands.Parameters.IParameter,``0@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.Take(Sagittaras.Commands.Parameters.IParameter,System.Collections.Generic.IReadOnlyDictionary{Sagittaras.Commands.Parameters.IParameter,System.Object},System.Boolean)">
+            <summary>
+                Takes the value known for the parameter, or falls back to its default.
+            </summary>
+            <param name="parameter">Parameter to take the value of.</param>
+            <param name="values">Values known for the parameters of the command.</param>
+            <param name="mayBeMissing">Whether the parameter is allowed to be left out.</param>
+            <exception cref="T:System.ArgumentException">Thrown when a parameter that has to be given is left out, or when a given value is refused.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.RequireAccepted(Sagittaras.Commands.Parameters.IParameter,System.Object,System.String)">
+            <summary>
+                Ensures a given value is one the parameter would have taken from a line of input.
+            </summary>
+            <remarks>
+                <para>
+                    A composed input skips the parsing, but not the rules of the parameter - a command has to be
+                    able to rely on its validator whether the value came from the console or from a button in the
+                    editor tooling. The value is judged the same way the binding judges one, in the validator's own
+                    words.
+                </para>
+                <para>
+                    The type is checked first, as the validator judges a value of the declared type and a value of
+                    another one would only break it with a cast nobody could read.
+                </para>
+            </remarks>
+            <param name="parameter">Parameter the value is given for.</param>
+            <param name="value">Value given for the parameter.</param>
+            <param name="paramName">Name of the argument the values arrived in, as reported by the exception.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the value is not of the declared type, or when the validator refuses it.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.Fits(System.Type,System.Object)">
+            <summary>
+                Tells whether the value can be held by a parameter of the given type.
+            </summary>
+            <param name="valueType">Type the parameter declares.</param>
+            <param name="value">Value to ask about.</param>
+            <returns>Returns true when the value is of the type, or null where the type allows it; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandInput.RequireDeclared(Sagittaras.Commands.ICommand,System.Collections.Generic.IReadOnlyDictionary{Sagittaras.Commands.Parameters.IParameter,System.Object})">
+            <summary>
+                Ensures no value was given for a parameter the command does not declare.
+            </summary>
+            <remarks>
+                A value nobody reads is a mistake worth hearing about - most often a parameter of another
+                command, or one that was renamed.
+            </remarks>
+            <param name="command">Command the values are meant for.</param>
+            <param name="values">Values known for the parameters of the command.</param>
+            <exception cref="T:System.ArgumentException">Thrown when a value is given for an undeclared parameter.</exception>
+        </member>
+        <member name="T:Sagittaras.Commands.Invocation.CommandOutput">
+            <summary>
+                The plain result of an invocation - an exit code and what there is to read about it.
+            </summary>
+            <remarks>
+                Enough for a command whose answer is text. One that answers with more than that - a table of
+                items, a tree of entities - derives its own output carrying the payload, and whoever receives it
+                decides by the type how to show it, while <see cref="P:Sagittaras.Commands.Invocation.CommandOutput.Content"/> stays the plain reading of the same
+                answer for anybody who does not know the type. The package answers this way itself, with
+                <see cref="T:Sagittaras.Commands.Invocation.UsageOutput"/> for a branch named alone and <c>RefusalOutput</c> for a line it could not
+                read.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandOutput.#ctor(System.Int32,System.String)">
+            <summary>
+                Creates an output of the given exit code.
+            </summary>
+            <param name="exitCode">Exit code of the invocation, zero for success.</param>
+            <param name="content">Content of the invocation.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.CommandOutput.ExitCode">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.CommandOutput.Content">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandOutput.Success(System.String)">
+            <summary>
+                Creates an output of a command that did its work.
+            </summary>
+            <param name="content">Content of the invocation, empty when the work speaks for itself.</param>
+            <returns>Returns the output of a successful invocation.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.CommandOutput.Failure(System.String,System.Int32)">
+            <summary>
+                Creates an output of a command that could not do its work.
+            </summary>
+            <remarks>
+                For what the command itself ran into - a missing entity, a scene that is not loaded. What the
+                input was wrong about never reaches an invocation.
+            </remarks>
+            <param name="content">Reading of what went wrong.</param>
+            <param name="exitCode">Exit code of the invocation, telling the failures apart where it matters.</param>
+            <returns>Returns the output of a failed invocation.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the exit code is zero, which is what a success is told by.</exception>
+        </member>
+        <member name="T:Sagittaras.Commands.Invocation.ICommandInput">
+            <summary>
+                Carries the values a single invocation of a command was given.
+            </summary>
+            <remarks>
+                <para>
+                    This is all a command ever sees of its input. It knows nothing of the text it may have come
+                    from, nor of the tokens it was cut into - a command reading its values through this contract
+                    works the same whether a console line, a button in the editor tooling or a startup script
+                    put them there.
+                </para>
+                <para>
+                    Values are looked up by the very <see cref="T:Sagittaras.Commands.Parameters.IParameter"/> instances the command declares, not
+                    by name. A command therefore holds its parameters as fields and reads them back through the
+                    same handles, and a typo cannot survive the compilation. Looking one up by name is still
+                    possible through <see cref="P:Sagittaras.Commands.ICommand.Arguments"/> and <see cref="P:Sagittaras.Commands.ICommand.Options"/>, which
+                    is where the names belong.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.ICommandInput.IsSpecified(Sagittaras.Commands.Parameters.IParameter)">
+            <summary>
+                Tells whether the input named the parameter itself.
+            </summary>
+            <remarks>
+                Separates a value that was given from one that was merely defaulted to, which the value
+                alone cannot tell - a flag left out and a flag named as false both read as false.
+            </remarks>
+            <param name="parameter">Parameter to ask about.</param>
+            <returns>Returns true when the value came from the input; false when it comes from the default of the parameter.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.ICommandInput.GetValue``1(Sagittaras.Commands.Parameters.IParameter)">
+            <summary>
+                Gets the value bound for the parameter.
+            </summary>
+            <remarks>
+                Throws rather than answers with a default, because reaching for a parameter the command does
+                not declare is a mistake in the command, not in the input - whatever the input was missing
+                has been answered long before the invocation.
+            </remarks>
+            <param name="parameter">Parameter to read the value of.</param>
+            <typeparam name="T">Type of the value, as declared by <see cref="P:Sagittaras.Commands.Parameters.IParameter.ValueType"/>.</typeparam>
+            <returns>Returns the bound value, or the default of the parameter when the input omitted it.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.ICommandInput.TryGetValue``1(Sagittaras.Commands.Parameters.IParameter,``0@)">
+            <summary>
+                Tries to get the value bound for the parameter.
+            </summary>
+            <remarks>
+                Worth reaching for where a command shares its body with parameters it does not always
+                declare; for its own, <see cref="M:Sagittaras.Commands.Invocation.ICommandInput.GetValue``1(Sagittaras.Commands.Parameters.IParameter)"/> says more by throwing.
+            </remarks>
+            <param name="parameter">Parameter to read the value of.</param>
+            <param name="value">Bound value, or the default of <typeparamref name="T"/> when there is none.</param>
+            <typeparam name="T">Type of the value, as declared by <see cref="P:Sagittaras.Commands.Parameters.IParameter.ValueType"/>.</typeparam>
+            <returns>Returns true when the input holds a value for the parameter; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Invocation.ICommandOutput">
+            <summary>
+                Represents the result of the command invocation.
+            </summary>
+            <remarks>
+                <para>
+                    Deliberately an interface and not a closed type. A command whose answer is more than a line
+                    of text - a table of items, a tree of entities, a diff of two states - implements its own
+                    output carrying that payload, and the layer rendering it picks the formatter by the type it
+                    was handed. <see cref="P:Sagittaras.Commands.Invocation.ICommandOutput.Content"/> stays the plain reading of the same answer, for everything
+                    that has no formatter of its own to reach for.
+                </para>
+                <para>
+                    That is also why the invocation reports failure by returning an output rather than by
+                    throwing: a command that could not do its work still has something to say about it, and the
+                    console has somewhere to put it.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.ICommandOutput.ExitCode">
+            <summary>
+                Exit code of the command invocation.
+            </summary>
+            <remarks>
+                Zero indicates success, non-zero indicates failure.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.ICommandOutput.Content">
+            <summary>
+                Content of the command invocation.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Commands.Invocation.UsageOutput">
+            <summary>
+                The answer of a branch of the hierarchy named without one of its subcommands - what it offers.
+            </summary>
+            <remarks>
+                <para>
+                    Carries the branch itself rather than only a text about it, so a console with an interface of its
+                    own can lay the subcommands out as a help of its own making - and one without it still prints
+                    <see cref="P:Sagittaras.Commands.Invocation.CommandOutput.Content"/>, which lists them lined up.
+                </para>
+                <para>
+                    It is also the pattern for an output of the game's own: derive from <see cref="T:Sagittaras.Commands.Invocation.CommandOutput"/>,
+                    carry the payload, and keep the content a plain reading of the same answer. How it is shown is
+                    left to whoever receives it.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Invocation.UsageOutput.BranchExitCode">
+            <summary>
+                Exit code of a branch named alone.
+            </summary>
+            <remarks>
+                Not a success - the line stopped short of anything to run - but not a mistake of the input either,
+                which is why it is told apart from <c>RefusalOutput.UsageExitCode</c>.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.UsageOutput.#ctor(Sagittaras.Commands.ICommand)">
+            <summary>
+                Creates the usage of the given branch.
+            </summary>
+            <param name="command">Branch whose subcommands are offered.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Invocation.UsageOutput.Command">
+            <summary>
+                Branch whose subcommands are offered.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Invocation.UsageOutput.Describe(Sagittaras.Commands.ICommand)">
+            <summary>
+                Writes out the subcommands the branch holds, with the descriptions lined up.
+            </summary>
+            <param name="command">Branch to describe.</param>
+            <returns>Returns the plain reading of what the branch offers.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.ISyncCommand">
+            <summary>
+                A command answering within the call that invoked it.
+            </summary>
+            <remarks>
+                The common case, and the one to reach for unless the work genuinely has to be awaited -
+                toggling a debug flag, printing a state, spawning an entity. The asynchronous counterpart is
+                <see cref="T:Sagittaras.Commands.IAsyncCommand"/>, and a command is one or the other, never both.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.ISyncCommand.Invoke(Sagittaras.Commands.Invocation.ICommandInput)">
+            <summary>
+                Runs the command over the values it was given.
+            </summary>
+            <remarks>
+                Everything the input could be wrong about has been decided before this is reached: the
+                command was resolved, the values converted, the defaults filled in. What is left to fail
+                here belongs to the command itself - a missing entity, a scene that is not loaded - and is
+                answered by the returned output, not by an exception.
+            </remarks>
+            <param name="input">Values bound for this invocation.</param>
+            <returns>Returns the result of the invocation.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.Argument`1">
+            <summary>
+                A value the command reads from its place in the input, declared with the type it is read as.
+            </summary>
+            <remarks>
+                <para>
+                    Meant to be held as a field of the command and read back through the very same instance, so
+                    that <see cref="T:Sagittaras.Commands.Invocation.ICommandInput"/> needs no names and a typo cannot survive the compilation:
+                </para>
+                <code>
+                    private static readonly Argument&lt;string&gt; Entity = new("entity", "Entity to spawn");
+                </code>
+                <para>
+                    An argument is required unless it is given a default, and giving it one is the only way to
+                    make it optional. The two cannot be told apart in the input anyway - an argument that may be
+                    missing has to answer with something once it is - and keeping them one decision means every
+                    declared parameter always has a value to read.
+                </para>
+                <para>
+                    A rule of this one argument, rather than of its type, is handed over as its own parser:
+                </para>
+                <code>
+                    private static readonly Argument&lt;int&gt; Percent = new("percent", "Share of the health to restore")
+                    {
+                        Parser = text => int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value) &amp;&amp; value is &gt;= 0 and &lt;= 100
+                            ? ParsedValue&lt;int&gt;.Read(value)
+                            : ParsedValue&lt;int&gt;.Refused($"The share has to be a whole number between 0 and 100, and '{text}' is not.")
+                    };
+                </code>
+                <para>
+                    A rule over a value the converter reads well on its own is better held by a validator, which
+                    sees the value already read and only judges it:
+                </para>
+                <code>
+                    private static readonly Argument&lt;int&gt; Count = new("count", "How many to summon", 1)
+                    {
+                        Validator = count => count is &gt;= 1 and &lt;= 10 ? null : $"Between 1 and 10 can be summoned at once, not {count}."
+                    };
+                </code>
+            </remarks>
+            <typeparam name="T">Type the value is read as.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Argument`1.#ctor(System.String,System.String)">
+            <summary>
+                Declares an argument the input has to carry.
+            </summary>
+            <param name="name">Name of the argument, as the help and the parsing errors spell it.</param>
+            <param name="description">Description of what the value means to the command.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the name is empty or holds white space.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Argument`1.#ctor(System.String,System.String,`0)">
+            <summary>
+                Declares an argument the input may leave out, falling back to the given value.
+            </summary>
+            <param name="name">Name of the argument, as the help and the parsing errors spell it.</param>
+            <param name="description">Description of what the value means to the command.</param>
+            <param name="defaultValue">Value used when the input ends before reaching the argument.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the name is empty or holds white space.</exception>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Argument`1.IsOptional">
+            <inheritdoc />
+            <remarks>
+                True exactly when the argument has a default value - there is no third state where the input
+                may leave it out with nothing to read in its place.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.Flag">
+            <summary>
+                An option whose whole value is whether the input named it.
+            </summary>
+            <remarks>
+                <para>
+                    Reads as false until the input names it, and takes no value of its own:
+                </para>
+                <code>
+                    private static readonly Flag DryRun = new("dry-run", "Report the work without doing it");
+                </code>
+                <para>
+                    A type of its own rather than an <see cref="T:Sagittaras.Commands.Parameters.Option`1"/> of bool that guesses, because
+                    <c>--verbose true</c> is a perfectly ordinary option and only the declaration can tell the
+                    two apart.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Flag.#ctor(System.String,System.String,System.String[])">
+            <summary>
+                Declares a flag the input may name.
+            </summary>
+            <param name="name">Name the flag is called by, spelled without the prefix the input uses.</param>
+            <param name="description">Description of what naming the flag means to the command.</param>
+            <param name="aliases">Alternative names the flag answers to, spelled without the prefix.</param>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.IArgument">
+            <summary>
+                Describes a value the command reads from its place in the input.
+            </summary>
+            <remarks>
+                <para>
+                    An argument has no calling sign - it is recognized by the position it holds among the
+                    remaining tokens, so the order in which <see cref="P:Sagittaras.Commands.ICommand.Arguments"/> lists them is the
+                    order the input is expected in.
+                </para>
+                <para>
+                    That is also why a command declaring arguments may not declare
+                    <see cref="P:Sagittaras.Commands.ICommand.Subcommands"/>: a bare token would be both a subcommand name and the
+                    first argument, and no rule resolving that is worth the surprise it causes.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IArgument.IsOptional">
+            <summary>
+                Indicates whether the input may end before reaching this argument.
+            </summary>
+            <remarks>
+                Optional arguments only ever come last - once one is allowed to be missing, nothing
+                positional behind it could be told apart from it.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.IOption">
+            <summary>
+                Describes a value the command reads by name, regardless of where it appears in the input.
+            </summary>
+            <remarks>
+                <para>
+                    An option carries its own calling sign, so it cannot be confused with anything else on the
+                    input - which is why a command may declare options whether it holds subcommands or
+                    arguments. Only positional <see cref="T:Sagittaras.Commands.Parameters.IArgument"/> collides with a subcommand name.
+                </para>
+                <para>
+                    An option is always optional and always has a default: a value that must be named but also
+                    must be present is better expressed as an argument. Nothing therefore fails to parse merely
+                    because an option was left out.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IOption.Aliases">
+            <summary>
+                Alternative calling signs the option answers to, apart from its <see cref="P:Sagittaras.Commands.Parameters.IParameter.Name"/>.
+            </summary>
+            <remarks>
+                Aliases are written without the prefix the input spells them with - recognizing the prefix
+                belongs to the parser, not to the description of the option.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IOption.IsFlag">
+            <summary>
+                Indicates whether naming the option is the whole of its value.
+            </summary>
+            <remarks>
+                A flag takes no value from the input - being named sets it, being left out leaves it at its
+                default. Its <see cref="P:Sagittaras.Commands.Parameters.IParameter.ValueType"/> is therefore always <see cref="T:System.Boolean"/>.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.IParameter">
+            <summary>
+                Describes a single value a command accepts on its input.
+            </summary>
+            <remarks>
+                <para>
+                    Shared by both ways a value can reach the command - positionally as an
+                    <see cref="T:Sagittaras.Commands.Parameters.IArgument"/>, or by name as an <see cref="T:Sagittaras.Commands.Parameters.IOption"/>. The distinction matters
+                    only while the input is being read; once the value is bound, nothing about it depends on
+                    the form it arrived in, which is why <see cref="T:Sagittaras.Commands.Invocation.ICommandInput"/> looks values up by the
+                    parameter alone.
+                </para>
+                <para>
+                    Parameters are description, not storage. The very same instance serves every invocation of
+                    the command, so it never holds a value - it is the key under which the bound one is found.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.ValueType">
+            <summary>
+                Gets the .NET type the input value is converted to.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.Name">
+            <summary>
+                Name of the parameter.
+            </summary>
+            <remarks>
+                Serves the generated help and the parsing errors. For an <see cref="T:Sagittaras.Commands.Parameters.IOption"/> it is also
+                the calling sign the input is matched against.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.Description">
+            <summary>
+                Description of what the value means to the command.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.HasDefaultValue">
+            <summary>
+                Indicates whether the parameter falls back to a value of its own when the input omits it.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.DefaultValue">
+            <summary>
+                The value used when the input omits the parameter.
+            </summary>
+            <remarks>
+                Meaningful only while <see cref="P:Sagittaras.Commands.Parameters.IParameter.HasDefaultValue"/> is true. Null is a legitimate default of
+                its own, so the flag is what decides, not the value being null.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.Parser">
+            <summary>
+                Reads the value from a piece of the input in place of the converter, or null when the converter
+                reads it.
+            </summary>
+            <remarks>
+                <para>
+                    For the rules of a single parameter rather than of a type - a share between nought and a
+                    hundred, an entity that is actually in the scene. None of those is a property of an integer
+                    or a string, so none of them belongs to the converter, and a refusal can say which rule the
+                    text broke instead of only naming the type it was not.
+                </para>
+                <para>
+                    The parameter only carries the parser; it is the binding that calls it, and the parameter
+                    stays a description of what it accepts. Null is the usual case - the converter reads the
+                    value as <see cref="P:Sagittaras.Commands.Parameters.IParameter.ValueType"/>.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.IParameter.Validator">
+            <summary>
+                Judges a value that has already been read, or null when every value of the type is accepted.
+            </summary>
+            <remarks>
+                <para>
+                    Answers null for a value it accepts, and the reason it does not otherwise - in words meant for
+                    whoever typed the input, as they reach the console unchanged.
+                </para>
+                <para>
+                    It comes after the reading, whether the converter or <see cref="P:Sagittaras.Commands.Parameters.IParameter.Parser"/> did it, and sees the
+                    value rather than the text. That makes it the place for a rule over a value the converter reads
+                    well on its own - a number within a range - without the parameter having to read the number
+                    itself and risk reading it differently than the rest of the input is read.
+                </para>
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.Option`1">
+            <summary>
+                A value the command reads by name, declared with the type it is read as.
+            </summary>
+            <remarks>
+                <para>
+                    Held as a field of the command the same way an <see cref="T:Sagittaras.Commands.Parameters.Argument`1"/> is, and read back
+                    through the same instance:
+                </para>
+                <code>
+                    private static readonly Option&lt;int&gt; Count = new("count", "How many to spawn", 1, "c");
+                </code>
+                <para>
+                    The default value is not optional here, because the option itself always is. Whatever the
+                    input leaves unsaid, the command still reads a value - and an option that had to be there
+                    would only be an argument with a name in front of it.
+                </para>
+                <para>
+                    A rule of this one option, rather than of its type, is handed over the same way an argument takes
+                    one - as <see cref="P:Sagittaras.Commands.Parameters.Parameter`1.Parser"/> or <see cref="P:Sagittaras.Commands.Parameters.Parameter`1.Validator"/>, set where the option is declared.
+                </para>
+            </remarks>
+            <typeparam name="T">Type the value is read as.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Option`1.#ctor(System.String,System.String,`0,System.String[])">
+            <summary>
+                Declares an option the input may name, in any place and any order.
+            </summary>
+            <param name="name">Name the option is called by, spelled without the prefix the input uses.</param>
+            <param name="description">Description of what the value means to the command.</param>
+            <param name="defaultValue">Value used when the input does not name the option.</param>
+            <param name="aliases">Alternative names the option answers to, spelled without the prefix.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the name or any of the aliases is empty or holds white space.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Option`1.#ctor(System.String,System.String,`0,System.Boolean,System.String[])">
+            <summary>
+                Declares an option, deciding whether naming it is the whole of its value.
+            </summary>
+            <remarks>
+                Reached through <see cref="T:Sagittaras.Commands.Parameters.Flag"/>, which is the only shape a valueless option makes sense in.
+                An option always has a default, as it is always allowed to be left out.
+            </remarks>
+            <param name="name">Name the option is called by, spelled without the prefix the input uses.</param>
+            <param name="description">Description of what the value means to the command.</param>
+            <param name="defaultValue">Value used when the input does not name the option.</param>
+            <param name="isFlag">Whether the option takes no value of its own.</param>
+            <param name="aliases">Alternative names the option answers to, spelled without the prefix.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the name or any of the aliases is empty or holds white space.</exception>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Option`1.Aliases">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Option`1.IsFlag">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Option`1.GuardAliases(System.String[])">
+            <summary>
+                Ensures every alias is something the input could be matched against.
+            </summary>
+            <param name="aliases">Aliases to guard.</param>
+            <exception cref="T:System.ArgumentException">Thrown when an alias is empty or holds white space.</exception>
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.Parameter`1">
+            <summary>
+                What an argument and an option have in common - a name, a description, a default, and the way
+                their values are read and judged.
+            </summary>
+            <remarks>
+                <para>
+                    The two differ only in how the input reaches them: an argument by its place, an option by its
+                    name. Everything about the value itself is the same, so it is said here once, and
+                    <see cref="T:Sagittaras.Commands.Parameters.Argument`1"/> and <see cref="T:Sagittaras.Commands.Parameters.Option`1"/> add nothing but what their kind needs.
+                </para>
+                <para>
+                    It cannot be derived from outside the package. Argument and option are the only two kinds the
+                    parser knows how to read, so a third one could be declared but never reached - which is
+                    better refused by the compiler than by the command it is declared on.
+                </para>
+            </remarks>
+            <typeparam name="T">Type the value is read as.</typeparam>
+        </member>
+        <member name="F:Sagittaras.Commands.Parameters.Parameter`1._parser">
+            <summary>
+                Own parser of the parameter, or null while the converter reads the value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parameters.Parameter`1._untypedParser">
+            <summary>
+                The same parser handing the value over as an object, built once for the binding to call.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parameters.Parameter`1._validator">
+            <summary>
+                Validator of the parameter, or null while every value of the type is accepted.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parameters.Parameter`1._untypedValidator">
+            <summary>
+                The same validator taking the value as an object, built once for the binding to call.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.Parameter`1.#ctor(System.String,System.String,System.String,System.Boolean,System.Object)">
+            <summary>
+                Declares a parameter of the given kind.
+            </summary>
+            <param name="kind">How the kind of the parameter is spoken of in the exceptions.</param>
+            <param name="name">Name of the parameter.</param>
+            <param name="description">Description of what the value means to the command.</param>
+            <param name="hasDefaultValue">Whether the parameter falls back to a value of its own.</param>
+            <param name="defaultValue">Value used when the input leaves the parameter out.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the name is empty or holds white space.</exception>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.ValueType">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.HasDefaultValue">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.DefaultValue">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.Parser">
+            <summary>
+                Reads the value from a piece of the input in place of the converter.
+            </summary>
+            <remarks>
+                Set once, while the parameter is declared. Null leaves the reading to the converter, as
+                <see cref="P:Sagittaras.Commands.Parameters.IParameter.Parser"/> describes.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.Sagittaras#Commands#Parameters#IParameter#Parser">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.Validator">
+            <summary>
+                Judges a value that has already been read, answering null for one it accepts.
+            </summary>
+            <remarks>
+                Set once, while the parameter is declared, and run after the reading as
+                <see cref="P:Sagittaras.Commands.Parameters.IParameter.Validator"/> describes. Several rules are one validator checking them in
+                turn.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.Parameter`1.Sagittaras#Commands#Parameters#IParameter#Validator">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Commands.Parameters.ParsedValue`1">
+            <summary>
+                What the own parser of a parameter made of a piece of the input.
+            </summary>
+            <remarks>
+                <para>
+                    Either the value that was read, or the reason it was not - told in words meant for whoever typed
+                    the input, as they reach the console unchanged. That is the whole difference from the converter,
+                    which can only say that a text is not the declared type: a parser knows the rule it holds the
+                    value to, and says which one was broken.
+                </para>
+                <para>
+                    The default of the struct is a refusal with no reason given, and is answered with the same
+                    reading a mismatched type would get.
+                </para>
+            </remarks>
+            <typeparam name="T">Type the value is read as.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.ParsedValue`1.#ctor(System.Boolean,`0,System.String)">
+            <summary>
+                Creates a parsed value.
+            </summary>
+            <param name="isRead">Whether the text was read.</param>
+            <param name="value">Value that was read.</param>
+            <param name="message">Reason the text was refused.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.ParsedValue`1.IsRead">
+            <summary>
+                Whether the text was read as a value.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.ParsedValue`1.Value">
+            <summary>
+                Value that was read.
+            </summary>
+            <remarks>
+                Meaningful only while <see cref="P:Sagittaras.Commands.Parameters.ParsedValue`1.IsRead"/> is true.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parameters.ParsedValue`1.Message">
+            <summary>
+                Reason the text was refused, meant for whoever typed the input.
+            </summary>
+            <remarks>
+                Null when the text was read, and for the default of the struct.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.ParsedValue`1.Read(`0)">
+            <summary>
+                Reports a text that was read as a value.
+            </summary>
+            <param name="value">Value that was read.</param>
+            <returns>Returns the parsed value.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.ParsedValue`1.Refused(System.String)">
+            <summary>
+                Reports a text that could not be read, and why.
+            </summary>
+            <param name="message">Reason the text was refused, meant for whoever typed the input.</param>
+            <returns>Returns the refusal.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the reason is empty.</exception>
+        </member>
+        <member name="M:Sagittaras.Commands.Parameters.ParsedValue`1.ToUntyped">
+            <summary>
+                Hands the result over with the value as an object, the way the binding works with it.
+            </summary>
+            <returns>Returns the same result, typed as object.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.CommandParser">
+            <summary>
+                Reads a console line in three steps: cutting it up, walking the hierarchy, binding the values.
+            </summary>
+            <remarks>
+                <para>
+                    The walk comes first and stops at the first token that is not the name of a subcommand, so
+                    the path is spelled out before anything else - <c>spawn entity goblin --scene arena</c>. An
+                    option met during the walk ends it, which is what keeps the parser from having to know whose
+                    option it is before it knows which command was meant.
+                </para>
+                <para>
+                    Names, aliases and enum members are all matched ignoring the case, the way a line typed into
+                    a console has to be. Everything else about reading a value is left to
+                    <see cref="T:Sagittaras.Commands.Parsing.Conversion.IValueConverter"/>.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.CommandParser._converter">
+            <summary>
+                Reader turning a piece of input into the value a parameter holds.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.#ctor">
+            <summary>
+                Creates a parser reading the types a console line is usually spelled in.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.#ctor(Sagittaras.Commands.Parsing.Conversion.IValueConverter)">
+            <summary>
+                Creates a parser reading the values through the given converter.
+            </summary>
+            <param name="converter">Converter turning a piece of input into the value a parameter holds.</param>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Parse(System.String,System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand})">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Resolve(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},System.Collections.Generic.List{Sagittaras.Commands.Parsing.Tokens.Token},System.Int32@,System.Collections.Generic.List{Sagittaras.Commands.ICommand})">
+            <summary>
+                Walks the hierarchy for as long as the input keeps naming commands.
+            </summary>
+            <param name="commands">Commands the walk starts from.</param>
+            <param name="tokens">Tokens the input was cut into, stamped as commands on the way.</param>
+            <param name="index">Index to walk from, left behind the last command that was named.</param>
+            <param name="chain">Commands the walk went through, filled on the way.</param>
+            <returns>Returns the command the input arrived at, or null when the first token names none.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Bind(Sagittaras.Commands.ICommand,System.String,System.Collections.Generic.List{Sagittaras.Commands.Parsing.Tokens.Token},System.Int32)">
+            <summary>
+                Binds what is left of the input to the parameters of the command.
+            </summary>
+            <param name="command">Command the input resolved to.</param>
+            <param name="path">Names of the commands the input walked through, the way the errors spell the command.</param>
+            <param name="tokens">Tokens the input was cut into, stamped with their roles on the way.</param>
+            <param name="index">Index to bind from.</param>
+            <returns>Returns the result of the binding, successful or not.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.BindOption(Sagittaras.Commands.ICommand,System.String,System.Collections.Generic.List{Sagittaras.Commands.Parsing.Tokens.Token},System.Int32@,System.Collections.Generic.Dictionary{Sagittaras.Commands.Parameters.IParameter,Sagittaras.Commands.Invocation.BoundValue})">
+            <summary>
+                Binds an option the input named, together with the value it takes.
+            </summary>
+            <param name="command">Command the input resolved to.</param>
+            <param name="path">Names of the commands the input walked through, the way the errors spell the command.</param>
+            <param name="tokens">Tokens the input was cut into.</param>
+            <param name="index">Index of the option token, left behind what was bound.</param>
+            <param name="values">Values bound so far.</param>
+            <returns>Returns the reason the option could not be bound, or null when it was.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.BindArgument(Sagittaras.Commands.ICommand,System.String,System.Collections.Generic.List{Sagittaras.Commands.Parsing.Tokens.Token},System.Int32@,System.Int32@,System.Collections.Generic.Dictionary{Sagittaras.Commands.Parameters.IParameter,Sagittaras.Commands.Invocation.BoundValue})">
+            <summary>
+                Binds a value to the argument whose place in the input it holds.
+            </summary>
+            <param name="command">Command the input resolved to.</param>
+            <param name="path">Names of the commands the input walked through, the way the errors spell the command.</param>
+            <param name="tokens">Tokens the input was cut into.</param>
+            <param name="index">Index of the value token, left behind it.</param>
+            <param name="positional">Number of arguments bound so far, raised by the one that was bound.</param>
+            <param name="values">Values bound so far.</param>
+            <returns>Returns the reason the value could not be bound, or null when it was.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Read(Sagittaras.Commands.Parameters.IParameter,System.String,Sagittaras.Commands.Parsing.Tokens.Token,System.Object@)">
+            <summary>
+                Reads the value of a token the way the parameter asks for, and has it judged.
+            </summary>
+            <param name="parameter">Parameter the value is read for.</param>
+            <param name="kind">How the parameter is spoken of in the error - an argument or an option.</param>
+            <param name="value">Token carrying the value.</param>
+            <param name="converted">Value that was read, or null when it was not.</param>
+            <returns>Returns the reason the value could not be taken, or null when it was.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Interpret(Sagittaras.Commands.Parameters.IParameter,System.String,Sagittaras.Commands.Parsing.Tokens.Token,System.Object@)">
+            <summary>
+                Turns the text of a token into the value of the parameter.
+            </summary>
+            <remarks>
+                The own parser of the parameter comes first and replaces the converter entirely, so a rule of the
+                parameter is never second-guessed by the reading of its type.
+            </remarks>
+            <param name="parameter">Parameter the value is read for.</param>
+            <param name="kind">How the parameter is spoken of in the error - an argument or an option.</param>
+            <param name="value">Token carrying the value.</param>
+            <param name="converted">Value that was read, or null when it was not.</param>
+            <returns>Returns the reason the text could not be read, or null when it was.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Validate(Sagittaras.Commands.Parameters.IParameter,System.String,Sagittaras.Commands.Parsing.Tokens.Token,System.Object)">
+            <summary>
+                Has a value that was read judged by the validator of the parameter.
+            </summary>
+            <remarks>
+                Reached only once the value was read, so the validator always judges a value of the declared type,
+                never the text it came from.
+            </remarks>
+            <param name="parameter">Parameter the value was read for.</param>
+            <param name="kind">How the parameter is spoken of in the error - an argument or an option.</param>
+            <param name="value">Token carrying the value.</param>
+            <param name="converted">Value that was read.</param>
+            <returns>Returns the reason the value was refused, or null when it was accepted.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Refuse(Sagittaras.Commands.Parameters.IParameter,System.String,Sagittaras.Commands.Parsing.Tokens.Token,System.String)">
+            <summary>
+                Reports a value the parameter refused, in its own words when it gave any.
+            </summary>
+            <param name="parameter">Parameter that refused the value.</param>
+            <param name="kind">How the parameter is spoken of in the error - an argument or an option.</param>
+            <param name="value">Token carrying the value.</param>
+            <param name="reason">Reason the parameter gave, or null or blank when it gave none.</param>
+            <returns>Returns the error pointing at the token.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.IsNamed(Sagittaras.Commands.Parsing.Tokens.Token)">
+            <summary>
+                Tells whether the token carries the calling sign of an option.
+            </summary>
+            <param name="token">Token to ask about.</param>
+            <returns>Returns true when the token names an option; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Match(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand},System.String)">
+            <summary>
+                Finds the command the token names among the candidates.
+            </summary>
+            <param name="candidates">Commands to look through.</param>
+            <param name="lexeme">Name the input spelled.</param>
+            <returns>Returns the command of that name, or null when none of them answers to it.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.MatchOption(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.Parameters.IOption},System.String)">
+            <summary>
+                Finds the option the input named, by its name or any of its aliases.
+            </summary>
+            <param name="options">Options to look through.</param>
+            <param name="name">Name the input spelled, without the prefix.</param>
+            <returns>Returns the option answering to the name, or null when none does.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Describe(System.Type)">
+            <summary>
+                Names the type a value was expected to be, for the error to read plainly.
+            </summary>
+            <param name="valueType">Type to name.</param>
+            <returns>Returns the reading of the type.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Spell(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand})">
+            <summary>
+                Spells the commands the walk went through, the way an error names the command it is about.
+            </summary>
+            <remarks>
+                The whole path rather than the last name, as a name is only unique among its siblings - an error
+                about <c>entity</c> could be about any command of that name in the hierarchy, while one about
+                <c>spawn entity</c> is about the one that was typed.
+            </remarks>
+            <param name="chain">Commands the walk went through.</param>
+            <returns>Returns their names, separated the way the input separates them.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.CommandParser.Stamp(Sagittaras.Commands.Parsing.Tokens.Token,Sagittaras.Commands.Parsing.Tokens.TokenType)">
+            <summary>
+                Copies the token with the role it turned out to play.
+            </summary>
+            <param name="token">Token to stamp.</param>
+            <param name="type">Role the token plays in the input.</param>
+            <returns>Returns the stamped token.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter">
+            <summary>
+                Reads the types a console line is usually spelled in.
+            </summary>
+            <remarks>
+                <para>
+                    Every type it knows is a single row of a table, each with a reader of its own. A type missing
+                    from the table is visible as a missing row - which a chain of conditions never made it, and
+                    which is how <see cref="T:System.UInt16"/> and <see cref="T:System.SByte"/> went unread for a while.
+                </para>
+                <para>
+                    Numbers are read with the invariant culture and with the number styles spelled out, on
+                    purpose. A command typed into a console is not a document: a build running under a
+                    comma-decimal locale must not read <c>1.5</c> differently, and <c>1,5</c> must be refused
+                    rather than taken for fifteen - which is what a thousands separator allowed by default would
+                    make of it. That is also why the table is not <see cref="M:System.Convert.ChangeType(System.Object,System.Type,System.IFormatProvider)"/>.
+                </para>
+                <para>
+                    Dates are read by whatever the runtime reads under the invariant culture - an ISO date with or
+                    without its time, a month spelled by name, a time alone meaning today. Numeric dates are read
+                    month first, so <c>21.09.2026</c> is refused, but <c>01.02.2026</c> is the second of January;
+                    a date that has to be read the same by everyone is best written the ISO way.
+                </para>
+                <para>
+                    Enums are the one kind that cannot be a row, as there is one per enum type. They are read by the
+                    names of their members, ignoring the case the way the rest of the input is matched - and never by
+                    a number, which would let a value the enum does not declare slip through. Anything else is left
+                    to a converter of the game's own.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Integers">
+            <summary>
+                Styles the integer types are read in - a sign and the surrounding white space, nothing more.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Decimals">
+            <summary>
+                Styles the decimal types are read in - a point and an exponent, but no thousands separator.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Invariant">
+            <summary>
+                Culture every number is read in, whatever the running build is set to.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Readers">
+            <summary>
+                Readers of the types the converter knows, one per type.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Reader">
+            <summary>
+                Reads the text as the value of a single type.
+            </summary>
+            <param name="text">Text to read.</param>
+            <param name="value">Value that was read, or null when the text could not be read as one.</param>
+            <returns>Returns true when the text was read; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.TryParse`1">
+            <summary>
+                The shape every TryParse of the runtime has, for <see cref="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Read``1(Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.TryParse{``0})"/> to turn into a reader.
+            </summary>
+            <param name="text">Text to read.</param>
+            <param name="value">Value that was read.</param>
+            <typeparam name="T">Type the text is read as.</typeparam>
+            <returns>Returns true when the text was read; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.TryConvert(System.String,System.Type,System.Object@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.Read``1(Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.TryParse{``0})">
+            <summary>
+                Turns a TryParse of the runtime into a reader of the table.
+            </summary>
+            <param name="parse">TryParse reading the type.</param>
+            <typeparam name="T">Type the text is read as.</typeparam>
+            <returns>Returns the reader handing the value over as an object.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.ReadString(System.String,System.Object@)">
+            <summary>
+                Hands a string over as it was typed.
+            </summary>
+            <param name="text">Text to read.</param>
+            <param name="value">The text itself.</param>
+            <returns>Always returns true - any text is a string.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.ReadBoolean(System.String,System.Object@)">
+            <summary>
+                Reads the text as a boolean, accepting the way a console line tends to spell one.
+            </summary>
+            <remarks>
+                Only ever met on an option that is not a flag - a flag carries no text to read at all.
+            </remarks>
+            <param name="text">Text to read.</param>
+            <param name="value">Value that was read, or null when the text is not a boolean.</param>
+            <returns>Returns true when the text was read as a boolean; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.ReadCharacter(System.String,System.Object@)">
+            <summary>
+                Reads the text as a single character.
+            </summary>
+            <param name="text">Text to read.</param>
+            <param name="value">The character, or null when the text is not exactly one.</param>
+            <returns>Returns true when the text is a single character; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.DefaultValueConverter.TryConvertEnum(System.String,System.Type,System.Object@)">
+            <summary>
+                Reads the text as a member of the enum, by its name and ignoring the case.
+            </summary>
+            <param name="text">Text to read.</param>
+            <param name="target">Enum the value is read as.</param>
+            <param name="value">Value that was read, or null when the text names no member.</param>
+            <returns>Returns true when the text names a member of the enum; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Conversion.IValueConverter">
+            <summary>
+                Turns a piece of the input into the value a parameter is declared to hold.
+            </summary>
+            <remarks>
+                The seam between the input being text and a command reading values. Whatever a game keeps its
+                own types of - an entity identifier, a vector, a currency - becomes reachable from a console line
+                by handing a converter of its own to <see cref="T:Sagittaras.Commands.Parsing.CommandParser"/>; the parser asks nothing else
+                about the types it binds.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Conversion.IValueConverter.TryConvert(System.String,System.Type,System.Object@)">
+            <summary>
+                Tries to read the text as a value of the given type.
+            </summary>
+            <remarks>
+                Answers with false rather than throwing - a value the input spelled wrong is an ordinary
+                thing to happen, and the parser turns it into a reason it can point at the token with.
+            </remarks>
+            <param name="text">Text to read, as the input spelled it.</param>
+            <param name="valueType">Type the value is read as, as declared by the parameter.</param>
+            <param name="value">Value that was read, or null when the text could not be read as one.</param>
+            <returns>Returns true when the text was read as the type; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Errors.IParseError">
+            <summary>
+                Describes why the input could not be parsed.
+            </summary>
+            <remarks>
+                A typo is the most ordinary thing that happens to a console, so a failed parsing is reported
+                rather than thrown. Being a value and not an exception is also what keeps the reason usable: the
+                code can be answered differently than it is printed, and <see cref="P:Sagittaras.Commands.Parsing.Errors.IParseError.Token"/> points at the very
+                word to say it about.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Errors.IParseError.Code">
+            <summary>
+                Reason the parsing failed.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Errors.IParseError.Message">
+            <summary>
+                Reading of the reason, meant for whoever typed the input.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Errors.IParseError.Token">
+            <summary>
+                Token the error is about.
+            </summary>
+            <remarks>
+                Null when the input is at fault by what it does not hold - an argument never given, an
+                option left without its value - as there is no word to point at in that case.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Errors.ParseError">
+            <summary>
+                The plain reason the input could not be parsed.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Errors.ParseError.#ctor(Sagittaras.Commands.Parsing.Errors.ParseErrorCode,System.String,System.Nullable{Sagittaras.Commands.Parsing.Tokens.Token})">
+            <summary>
+                Creates a reason of the given code.
+            </summary>
+            <param name="code">Reason the parsing failed.</param>
+            <param name="message">Reading of the reason, meant for whoever typed the input.</param>
+            <param name="token">Token the error is about, or null when the input is at fault by what it does not hold.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Errors.ParseError.Code">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Errors.ParseError.Message">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Errors.ParseError.Token">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Errors.ParseErrorCode">
+            <summary>
+                Names the reason the input could not be parsed.
+            </summary>
+            <remarks>
+                The members follow the order the parser works in - cutting the input, walking the hierarchy,
+                binding the values - so the reason also says how far the parsing got before it gave up.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.EmptyInput">
+            <summary>
+                The input held nothing to parse.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.UnterminatedQuote">
+            <summary>
+                The input opened a quote it never closed.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.UnknownCommand">
+            <summary>
+                The first token of the input names no registered command.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.UnknownSubcommand">
+            <summary>
+                A command was reached, but the token behind it names none of its subcommands.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.MissingArgument">
+            <summary>
+                The input ended before a required argument was given.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.TooManyArguments">
+            <summary>
+                The input held more values than the command has arguments to bind them to.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.UnknownOption">
+            <summary>
+                The input named an option the command does not declare.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.MissingOptionValue">
+            <summary>
+                An option was named, but the value it takes never followed.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.ValueTypeMismatch">
+            <summary>
+                A value could not be converted to the type its parameter declares.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.ValueRefused">
+            <summary>
+                The own parser of a parameter refused the value.
+            </summary>
+            <remarks>
+                Told apart from <see cref="F:Sagittaras.Commands.Parsing.Errors.ParseErrorCode.ValueTypeMismatch"/> on purpose: the value may well be of the right
+                type and still break a rule of the parameter - a share over a hundred, an entity not in the
+                scene - and the message is the parser's own.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.ICommandParser">
+            <summary>
+                Reads a line of input as one of the commands it is offered.
+            </summary>
+            <remarks>
+                <para>
+                    The parser is handed the commands to resolve against and gives back what it made of the
+                    input. It never runs anything - <see cref="T:Sagittaras.Commands.Parsing.IParseResult"/> is the whole of its answer - which
+                    is what lets a console show what an input means before it is committed to, and what keeps a
+                    command reachable without a parser at all.
+                </para>
+                <para>
+                    It holds no state between calls, so the one built by the registry is shared for the lifetime
+                    of the manager and answers every line typed into the console.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.ICommandParser.Parse(System.String,System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.ICommand})">
+            <summary>
+                Reads the input as one of the given commands.
+            </summary>
+            <param name="input">Line of input, as it was typed.</param>
+            <param name="commands">Commands the first token is resolved against, the roots of the hierarchy.</param>
+            <returns>Returns what the parser made of the input, successful or not.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.IParseResult">
+            <summary>
+                Represents the result of parsing the input into <see cref="T:Sagittaras.Commands.ICommand"/>.
+            </summary>
+            <remarks>
+                <para>
+                    Everything the parser has to say, and the seam the invocation is separated by: what the
+                    command is given is <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Input"/> alone, while the tokens and the error stay here, with
+                    the console that has a use for them.
+                </para>
+                <para>
+                    Parsing stops at the first thing it cannot make sense of, so there is at most one
+                    <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Error"/> - reporting the second problem of an input whose first word was already
+                    wrong would be guessing.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.IParseResult.Success">
+            <summary>
+                Indicates whether the parsing was successful.
+            </summary>
+            <remarks>
+                True when the input resolved to a command and every value it needs was bound, which is
+                exactly when <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Command"/> and <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Input"/> are both there.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.IParseResult.Command">
+            <summary>
+                Instance of resolved <see cref="T:Sagittaras.Commands.ICommand"/>.
+            </summary>
+            <remarks>
+                Present even on an unsuccessful parsing whenever the input got far enough to name a command -
+                which is what lets the console answer a mistyped value with the usage of the command it was
+                meant for.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.IParseResult.Input">
+            <summary>
+                Values bound for the resolved command.
+            </summary>
+            <remarks>
+                Null until the binding has run through, so an unsuccessful parsing may leave it behind even
+                with a <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Command"/> already resolved.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.IParseResult.Error">
+            <summary>
+                Reason the parsing failed.
+            </summary>
+            <remarks>
+                Null on a successful parsing.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.IParseResult.Tokens">
+            <summary>
+                Tokens the input was cut into, in the order they appear in it.
+            </summary>
+            <remarks>
+                Carries the whole input, the unmatched tokens included, each with the role it was given and
+                the place it holds - which is what a console highlighting the line reads.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.IParseResult.UnmatchedTokens">
+            <summary>
+                Tokens that were left without a role.
+            </summary>
+            <remarks>
+                Contains tokens not accounted for by any command, argument or option. A subset of
+                <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Tokens"/>, offered apart so that answering the mistake does not mean walking the
+                whole input again.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.ParseResult">
+            <summary>
+                What the parser made of an input.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.ParseResult.#ctor(Sagittaras.Commands.ICommand,Sagittaras.Commands.Invocation.ICommandInput,Sagittaras.Commands.Parsing.Errors.IParseError,System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.Parsing.Tokens.Token})">
+            <summary>
+                Creates a result of the given parts.
+            </summary>
+            <param name="command">Command the input resolved to, if it got that far.</param>
+            <param name="input">Values bound for the command, if the binding ran through.</param>
+            <param name="error">Reason the parsing failed, or null when it did not.</param>
+            <param name="tokens">Tokens the input was cut into.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.ParseResult.Success">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.ParseResult.Command">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.ParseResult.Input">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.ParseResult.Error">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.ParseResult.Tokens">
+            <inheritdoc />
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.ParseResult.UnmatchedTokens">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.ParseResult.Parsed(Sagittaras.Commands.ICommand,Sagittaras.Commands.Invocation.ICommandInput,System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.Parsing.Tokens.Token})">
+            <summary>
+                Reports an input the parser made sense of all the way through.
+            </summary>
+            <param name="command">Command the input resolved to.</param>
+            <param name="input">Values bound for the command.</param>
+            <param name="tokens">Tokens the input was cut into, each with the role it was given.</param>
+            <returns>Returns the result of a successful parsing.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.ParseResult.Failed(Sagittaras.Commands.Parsing.Errors.IParseError,Sagittaras.Commands.ICommand,System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.Parsing.Tokens.Token})">
+            <summary>
+                Reports an input the parser could not make sense of.
+            </summary>
+            <remarks>
+                The command is carried along whenever the input got far enough to name one, so that the answer
+                can be about that command rather than about the input in general.
+            </remarks>
+            <param name="error">Reason the parsing failed.</param>
+            <param name="command">Command the input resolved to before it failed, if any.</param>
+            <param name="tokens">Tokens the input was cut into, those left without a role included.</param>
+            <returns>Returns the result of a failed parsing.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.ParseResult.CollectUnmatched(System.Collections.Generic.IReadOnlyList{Sagittaras.Commands.Parsing.Tokens.Token})">
+            <summary>
+                Picks the tokens that were left without a role.
+            </summary>
+            <param name="tokens">Tokens the input was cut into.</param>
+            <returns>Returns the tokens of an unknown role, empty when every token was accounted for.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.RefusalOutput">
+            <summary>
+                The answer to a line the parser could not make sense of.
+            </summary>
+            <remarks>
+                <para>
+                    Carries the whole result of the parsing rather than only its message, so a console can point at
+                    the word the error names through <see cref="P:Sagittaras.Commands.Parsing.Errors.IParseError.Token"/>, colour the rest of the line by
+                    <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Tokens"/>, or answer with the usage of <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Command"/>
+                    when the line got as far as naming one - straight from <c>Execute</c>, without parsing the line a
+                    second time. <see cref="P:Sagittaras.Commands.Invocation.CommandOutput.Content"/> is the message of the error, for a console that
+                    does none of that.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.RefusalOutput.UsageExitCode">
+            <summary>
+                Exit code of a line the parser could not make sense of.
+            </summary>
+            <remarks>
+                Told apart from the exit code a failing command answers with, so a console can react to a mistyped
+                line differently than to work that did not go through.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.RefusalOutput.#ctor(Sagittaras.Commands.Parsing.IParseResult)">
+            <summary>
+                Creates the answer to a failed parsing.
+            </summary>
+            <param name="result">Result of the parsing that failed.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the parsing did not fail.</exception>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.RefusalOutput.Result">
+            <summary>
+                Result of the parsing that failed.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.RefusalOutput.Error">
+            <summary>
+                Reason the parsing failed.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.RefusalOutput.RequireFailed(Sagittaras.Commands.Parsing.IParseResult)">
+            <summary>
+                Ensures the result is one there is something to refuse about.
+            </summary>
+            <param name="result">Result to guard.</param>
+            <returns>Returns the guarded result.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the parsing did not fail.</exception>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Tokenizer">
+            <summary>
+                Cuts a line of input into the pieces the rest of the parsing works over.
+            </summary>
+            <remarks>
+                <para>
+                    Knows nothing about commands. It splits on white space, resolves the quoting, and leaves
+                    every piece as <see cref="F:Sagittaras.Commands.Parsing.Tokens.TokenType.Unknown"/> - what a piece means is decided by the walk
+                    through the hierarchy and the binding that follow.
+                </para>
+                <para>
+                    The one thing it does decide is the pairing an equals sign spells out: <c>--scene=arena</c>
+                    names an option and hands it a value in a single piece of input, and that pairing is lexical,
+                    so it is read here rather than guessed at later.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokenizer.TryTokenize(System.String,System.Collections.Generic.List{Sagittaras.Commands.Parsing.Tokens.Token},Sagittaras.Commands.Parsing.Errors.IParseError@)">
+            <summary>
+                Tries to cut the input into tokens.
+            </summary>
+            <param name="input">Input to cut.</param>
+            <param name="tokens">Tokens the input was cut into, filled as far as the cutting got.</param>
+            <param name="error">Reason the cutting failed, or null when it did not.</param>
+            <returns>Returns true when the whole input was cut; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokenizer.LooksNamed(System.String,System.Int32)">
+            <summary>
+                Tells whether the piece of input starting at the index carries an option's calling sign.
+            </summary>
+            <remarks>
+                A dash followed by a digit or a decimal point is a negative number, not a name - which is the
+                whole reason this is asked about the character behind the dash at all.
+            </remarks>
+            <param name="value">Value to look at.</param>
+            <param name="index">Index the piece starts at.</param>
+            <returns>Returns true when the piece names an option; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokenizer.TryReadToken(System.String,System.Int32@,System.Collections.Generic.List{Sagittaras.Commands.Parsing.Tokens.Token},Sagittaras.Commands.Parsing.Errors.IParseError@)">
+            <summary>
+                Reads a single token, resolving the quoting and the equals sign on the way.
+            </summary>
+            <param name="input">Input being cut.</param>
+            <param name="index">Index to read from, left behind the token that was read.</param>
+            <param name="tokens">Tokens to add the result to - two of them for the equals sign form.</param>
+            <param name="error">Reason the reading failed, or null when it did not.</param>
+            <returns>Returns true when a token was read; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokenizer.TryReadQuoted(System.String,System.Int32@,System.Int32,System.Text.StringBuilder,Sagittaras.Commands.Parsing.Errors.IParseError@)">
+            <summary>
+                Reads a quoted stretch into the token being read.
+            </summary>
+            <remarks>
+                The quotes themselves are left out of the lexeme but stay counted in the span of the token,
+                which is what keeps a console able to point back at the input.
+            </remarks>
+            <param name="input">Input being cut.</param>
+            <param name="index">Index of the opening quote, left behind the closing one.</param>
+            <param name="start">Index the whole token starts at, for the error to point at.</param>
+            <param name="lexeme">Lexeme being built.</param>
+            <param name="error">Reason the reading failed, or null when it did not.</param>
+            <returns>Returns true when the stretch was closed; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Tokens.Token">
+            <summary>
+                Represents a single piece of the input, together with the role the parser gave it.
+            </summary>
+            <remarks>
+                <para>
+                    Cutting the input into tokens and deciding what they mean are two different things. The
+                    lexeme and its place in the input are known the moment the input is cut; the
+                    <see cref="P:Sagittaras.Commands.Parsing.Tokens.Token.Type"/> is only known once the command has been resolved and the values bound,
+                    and it is the finished classification that <see cref="P:Sagittaras.Commands.Parsing.IParseResult.Tokens"/> hands out.
+                </para>
+                <para>
+                    The token keeps its place in the original input, which is what lets a console point at the
+                    piece it has something to say about - underlining the word a parsing error names, or
+                    colouring a command differently from its values while the line is still being typed.
+                </para>
+                <para>
+                    Two tokens are equal when they play the same role over the same piece of the same input -
+                    the same text at a different place is a different token, as it is a different word to point
+                    at.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.#ctor(Sagittaras.Commands.Parsing.Tokens.TokenType,System.String,System.Int32,System.Int32)">
+            <summary>
+                Creates a token of the given role over a piece of the input.
+            </summary>
+            <param name="type">Role the token plays in the input.</param>
+            <param name="lexeme">Text the token carries, with the quoting already resolved.</param>
+            <param name="start">Index the token starts at in the original input.</param>
+            <param name="length">Number of characters the token takes up in the original input.</param>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Tokens.Token.Type">
+            <summary>
+                Role the token plays in the input.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Tokens.Token.Lexeme">
+            <summary>
+                Text the token carries.
+            </summary>
+            <remarks>
+                Quoting is already resolved, so a quoted token carries what was inside the quotes. An option
+                keeps the prefix it was written with - stripping it is a matter of matching the option, which
+                happens later and knows what it is matching against.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Tokens.Token.Start">
+            <summary>
+                Index the token starts at in the original input.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Commands.Parsing.Tokens.Token.Length">
+            <summary>
+                Number of characters the token takes up in the original input.
+            </summary>
+            <remarks>
+                Told apart from the length of <see cref="P:Sagittaras.Commands.Parsing.Tokens.Token.Lexeme"/> on purpose: a quoted token takes up the
+                quotes as well, and pointing back at the input has to count them.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.op_Equality(Sagittaras.Commands.Parsing.Tokens.Token,Sagittaras.Commands.Parsing.Tokens.Token)">
+            <summary>
+                Tells whether two tokens play the same role over the same piece of the input.
+            </summary>
+            <param name="left">Token on the left.</param>
+            <param name="right">Token on the right.</param>
+            <returns>Returns true when the tokens are equal; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.op_Inequality(Sagittaras.Commands.Parsing.Tokens.Token,Sagittaras.Commands.Parsing.Tokens.Token)">
+            <summary>
+                Tells whether two tokens differ in their role or in the piece of the input they cover.
+            </summary>
+            <param name="left">Token on the left.</param>
+            <param name="right">Token on the right.</param>
+            <returns>Returns true when the tokens differ; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.Equals(Sagittaras.Commands.Parsing.Tokens.Token)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Commands.Parsing.Tokens.Token.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Commands.Parsing.Tokens.TokenType">
+            <summary>
+                Role a <see cref="T:Sagittaras.Commands.Parsing.Tokens.Token"/> plays in the input it was cut from.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Tokens.TokenType.Unknown">
+            <summary>
+                Indicates that the token could not be given a role.
+            </summary>
+            <remarks>
+                The state a token is left in when nothing on the command it belongs to accounts for it,
+                which is how it ends up in <see cref="P:Sagittaras.Commands.Parsing.IParseResult.UnmatchedTokens"/>.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Tokens.TokenType.Command">
+            <summary>
+                Indicates that the token represents a command's name.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Tokens.TokenType.Argument">
+            <summary>
+                Indicates that the token carries the value of a positional argument.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Tokens.TokenType.Option">
+            <summary>
+                Indicates that the token names an option.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Commands.Parsing.Tokens.TokenType.OptionValue">
+            <summary>
+                Indicates that the token carries the value of the option named before it.
+            </summary>
+            <remarks>
+                A flag has no such token - being named is the whole of its value.
+            </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+                Lets the compiler emit init accessors for a target that does not ship the type.
+            </summary>
+            <remarks>
+                C# 9 marks an init accessor with this type, which only arrived in .NET 5. The package targets
+                netstandard2.1, so it declares the type itself - internally, so no other assembly ever sees it or
+                collides with a declaration of its own.
+            </remarks>
+        </member>
+    </members>
+</doc>

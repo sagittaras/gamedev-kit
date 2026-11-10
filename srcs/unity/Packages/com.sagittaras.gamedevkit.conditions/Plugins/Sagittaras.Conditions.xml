@@ -1,0 +1,607 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Conditions</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Conditions.Comparison">
+            <summary>
+                Comparison operator used for evaluation of the subject's value against the value expected by the condition.
+            </summary>
+            <remarks>
+                The subject's value always stands on the left side of the comparison, the expected value on the right side.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Conditions.Comparison.Equals">
+            <summary>
+                Subject's value is equal to the expected value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.Comparison.GreaterThan">
+            <summary>
+                Subject's value is greater than the expected value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.Comparison.LessThan">
+            <summary>
+                Subject's value is less than the expected value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.Comparison.GreaterOrEqual">
+            <summary>
+                Subject's value is greater than or equal to the expected value.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.Comparison.LessOrEqual">
+            <summary>
+                Subject's value is less than or equal to the expected value.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Conditions.ConditionTarget">
+            <summary>
+                Read-only value representing a target of condition as open enum.
+            </summary>
+            <remarks>
+                Target selects the subject of evaluation from the evaluation context, for example the caster
+                or the target of a spell.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Conditions.ConditionTarget._id">
+            <summary>
+                Unique identifier of the target description.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.#ctor(System.String)">
+            <summary>
+                Creates a condition target with the given identifier.
+            </summary>
+            <param name="id">Unique identifier of the target description.</param>
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.Equals(Sagittaras.Conditions.ConditionTarget)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.op_Equality(Sagittaras.Conditions.ConditionTarget,Sagittaras.Conditions.ConditionTarget)">
+            <summary>
+                Determines whether two condition targets are equal.
+            </summary>
+            <param name="left">The first condition target to compare.</param>
+            <param name="right">The second condition target to compare.</param>
+            <returns>Returns true if both targets have the same identifier; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionTarget.op_Inequality(Sagittaras.Conditions.ConditionTarget,Sagittaras.Conditions.ConditionTarget)">
+            <summary>
+                Determines whether two condition targets are not equal.
+            </summary>
+            <param name="left">The first condition target to compare.</param>
+            <param name="right">The second condition target to compare.</param>
+            <returns>Returns true if the targets have different identifiers; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.ConditionType">
+            <summary>
+                Read-only value representing a type of condition as open enum.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.ConditionType._id">
+            <summary>
+                Unique identifier of the condition type.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.#ctor(System.String)">
+            <summary>
+                Creates a condition type with the given identifier.
+            </summary>
+            <param name="id">Unique identifier of the condition type.</param>
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.Equals(Sagittaras.Conditions.ConditionType)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.op_Equality(Sagittaras.Conditions.ConditionType,Sagittaras.Conditions.ConditionType)">
+            <summary>
+                Determines whether two condition types are equal.
+            </summary>
+            <param name="left">The first condition type to compare.</param>
+            <param name="right">The second condition type to compare.</param>
+            <returns>Returns true if both types have the same identifier; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Conditions.ConditionType.op_Inequality(Sagittaras.Conditions.ConditionType,Sagittaras.Conditions.ConditionType)">
+            <summary>
+                Determines whether two condition types are not equal.
+            </summary>
+            <param name="left">The first condition type to compare.</param>
+            <param name="right">The second condition type to compare.</param>
+            <returns>Returns true if the types have different identifiers; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2">
+            <summary>
+                Evaluates conditions by resolving their subject from the context and passing it to the handler
+                registered for the condition type.
+            </summary>
+            <remarks>
+                Evaluator is immutable once created and can be safely shared. Use <see cref="T:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2"/>
+                to register handlers and resolvers and create the evaluator.
+            </remarks>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <typeparam name="TSubject">Subject against which the conditions are evaluated.</typeparam>
+        </member>
+        <member name="F:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2._handlers">
+            <summary>
+                Handlers registered for each supported condition type.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2._resolvers">
+            <summary>
+                Resolvers registered for each supported condition target.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2.#ctor(System.Collections.Generic.Dictionary{Sagittaras.Conditions.ConditionType,Sagittaras.Conditions.Handlers.IConditionHandler{`1}},System.Collections.Generic.Dictionary{Sagittaras.Conditions.ConditionTarget,Sagittaras.Conditions.Targeting.ITargetResolver{`0,`1}})">
+            <summary>
+                Creates the evaluator with the registered handlers and resolvers.
+            </summary>
+            <param name="handlers">Handlers registered for each supported condition type. Evaluator takes ownership of the dictionary.</param>
+            <param name="resolvers">Resolvers registered for each supported condition target. Evaluator takes ownership of the dictionary.</param>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2.Evaluate(Sagittaras.Conditions.ICondition,`0)">
+            <inheritdoc />
+            <remarks>
+                When the subject cannot be resolved from the context, the condition is not satisfied
+                regardless of <see cref="P:Sagittaras.Conditions.ICondition.Negated"/>, as it could not be evaluated at all.
+            </remarks>
+            <exception cref="T:Sagittaras.Conditions.Evaluation.ConditionHandlerNotRegisteredException">Thrown when no condition handler is registered for the condition type.</exception>
+            <exception cref="T:Sagittaras.Conditions.Evaluation.TargetResolverNotRegisteredException">Thrown when no target resolver is registered for the condition target.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2.Evaluate(Sagittaras.Conditions.IConditional,`0)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2">
+            <summary>
+                Builds the <see cref="T:Sagittaras.Conditions.Evaluation.ConditionEvaluator`2"/> from registered handlers and resolvers.
+            </summary>
+            <remarks>
+                Registrations can be composed from multiple places, for example by extension methods of game modules.
+                Each condition type and condition target can be registered only once.
+            </remarks>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <typeparam name="TSubject">Subject against which the conditions are evaluated.</typeparam>
+        </member>
+        <member name="F:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2._handlers">
+            <summary>
+                Handlers registered for each supported condition type.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2._resolvers">
+            <summary>
+                Resolvers registered for each supported condition target.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2.WithHandler(Sagittaras.Conditions.ConditionType,Sagittaras.Conditions.Handlers.IConditionHandler{`1})">
+            <summary>
+                Registers the handler responsible for evaluation of the condition type.
+            </summary>
+            <param name="type">Condition type served by the handler.</param>
+            <param name="handler">Handler evaluating the condition type.</param>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the condition type already has a registered handler.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2.WithHandler(Sagittaras.Conditions.ConditionType,System.Func{Sagittaras.Conditions.ICondition,`1,System.Boolean})">
+            <summary>
+                Registers the evaluation function responsible for evaluation of the condition type.
+            </summary>
+            <param name="type">Condition type served by the function.</param>
+            <param name="evaluate">Function returning true if the condition is satisfied by the subject; otherwise false.</param>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the condition type already has a registered handler.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2.WithResolver(Sagittaras.Conditions.ConditionTarget,Sagittaras.Conditions.Targeting.ITargetResolver{`0,`1})">
+            <summary>
+                Registers the resolver responsible for resolution of the condition target.
+            </summary>
+            <param name="target">Condition target served by the resolver.</param>
+            <param name="resolver">Resolver finding the subject for the condition target.</param>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the condition target already has a registered resolver.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2.WithResolver(Sagittaras.Conditions.ConditionTarget,System.Func{`0,`1})">
+            <summary>
+                Registers the resolution function responsible for resolution of the condition target.
+            </summary>
+            <remarks>
+                Returning null means the context has no such subject. Value type subjects cannot be null
+                and are therefore always resolved; implement <see cref="T:Sagittaras.Conditions.Targeting.ITargetResolver`2"/>
+                when they need to be unresolved.
+            </remarks>
+            <param name="target">Condition target served by the function.</param>
+            <param name="resolve">Function returning the subject from the context, or null if there is none.</param>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the condition target already has a registered resolver.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorBuilder`2.Build">
+            <summary>
+                Creates the evaluator from the current registrations.
+            </summary>
+            <remarks>
+                Registrations are copied, so further changes of the builder do not affect already created evaluators.
+            </remarks>
+            <returns>Returns the immutable evaluator.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException">
+            <summary>
+                Represents an exception that occurs when conditions are evaluated in a context without a registered evaluator.
+            </summary>
+            <remarks>
+                This exception indicates an error in the manager setup or in the context type used at the call site,
+                not in the game state.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.Type})">
+            <summary>
+                Represents an exception that occurs when conditions are evaluated in a context without a registered evaluator.
+            </summary>
+            <param name="contextType">Context type without a registered evaluator.</param>
+            <param name="registeredContextTypes">Context types having a registered evaluator.</param>
+        </member>
+        <member name="P:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException.ContextType">
+            <summary>
+                Context type without a registered evaluator.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException.GetExceptionMessage(System.Type,System.Collections.Generic.IEnumerable{System.Type})">
+            <summary>
+                Constructs the message listing the context types the manager actually knows.
+            </summary>
+            <remarks>
+                Evaluator is looked up by the context type taken from the call site, so the listing tells
+                whether the evaluator is missing at all, or just registered for a different type.
+            </remarks>
+            <param name="contextType">Context type without a registered evaluator.</param>
+            <param name="registeredContextTypes">Context types having a registered evaluator.</param>
+            <returns>A string describing the missing evaluator and the registered context types.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.ConditionHandlerNotRegisteredException">
+            <summary>
+                Represents an exception that occurs when a condition is evaluated without a condition handler registered for its type.
+            </summary>
+            <remarks>
+                This exception indicates an error in the condition data or evaluator setup, not in the game state.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionHandlerNotRegisteredException.#ctor(Sagittaras.Conditions.ConditionType)">
+            <summary>
+                Represents an exception that occurs when a condition is evaluated without a condition handler registered for its type.
+            </summary>
+            <param name="conditionType">Condition type without a registered condition handler.</param>
+        </member>
+        <member name="P:Sagittaras.Conditions.Evaluation.ConditionHandlerNotRegisteredException.ConditionType">
+            <summary>
+                Condition type without a registered condition handler.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.ConditionManager">
+            <inheritdoc />
+            <remarks>
+                Manager is immutable once created and can be safely shared. Use <see cref="T:Sagittaras.Conditions.Evaluation.ConditionManagerBuilder"/>
+                to register the evaluators and create the manager.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Conditions.Evaluation.ConditionManager._evaluators">
+            <summary>
+                Evaluators registered for each supported context type.
+            </summary>
+            <remarks>
+                Values are instances of <see cref="T:Sagittaras.Conditions.Evaluation.IConditionEvaluator`1"/> of the context type used as the key.
+                The generic type cannot be expressed here, registration keeps the pairing valid.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManager.#ctor(System.Collections.Generic.Dictionary{System.Type,System.Object})">
+            <summary>
+                Creates the manager with the registered evaluators.
+            </summary>
+            <param name="evaluators">Evaluators registered for each supported context type. Manager takes ownership of the dictionary.</param>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManager.Evaluate``1(Sagittaras.Conditions.ICondition,``0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManager.Evaluate``1(Sagittaras.Conditions.IConditional,``0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManager.TryGetEvaluator``1(Sagittaras.Conditions.Evaluation.IConditionEvaluator{``0}@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManager.GetEvaluator``1">
+            <summary>
+                Gets the evaluator registered for the context type.
+            </summary>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <returns>Returns the evaluator registered for the context type.</returns>
+            <exception cref="T:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException">Thrown when no evaluator is registered for the context type.</exception>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.ConditionManagerBuilder">
+            <summary>
+                Builds the <see cref="T:Sagittaras.Conditions.Evaluation.ConditionManager"/> from evaluators of different contexts.
+            </summary>
+            <remarks>
+                Each context type can be registered only once.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Conditions.Evaluation.ConditionManagerBuilder._evaluators">
+            <summary>
+                Evaluators registered for each supported context type.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManagerBuilder.WithEvaluator``1(Sagittaras.Conditions.Evaluation.IConditionEvaluator{``0})">
+            <summary>
+                Registers the evaluator responsible for evaluation of conditions in the given context.
+            </summary>
+            <param name="evaluator">Evaluator of the context.</param>
+            <typeparam name="TContext">Context served by the evaluator.</typeparam>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the context type already has a registered evaluator.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.ConditionManagerBuilder.Build">
+            <summary>
+                Creates the manager from the current registrations.
+            </summary>
+            <remarks>
+                Registrations are copied, so further changes of the builder do not affect already created managers.
+            </remarks>
+            <returns>Returns the immutable manager.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.IConditionEvaluator`1">
+            <summary>
+                Represents an evaluation engine for the conditions.
+            </summary>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.IConditionEvaluator`1.Evaluate(Sagittaras.Conditions.ICondition,`0)">
+            <summary>
+                Evaluate whether the given condition is met.
+            </summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="context">Context of the evaluation.</param>
+            <returns>Returns true if the condition is satisfied; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.IConditionEvaluator`1.Evaluate(Sagittaras.Conditions.IConditional,`0)">
+            <summary>
+                Evaluates whether all conditions of the given conditional are met.
+            </summary>
+            <param name="conditional">The conditional to evaluate.</param>
+            <param name="context">Context of the evaluation.</param>
+            <returns>Returns true if all conditions are satisfied; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.IConditionManager">
+            <summary>
+                Combines evaluators of different contexts into a single entry point for the condition evaluation.
+            </summary>
+            <remarks>
+                Evaluator is looked up by the type of the context, which is taken from the call site. Context
+                passed as its base type or interface therefore does not find an evaluator registered for the
+                derived type.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.IConditionManager.Evaluate``1(Sagittaras.Conditions.ICondition,``0)">
+            <summary>
+                Evaluates whether the given condition is met, using the evaluator registered for the context type.
+            </summary>
+            <param name="condition">The condition to evaluate.</param>
+            <param name="context">Context of the evaluation.</param>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <returns>Returns true if the condition is satisfied; otherwise false.</returns>
+            <exception cref="T:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException">Thrown when no evaluator is registered for the context type.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.IConditionManager.Evaluate``1(Sagittaras.Conditions.IConditional,``0)">
+            <summary>
+                Evaluates whether all conditions of the given conditional are met, using the evaluator
+                registered for the context type.
+            </summary>
+            <param name="conditional">The conditional to evaluate.</param>
+            <param name="context">Context of the evaluation.</param>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <returns>Returns true if all conditions are satisfied; otherwise false.</returns>
+            <exception cref="T:Sagittaras.Conditions.Evaluation.ConditionEvaluatorNotRegisteredException">Thrown when no evaluator is registered for the context type.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.IConditionManager.TryGetEvaluator``1(Sagittaras.Conditions.Evaluation.IConditionEvaluator{``0}@)">
+            <summary>
+                Tries to get the evaluator registered for the context type.
+            </summary>
+            <remarks>
+                Useful for systems evaluating conditions repeatedly, as they can keep the evaluator
+                instead of looking it up for each evaluation.
+            </remarks>
+            <param name="evaluator">Evaluator registered for the context type, if there is one.</param>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <returns>Returns true if the evaluator was found; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.Evaluation.TargetResolverNotRegisteredException">
+            <summary>
+                Represents an exception that occurs when a condition is evaluated without a target resolver registered for its target.
+            </summary>
+            <remarks>
+                This exception indicates an error in the condition data or evaluator setup, not in the game state.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Conditions.Evaluation.TargetResolverNotRegisteredException.#ctor(Sagittaras.Conditions.ConditionTarget)">
+            <summary>
+                Represents an exception that occurs when a condition is evaluated without a target resolver registered for its target.
+            </summary>
+            <param name="target">Condition target without a registered target resolver.</param>
+        </member>
+        <member name="P:Sagittaras.Conditions.Evaluation.TargetResolverNotRegisteredException.Target">
+            <summary>
+                Condition target without a registered target resolver.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Conditions.Handlers.ComparisonHandler`1">
+            <summary>
+                Base handler for conditions comparing a value of the subject against the value expected by the condition
+                using the <see cref="P:Sagittaras.Conditions.ICondition.Comparison"/> operator.
+            </summary>
+            <remarks>
+                Derived handler only provides the actual value of the subject, for example its level. The expected value
+                is taken from the first parameter of the condition by default.
+            </remarks>
+            <typeparam name="TSubject">Subject against which the condition is evaluated.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Conditions.Handlers.ComparisonHandler`1.Evaluate(Sagittaras.Conditions.ICondition,`0)">
+            <inheritdoc />
+            <exception cref="T:System.ArgumentException">Thrown when the condition does not provide the expected value.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the condition uses an unknown comparison operator.</exception>
+        </member>
+        <member name="M:Sagittaras.Conditions.Handlers.ComparisonHandler`1.GetActualValue(Sagittaras.Conditions.ICondition,`0)">
+            <summary>
+                Gets the actual value of the subject compared against the expected value.
+            </summary>
+            <param name="condition">Condition being evaluated.</param>
+            <param name="subject">Subject against which the condition is evaluated.</param>
+            <returns>Returns the value of the subject standing on the left side of the comparison.</returns>
+        </member>
+        <member name="M:Sagittaras.Conditions.Handlers.ComparisonHandler`1.GetExpectedValue(Sagittaras.Conditions.ICondition)">
+            <summary>
+                Gets the value expected by the condition.
+            </summary>
+            <remarks>
+                Override when the condition carries more parameters, for example an item identifier
+                followed by the required amount.
+            </remarks>
+            <param name="condition">Condition being evaluated.</param>
+            <returns>Returns the value standing on the right side of the comparison.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the condition has no parameters.</exception>
+        </member>
+        <member name="T:Sagittaras.Conditions.Handlers.DelegateConditionHandler`1">
+            <summary>
+                Condition handler delegating the evaluation to a function.
+            </summary>
+            <typeparam name="TSubject">Subject against which the condition is evaluated.</typeparam>
+        </member>
+        <member name="F:Sagittaras.Conditions.Handlers.DelegateConditionHandler`1._evaluate">
+            <summary>
+                Function evaluating the condition against the subject.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.Handlers.DelegateConditionHandler`1.#ctor(System.Func{Sagittaras.Conditions.ICondition,`0,System.Boolean})">
+            <summary>
+                Creates the handler delegating the evaluation to the function.
+            </summary>
+            <param name="evaluate">Function evaluating the condition against the subject.</param>
+        </member>
+        <member name="M:Sagittaras.Conditions.Handlers.DelegateConditionHandler`1.Evaluate(Sagittaras.Conditions.ICondition,`0)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Conditions.Handlers.IConditionHandler`1">
+            <summary>
+                Handles the evaluation logic for <see cref="T:Sagittaras.Conditions.ConditionType"/>.
+            </summary>
+            <typeparam name="TSubject"></typeparam>
+        </member>
+        <member name="M:Sagittaras.Conditions.Handlers.IConditionHandler`1.Evaluate(Sagittaras.Conditions.ICondition,`0)">
+            <summary>
+                Evaluates the condition against the subject.
+            </summary>
+            <param name="condition">Condition to evaluate.</param>
+            <param name="subject">Subject against which the condition is evaluated.</param>
+            <returns>Returns true if the condition is satisfied; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Conditions.ICondition">
+            <summary>
+                Condition that can be attached to an entity and used to validate whether the entity meets certain criteria.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Conditions.ICondition.ConditionType">
+            <summary>
+                Type of condition representing evaluation behavior and required parameters. 
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Conditions.ICondition.Target">
+            <summary>
+                Specified the target to which the condition is applied.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Conditions.ICondition.Parameters">
+            <summary>
+                Parameters required for the condition evaluation.;
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Conditions.ICondition.Negated">
+            <summary>
+                Indicates whether the result of condition evaluation should be negated.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Conditions.ICondition.Comparison">
+            <summary>
+                Comparison operator used for evaluation of parameter value and condition's target.
+            </summary>
+            <remarks>
+                Comparison applies only for cases where a single parameter is used for evaluation.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Conditions.IConditional">
+            <summary>
+                Interface marking the entity as a source of conditions.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Conditions.IConditional.Conditions">
+            <summary>
+                Conditions that the entity must meet.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Conditions.Targeting.DelegateTargetResolver`2">
+            <summary>
+                Target resolver delegating the resolution to a function.
+            </summary>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <typeparam name="TSubject">Subject against which the condition is evaluated.</typeparam>
+        </member>
+        <member name="F:Sagittaras.Conditions.Targeting.DelegateTargetResolver`2._resolve">
+            <summary>
+                Function returning the subject from the context, or null if there is none.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Conditions.Targeting.DelegateTargetResolver`2.#ctor(System.Func{`0,`1})">
+            <summary>
+                Creates the resolver delegating the resolution to the function.
+            </summary>
+            <param name="resolve">Function returning the subject from the context, or null if there is none.</param>
+        </member>
+        <member name="M:Sagittaras.Conditions.Targeting.DelegateTargetResolver`2.TryResolve(`0,`1@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Conditions.Targeting.ITargetResolver`2">
+            <summary>
+                Resolves the subject of evaluation for <see cref="T:Sagittaras.Conditions.ConditionTarget"/> from the evaluation context.
+            </summary>
+            <remarks>
+                Each resolver serves a single <see cref="T:Sagittaras.Conditions.ConditionTarget"/>, the same way as condition handler
+                serves a single <see cref="T:Sagittaras.Conditions.ConditionType"/>. New targets are added by registering new resolvers.
+            </remarks>
+            <typeparam name="TContext">Context of the evaluation.</typeparam>
+            <typeparam name="TSubject">Subject against which the condition is evaluated.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Conditions.Targeting.ITargetResolver`2.TryResolve(`0,`1@)">
+            <summary>
+                Tries to resolve the subject from the evaluation context.
+            </summary>
+            <param name="context">Context of the evaluation.</param>
+            <param name="subject">Resolved subject, if the context contains one.</param>
+            <returns>
+                Returns true if the subject was resolved; otherwise false, for example when the context
+                has no such subject at the moment of evaluation.
+            </returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,1552 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sagittaras.Scripting</name>
+    </assembly>
+    <members>
+        <member name="T:Sagittaras.Scripting.Activation.IScriptActivator">
+            <summary>
+                Provides and takes back the instances of transient scripts.
+            </summary>
+            <remarks>
+                <para>
+                    Instances come from a plain <c>new</c>, which is why the transient scripts are constrained to a
+                    parameterless constructor - it keeps the spawn free of reflection and safe on AOT runtimes.
+                    State reaches the script through <see cref="M:Sagittaras.Scripting.ITransientEntityScript`1.Initialize(Sagittaras.Scripting.Entities.ITransientScriptedEntity,`0@)"/>
+                    afterwards, which is also what lets a released instance serve the next entity.
+                </para>
+                <para>
+                    <see cref="T:Sagittaras.Scripting.Activation.PoolingScriptActivator"/> serves by default. Replacing it is the seam for a
+                    container that injects the dependencies into the created script, or for a pool of your own.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.IScriptActivator.Create``1">
+            <summary>
+                Provides an instance of the script to be initialized.
+            </summary>
+            <remarks>
+                A pooled instance may carry the state of the entity it served before - the caller initializes
+                it before it reaches any hook-point.
+            </remarks>
+            <typeparam name="TScript">Concrete type of the script to provide.</typeparam>
+            <returns>Returns the instance to be initialized.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.IScriptActivator.Release(Sagittaras.Scripting.ITransientEntityScript)">
+            <summary>
+                Takes back a script that is no longer bound to any entity instance.
+            </summary>
+            <param name="script">Script dropped by the registry.</param>
+        </member>
+        <member name="T:Sagittaras.Scripting.Activation.PoolingScriptActivator">
+            <inheritdoc />
+            <remarks>
+                <para>
+                    Keeps the released scripts and hands them out again instead of letting every spawn allocate.
+                    It works because a transient script takes its state in
+                    <see cref="M:Sagittaras.Scripting.ITransientEntityScript`1.Initialize(Sagittaras.Scripting.Entities.ITransientScriptedEntity,`0@)"/> rather than through its constructor -
+                    a rented instance is bound to its new entity the same way a fresh one is.
+                </para>
+                <para>
+                    The scripts it holds are the ones already released, so the pool settles at the peak number of
+                    entities that lived at once. Pass a capacity where that peak is not something the game keeps
+                    a lid on by itself.
+                </para>
+                <para>
+                    This is what a manager uses unless told otherwise, so that transient scripts cost what they
+                    should out of the box. A capacity of zero turns the pooling off and every spawn allocates
+                    again, which is the way to tell a leftover state apart from a defect while chasing one.
+                </para>
+                <para>
+                    Not safe for concurrent use, the same as the registry that drives it.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Activation.PoolingScriptActivator.Unbounded">
+            <summary>
+                Capacity of a pool that keeps every script released to it.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Activation.PoolingScriptActivator._pools">
+            <summary>
+                Released scripts waiting to be handed out again, per concrete type.
+            </summary>
+            <remarks>
+                A stack rather than a queue - the instance released last is the one still warm in the cache.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Activation.PoolingScriptActivator._pooled">
+            <summary>
+                Scripts currently held by the pools.
+            </summary>
+            <remarks>
+                Releasing a script twice would hand the same instance to two entities at once, and neither of
+                them would show anything but strange behavior. The set is what turns that into a report.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Activation.PoolingScriptActivator._capacity">
+            <summary>
+                Number of scripts a single pool keeps, zero to pool nothing at all, or <see cref="F:Sagittaras.Scripting.Activation.PoolingScriptActivator.Unbounded"/>.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.#ctor">
+            <summary>
+                Creates the activator keeping every script released to it.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.#ctor(System.Int32)">
+            <summary>
+                Creates the activator keeping at most the given number of scripts of each type.
+            </summary>
+            <param name="capacity">Number of scripts a single pool keeps, zero to pool nothing at all, or <see cref="F:Sagittaras.Scripting.Activation.PoolingScriptActivator.Unbounded"/>.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the capacity is negative.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.Create``1">
+            <inheritdoc />
+            <remarks>
+                A rented instance carries the state of the entity it served before, which
+                <see cref="M:Sagittaras.Scripting.ITransientEntityScript`1.Initialize(Sagittaras.Scripting.Entities.ITransientScriptedEntity,`0@)"/> is expected to overwrite in full.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.Release(Sagittaras.Scripting.ITransientEntityScript)">
+            <inheritdoc />
+            <exception cref="T:System.InvalidOperationException">Thrown when the script is already held by the pool.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.Prewarm``1(System.Int32)">
+            <summary>
+                Fills the pool of a script ahead of the spawns that would otherwise allocate it.
+            </summary>
+            <remarks>
+                Worth doing while a scene loads, so that the first wave of entities costs no more than the
+                later ones. Stops at the capacity of the pool.
+            </remarks>
+            <param name="count">Number of instances to create in advance.</param>
+            <typeparam name="TScript">Concrete type of the script to create.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.Available(System.Type)">
+            <summary>
+                Number of scripts of the type the pool can hand out without allocating.
+            </summary>
+            <param name="scriptType">Concrete type of the script.</param>
+            <returns>Returns the number of scripts waiting in the pool.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Activation.PoolingScriptActivator.Clear">
+            <summary>
+                Drops every script the pools hold.
+            </summary>
+            <remarks>
+                Scripts of a scene that has been unloaded may hold on to what the scene left behind, and the
+                pool would keep them alive until the type spawns again.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Activation.ScriptReferenceComparer">
+            <summary>
+                Tells the script instances apart by their reference.
+            </summary>
+            <remarks>
+                A pool reasons about the identity of the instances it handed out, which is not the same question a
+                script answers by overriding <see cref="M:System.Object.Equals(System.Object)"/>. Two equal scripts are still two
+                instances, and the default comparer would let the pool mistake them for one.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Activation.ScriptReferenceComparer.Instance">
+            <summary>
+                Shared instance of the comparer.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Scripting.Attributes.GameScriptAttribute">
+            <summary>
+                Marks abstract class as an available and registrable entrypoint.
+            </summary>
+            <remarks>
+                <para>
+                    The marked class is the contract declared by the core module: its virtual members are the
+                    hook-points, and every concrete script derived from it is discovered and registered under it.
+                    Calls made through <see cref="T:Sagittaras.Scripting.IScriptManager"/> are resolved against this base type, which is
+                    what keeps the core free of any reference to the extending modules.
+                </para>
+                <para>
+                    Name the hook-points after the moment they open up - <c>OnAggro</c>, <c>OnDamageTaken</c>. Read
+                    top to bottom, the marked class is then the list of moments an extending module can step into.
+                    A hook-point returning a value asks a question at that moment instead of announcing it: the
+                    core hands in what it would have used on its own, and the script answers or passes it back.
+                </para>
+                <para>
+                    Classes without this attribute will not be registered as entrypoint.
+                </para>
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Attributes.ScriptedEntityAttribute">
+            <summary>
+                Identifies the target entity for instances of <see cref="T:Sagittaras.Scripting.Entities.IScriptedEntity"/> or <see cref="T:Sagittaras.Scripting.Entities.ITransientScriptedEntity"/>.
+            </summary>
+            <remarks>
+                <para>
+                    Required to automatically register the script inside <see cref="T:Sagittaras.Scripting.IScriptManager"/>.
+                </para>
+                <para>
+                    Not inherited - a script deriving from another one would otherwise take over its target and
+                    collide with it. Every script names its own entity, the same way every level of the hierarchy
+                    declares itself an entrypoint by <see cref="T:Sagittaras.Scripting.Attributes.GameScriptAttribute"/>.
+                </para>
+                <para>
+                    Repeat the attribute to let a single script serve several entities. A shared entity script is
+                    then one instance answering for all of them, while a transient one is created per instance of
+                    each of them.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Attributes.ScriptedEntityAttribute.#ctor(System.String)">
+            <summary>
+                Declares the entity the annotated script is written for.
+            </summary>
+            <param name="id">
+                Identifier of the target entity, matched against <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/> when the
+                script is being looked up.
+            </param>
+        </member>
+        <member name="P:Sagittaras.Scripting.Attributes.ScriptedEntityAttribute.Id">
+            <summary>
+                Identifier of the entity the annotated script belongs to.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute">
+            <summary>
+                Declares the order in which the script answers a hook-point shared with other scripts.
+            </summary>
+            <remarks>
+                <para>
+                    Applies to <see cref="T:Sagittaras.Scripting.IGlobalScript"/> only. Entity and transient hook-points hold at most one
+                    script per entrypoint, so there is nothing to order - the attribute is ignored there.
+                </para>
+                <para>
+                    Without the attribute the script takes <see cref="F:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute.DefaultPriority"/> and ends up ordered by
+                    the moment of its registration, which depends on the order the assemblies were loaded in.
+                    Declare the priority explicitly wherever the outcome of a hook-point must not depend on it.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute.DefaultPriority">
+            <summary>
+                Priority taken by a script that does not declare the attribute.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute.#ctor(System.Int32)">
+            <summary>
+                Declares the priority of the annotated script.
+            </summary>
+            <param name="priority">Priority of the script, where a higher value is called earlier.</param>
+        </member>
+        <member name="P:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute.Priority">
+            <summary>
+                Priority of the script, where a higher value is called earlier.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Scripting.Building.GlobalScriptRegistration">
+            <summary>
+                Global script waiting to be ordered into the bucket of an entrypoint.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Building.GlobalScriptRegistration.Script">
+            <summary>
+                Registered instance of the script.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Building.GlobalScriptRegistration.Priority">
+            <summary>
+                Declared priority of the script, where a higher value is called earlier.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Building.GlobalScriptRegistration.Order">
+            <summary>
+                Order the script was registered in.
+            </summary>
+            <remarks>
+                Breaks the ties of equal priorities, so that the outcome does not depend on the sorting
+                algorithm being stable.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Building.IScriptHierarchy">
+            <summary>
+                Resolves the entrypoints a concrete script can be reached through.
+            </summary>
+            <remarks>
+                <para>
+                    Scripts form a hierarchy of entrypoints - an object script, a world object script derived from
+                    it, a creature script derived from that - and the core module calls a hook-point at whichever
+                    level it is declared on. A concrete script therefore has to be reachable by every entrypoint
+                    above it, not only by the one it derives from directly.
+                </para>
+                <para>
+                    The registries resolve this once during registration and index the script under each of its
+                    entrypoints. A call is then a single lookup by the requested type, with no assignability
+                    testing left for the game loop.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.IScriptHierarchy.GetEntrypoints(System.Type)">
+            <summary>
+                Gets the entrypoints the given script is registered under.
+            </summary>
+            <remarks>
+                Walks the chain of base types and collects those annotated by <see cref="T:Sagittaras.Scripting.Attributes.GameScriptAttribute"/>,
+                including the script itself when it carries the attribute. Because the attribute is not
+                inherited, every level of the hierarchy has to opt in on its own.
+            </remarks>
+            <param name="scriptType">Type of the concrete script.</param>
+            <returns>
+                Returns the entrypoints ordered from the most derived one, or an empty list when the script
+                derives from no entrypoint at all.
+            </returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Building.IScriptRegistryBuilder">
+            <summary>
+                Collects the scripts of all modules and builds the <see cref="T:Sagittaras.Scripting.IScriptManager"/> serving them.
+            </summary>
+            <remarks>
+                <para>
+                    Registration is deliberately the expensive half of the system. Resolving the entrypoints of a
+                    script, ordering by priority and capturing how a transient script is created all happen here,
+                    once during the boot, so that a hook-point reached from the game loop is a plain lookup.
+                </para>
+                <para>
+                    Discovering the scripts - scanning the assemblies for
+                    <see cref="T:Sagittaras.Scripting.Attributes.ScriptedEntityAttribute"/> and the entrypoints - is not a part of the
+                    builder. It is a separate concern feeding these methods, so that an environment where
+                    reflection is unreliable, such as an AOT build with stripped code, can replace it without
+                    touching the registries.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.IScriptRegistryBuilder.AddGlobal(Sagittaras.Scripting.IGlobalScript)">
+            <summary>
+                Registers a script extending the hook-points that have no entity target.
+            </summary>
+            <remarks>
+                The instance is created by the caller and lives for as long as the built manager does.
+            </remarks>
+            <param name="script">Instance of the script to register.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.IScriptRegistryBuilder.AddEntity(System.String,Sagittaras.Scripting.IEntityScript)">
+            <summary>
+                Registers a script extending the hook-points of every entity carrying the identifier.
+            </summary>
+            <remarks>
+                The instance is shared by all of those entities, so it must not keep state of any single one.
+            </remarks>
+            <param name="entityId">Identifier of the entity, as declared by <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/>.</param>
+            <param name="script">Instance of the script to register.</param>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the entity already has a script under any of the entrypoints of this one.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.IScriptRegistryBuilder.AddTransient``1(System.String)">
+            <summary>
+                Registers a script to be created per instance of every entity carrying the identifier.
+            </summary>
+            <remarks>
+                Takes the type rather than an instance - the instances are created later, on the spawns of the
+                entity. The parameterless constructor is required here and nowhere else: capturing it while
+                the concrete type is still known statically is what keeps the spawn itself free of reflection.
+            </remarks>
+            <param name="entityId">Identifier of the entity, as declared by <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/>.</param>
+            <typeparam name="TScript">Concrete type of the script to register.</typeparam>
+            <returns>Returns the builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the entity already has a script under any of the entrypoints of this one.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.IScriptRegistryBuilder.WithActivator(Sagittaras.Scripting.Activation.IScriptActivator)">
+            <summary>
+                Replaces the way the transient script instances are created.
+            </summary>
+            <param name="activator">Activator providing the instances.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.IScriptRegistryBuilder.Build">
+            <summary>
+                Creates the manager from the current registrations.
+            </summary>
+            <remarks>
+                Registrations are copied, so further changes of the builder do not affect already created managers.
+            </remarks>
+            <returns>Returns the manager serving the registered scripts.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Building.ScriptHierarchy">
+            <inheritdoc />
+            <remarks>
+                Results are cached per script type. Registration of a whole game resolves the same chains over and
+                over, and the walk is pure reflection.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptHierarchy._entrypoints">
+            <summary>
+                Entrypoints already resolved for a script type.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptHierarchy.GetEntrypoints(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptHierarchy.Resolve(System.Type)">
+            <summary>
+                Walks the chain of base types and collects the entrypoints declared on it.
+            </summary>
+            <param name="scriptType">Type of the concrete script.</param>
+            <returns>Returns the entrypoints ordered from the most derived one.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Building.ScriptRegistryBuilder">
+            <inheritdoc />
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptRegistryBuilder._hierarchy">
+            <summary>
+                Resolves the entrypoints of the registered scripts.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptRegistryBuilder._globals">
+            <summary>
+                Global scripts collected per entrypoint, ordered once the manager is built.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptRegistryBuilder._entities">
+            <summary>
+                Scripts shared by all instances of an entity.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptRegistryBuilder._transients">
+            <summary>
+                Scripts created per instance of an entity.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptRegistryBuilder._activator">
+            <summary>
+                Provides the transient script instances of the built manager.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Building.ScriptRegistryBuilder._order">
+            <summary>
+                Number of global scripts registered so far, used to break the ties of equal priorities.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.#ctor">
+            <summary>
+                Creates the builder resolving the entrypoints on its own.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.#ctor(Sagittaras.Scripting.Building.IScriptHierarchy)">
+            <summary>
+                Creates the builder over the given resolver of entrypoints.
+            </summary>
+            <param name="hierarchy">Resolver of the entrypoints a script is registered under.</param>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.AddGlobal(Sagittaras.Scripting.IGlobalScript)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.AddEntity(System.String,Sagittaras.Scripting.IEntityScript)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.AddTransient``1(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.WithActivator(Sagittaras.Scripting.Activation.IScriptActivator)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.Build">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.Activate``1(Sagittaras.Scripting.Activation.IScriptActivator)">
+            <summary>
+                Takes an instance of the script from the activator.
+            </summary>
+            <remarks>
+                Captured while the concrete type is still known statically, which is what leaves the spawn
+                itself free of reflection.
+            </remarks>
+            <param name="activator">Activator providing the instance.</param>
+            <typeparam name="TScript">Concrete type of the script.</typeparam>
+            <returns>Returns the instance to be initialized.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.CreateBucket(System.Type,System.Collections.Generic.List{Sagittaras.Scripting.Building.GlobalScriptRegistration})">
+            <summary>
+                Builds the ordered bucket of scripts of a single entrypoint.
+            </summary>
+            <remarks>
+                The bucket is a <see cref="T:System.Collections.Generic.List`1"/> of the entrypoint type, so that a lookup casts it as a
+                whole instead of casting every script it holds.
+            </remarks>
+            <param name="entrypoint">Entrypoint the scripts are reached through.</param>
+            <param name="registrations">Scripts registered under the entrypoint.</param>
+            <returns>Returns the bucket ordered by the priority of the scripts.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.CompareByPriority(Sagittaras.Scripting.Building.GlobalScriptRegistration,Sagittaras.Scripting.Building.GlobalScriptRegistration)">
+            <summary>
+                Orders the scripts of an entrypoint, the highest priority first.
+            </summary>
+            <param name="left">Registration on the left side of the comparison.</param>
+            <param name="right">Registration on the right side of the comparison.</param>
+            <returns>Returns the relative order of the two registrations.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.ReadPriority(System.Type)">
+            <summary>
+                Reads the priority declared by the script.
+            </summary>
+            <param name="scriptType">Type of the concrete script.</param>
+            <returns>Returns the declared priority, or <see cref="F:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute.DefaultPriority"/>.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.RequireEntrypoints(System.Type)">
+            <summary>
+                Resolves the entrypoints of a script that is being registered.
+            </summary>
+            <param name="scriptType">Type of the concrete script.</param>
+            <returns>Returns the entrypoints the script is registered under.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the script derives from no entrypoint, as nothing could ever reach it.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Building.ScriptRegistryBuilder.RequireFreeEntrypoints(System.String,System.Collections.Generic.IReadOnlyList{System.Type},System.Func{Sagittaras.Scripting.Registries.EntityScriptKey,System.Boolean})">
+            <summary>
+                Verifies that the entity is served by no script under any of the entrypoints yet.
+            </summary>
+            <remarks>
+                Checked for all entrypoints before anything is registered, so that a refused registration
+                leaves the builder untouched.
+            </remarks>
+            <param name="entityId">Identifier of the entity the script is registered for.</param>
+            <param name="entrypoints">Entrypoints the script would be registered under.</param>
+            <param name="isTaken">Tells whether a script is already registered for the key.</param>
+            <exception cref="T:System.ArgumentException">Thrown when the entity already has a script under one of the entrypoints.</exception>
+        </member>
+        <member name="T:Sagittaras.Scripting.Discovery.ActivatorScriptFactory">
+            <inheritdoc />
+            <remarks>
+                Creates the script by its parameterless constructor.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ActivatorScriptFactory.Create(System.Type)">
+            <inheritdoc />
+            <exception cref="T:System.ArgumentException">Thrown when the script cannot be created by a parameterless constructor.</exception>
+        </member>
+        <member name="T:Sagittaras.Scripting.Discovery.IScriptFactory">
+            <summary>
+                Creates the single instance of a global or a shared entity script.
+            </summary>
+            <remarks>
+                These scripts are created once while the game boots, so unlike the transient ones they are free to
+                take their dependencies through the constructor. Replacing the factory is what lets a container
+                resolve them.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.IScriptFactory.Create(System.Type)">
+            <summary>
+                Creates the instance of the discovered script.
+            </summary>
+            <param name="scriptType">Concrete type of the script.</param>
+            <returns>Returns the created instance.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Discovery.ScriptDescriptor">
+            <summary>
+                Describes a script that was found and the way it should be registered.
+            </summary>
+            <remarks>
+                The descriptor is the seam between finding the scripts and registering them. Reflection over the
+                assemblies is only one way to arrive at these - a source generator producing them ahead of time
+                registers exactly the same way, which matters on AOT builds with stripped code.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Scripting.Discovery.ScriptDescriptor.ScriptType">
+            <summary>
+                Concrete type of the discovered script.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Discovery.ScriptDescriptor.Kind">
+            <summary>
+                Registry the script belongs to.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Discovery.ScriptDescriptor.EntityIds">
+            <summary>
+                Entities the script is written for, empty for a global script.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDescriptor.Global(System.Type)">
+            <summary>
+                Describes a script extending the hook-points without an entity target.
+            </summary>
+            <param name="scriptType">Concrete type of the script.</param>
+            <returns>Returns the descriptor of the script.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDescriptor.Entity(System.Type,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+                Describes a script shared by all instances of the given entities.
+            </summary>
+            <param name="scriptType">Concrete type of the script.</param>
+            <param name="entityIds">Entities the script is written for.</param>
+            <returns>Returns the descriptor of the script.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDescriptor.Transient(System.Type,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+                Describes a script created per instance of the given entities.
+            </summary>
+            <param name="scriptType">Concrete type of the script.</param>
+            <param name="entityIds">Entities the script is written for.</param>
+            <returns>Returns the descriptor of the script.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Discovery.ScriptDiscovery">
+            <summary>
+                Finds the scripts of the loaded modules and registers them into an <see cref="T:Sagittaras.Scripting.Building.IScriptRegistryBuilder"/>.
+            </summary>
+            <remarks>
+                <para>
+                    Kept apart from the registries on purpose. Scanning is reflection over the assemblies, which is
+                    exactly what an AOT build with stripped code cannot be trusted with - swapping it for a source
+                    generator producing <see cref="T:Sagittaras.Scripting.Discovery.ScriptDescriptor"/> ahead of time leaves the registration and
+                    the registries untouched.
+                </para>
+                <para>
+                    A type implementing <see cref="T:Sagittaras.Scripting.IGameScript"/> that derives from no entrypoint is skipped rather
+                    than reported. It is not a part of the system, as nothing could ever call it. Mind the flip
+                    side: forgetting <see cref="T:Sagittaras.Scripting.Attributes.GameScriptAttribute"/> on a base script silently leaves every
+                    script below it unregistered.
+                </para>
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Discovery.ScriptDiscovery.AddTransientDefinition">
+            <summary>
+                Generic definition of the registration of a transient script.
+            </summary>
+            <remarks>
+                Transient scripts are registered by their concrete type, which the builder needs statically to
+                capture their constructor. Discovery only has the type at hand, so it reaches the method
+                through reflection - once per script while booting, never on a spawn.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Discovery.ScriptDiscovery._hierarchy">
+            <summary>
+                Resolves the entrypoints of the scanned types.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Discovery.ScriptDiscovery._factory">
+            <summary>
+                Creates the instances of global and shared entity scripts.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.#ctor">
+            <summary>
+                Creates the discovery over the default factory of script instances.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.#ctor(Sagittaras.Scripting.Discovery.IScriptFactory)">
+            <summary>
+                Creates the discovery over the given factory of script instances.
+            </summary>
+            <param name="factory">Creates the instances of global and shared entity scripts.</param>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.#ctor(Sagittaras.Scripting.Discovery.IScriptFactory,Sagittaras.Scripting.Building.IScriptHierarchy)">
+            <summary>
+                Creates the discovery over the given factory and resolver of entrypoints.
+            </summary>
+            <param name="factory">Creates the instances of global and shared entity scripts.</param>
+            <param name="hierarchy">Resolves the entrypoints of the scanned types.</param>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.Scan(System.Reflection.Assembly)">
+            <summary>
+                Finds every script the assembly holds.
+            </summary>
+            <remarks>
+                Types that failed to load are skipped, as a single missing optional dependency would otherwise
+                take the whole scan down with it.
+            </remarks>
+            <param name="assembly">Assembly of a module holding the scripts.</param>
+            <returns>Returns the descriptor of every script found.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.Register(Sagittaras.Scripting.Building.IScriptRegistryBuilder,System.Collections.Generic.IEnumerable{Sagittaras.Scripting.Discovery.ScriptDescriptor})">
+            <summary>
+                Registers the described scripts into the builder.
+            </summary>
+            <param name="builder">Builder collecting the scripts of all modules.</param>
+            <param name="descriptors">Scripts to register.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.Register(Sagittaras.Scripting.Building.IScriptRegistryBuilder,Sagittaras.Scripting.Discovery.ScriptDescriptor@)">
+            <summary>
+                Registers a single described script into the builder.
+            </summary>
+            <param name="builder">Builder collecting the scripts of all modules.</param>
+            <param name="descriptor">Script to register.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.IsScript(System.Type)">
+            <summary>
+                Tells whether the type is a script that can be registered.
+            </summary>
+            <param name="type">Type found in the scanned assembly.</param>
+            <returns>Returns true when the type is a concrete script deriving from an entrypoint.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.Describe(System.Type)">
+            <summary>
+                Describes how a script should be registered, the way <see cref="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.Scan(System.Reflection.Assembly)"/> would.
+            </summary>
+            <remarks>
+                Useful on its own where the scripts are listed by hand instead of scanned, as an AOT build
+                with stripped code may have to do.
+            </remarks>
+            <param name="type">Concrete type of the script.</param>
+            <returns>Returns the descriptor of the script.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the script targets several registries at once, or when it names no entity while needing one.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.RequireEntities(System.Type)">
+            <summary>
+                Reads the entities the script is written for.
+            </summary>
+            <remarks>
+                Attributes of the base types are not taken - a script deriving from another one would inherit
+                its target and collide with it. Every script names its own entities, the same way every level
+                of the hierarchy declares itself an entrypoint.
+            </remarks>
+            <param name="type">Concrete type of the script.</param>
+            <returns>Returns the entities named by the script.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the script names no entity.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.RequireNoEntities(System.Type)">
+            <summary>
+                Verifies that a global script names no entity.
+            </summary>
+            <param name="type">Concrete type of the script.</param>
+            <exception cref="T:System.ArgumentException">Thrown when a global script names an entity it cannot serve.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.MakeAddTransient(System.Type)">
+            <summary>
+                Binds the registration of a transient script to its concrete type.
+            </summary>
+            <param name="type">Concrete type of the script.</param>
+            <returns>Returns the bound registration method.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when the script has no public parameterless constructor.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.InvokeAddTransient(System.Reflection.MethodInfo,Sagittaras.Scripting.Building.IScriptRegistryBuilder,System.String)">
+            <summary>
+                Registers the transient script for a single entity.
+            </summary>
+            <remarks>
+                Unwraps the reflection wrapper, so that a collision of two scripts reaches the caller as the
+                exception the builder threw rather than as a <see cref="T:System.Reflection.TargetInvocationException"/>.
+            </remarks>
+            <param name="add">Registration method bound to the concrete type.</param>
+            <param name="builder">Builder collecting the scripts of all modules.</param>
+            <param name="entityId">Entity the script is registered for.</param>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscovery.GetLoadableTypes(System.Reflection.Assembly)">
+            <summary>
+                Gets the types of the assembly, leaving out those that failed to load.
+            </summary>
+            <param name="assembly">Assembly of a module holding the scripts.</param>
+            <returns>Returns the types that could be loaded.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Discovery.ScriptDiscoveryExtensions">
+            <summary>
+                Shorthands for registering the scripts a module holds.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscoveryExtensions.Discover(Sagittaras.Scripting.Building.IScriptRegistryBuilder,System.Reflection.Assembly)">
+            <summary>
+                Finds every script of the assembly and registers it.
+            </summary>
+            <param name="builder">Builder collecting the scripts of all modules.</param>
+            <param name="assembly">Assembly of a module holding the scripts.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Discovery.ScriptDiscoveryExtensions.Discover(Sagittaras.Scripting.Building.IScriptRegistryBuilder,System.Reflection.Assembly,Sagittaras.Scripting.Discovery.ScriptDiscovery)">
+            <summary>
+                Finds every script of the assembly and registers it through the given discovery.
+            </summary>
+            <param name="builder">Builder collecting the scripts of all modules.</param>
+            <param name="assembly">Assembly of a module holding the scripts.</param>
+            <param name="discovery">Discovery finding and registering the scripts.</param>
+            <returns>Returns the builder for chaining.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Discovery.ScriptKind">
+            <summary>
+                Tells which registry a discovered script belongs to.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Discovery.ScriptKind.Global">
+            <summary>
+                Script extending the hook-points without an entity target.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Discovery.ScriptKind.Entity">
+            <summary>
+                Script shared by all instances of the entities it is written for.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Discovery.ScriptKind.Transient">
+            <summary>
+                Script created per instance of the entities it is written for.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Scripting.Entities.IScriptedEntity">
+            <summary>
+                Marks game entity as a target of <see cref="T:Sagittaras.Scripting.IEntityScript"/>.
+            </summary>
+            <remarks>
+                The entity itself carries no scripting logic - it only tells the <see cref="T:Sagittaras.Scripting.IScriptManager"/>
+                which script to look up, by matching its <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/> against the identifier declared by
+                <see cref="T:Sagittaras.Scripting.Attributes.ScriptedEntityAttribute"/>.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id">
+            <summary>
+                Unique identifier of the entity.
+            </summary>
+            <remarks>
+                Identifies the entity type, not its instance - typically a template or database identifier
+                shared by all entities of the same kind.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Entities.ITransientScriptedEntity">
+            <summary>
+                Marks game entity as a target of <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/>.
+            </summary>
+            <remarks>
+                Instance of a script is created per instance of <see cref="T:Sagittaras.Scripting.Entities.ITransientScriptedEntity"/>, and are not shared
+                between the objects of the same type.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Scripting.Entities.ITransientScriptedEntity.InstanceId">
+            <summary>
+                Unique identifier of this entity instance.
+            </summary>
+            <remarks>
+                While <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/> is shared by all entities of the same kind, this value
+                distinguishes the individual instances between each other and pairs each of them with its own
+                script instance.
+            </remarks>
+        </member>
+        <member name="E:Sagittaras.Scripting.Entities.ITransientScriptedEntity.Released">
+            <summary>
+                Event raised when the target is released.
+            </summary>
+            <remarks>
+                <para>
+                    Transient scripting should only tie to a single lifecycle of the game entity. When advanced
+                    techniques like pooling are used, the same object - and therefore the same
+                    <see cref="P:Sagittaras.Scripting.Entities.ITransientScriptedEntity.InstanceId"/> - comes back to life representing a completely different entity,
+                    and the state accumulated by the previous script instance would leak into it.
+                </para>
+                <para>
+                    Event helps to clear the <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/> instance, and allows for
+                    the creation of a new one once the entity is instantiated again.
+                </para>
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Entities.ScriptedEntityKey">
+            <summary>
+                Identifies a single living instance of <see cref="T:Sagittaras.Scripting.Entities.ITransientScriptedEntity"/>.
+            </summary>
+            <remarks>
+                <para>
+                    <see cref="P:Sagittaras.Scripting.Entities.ITransientScriptedEntity.InstanceId"/> is unique only within a single
+                    <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/>, so neither part identifies the instance on its own - several
+                    entities of different kinds may share the same instance number.
+                </para>
+                <para>
+                    <see cref="T:System.IEquatable`1"/> is implemented deliberately. Without it the dictionaries keyed by
+                    this struct fall back to the reflection based comparer, which boxes the key on every single
+                    lookup - and lookups happen on every transient script call in the game loop.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.#ctor(System.String,System.Int32)">
+            <summary>
+                Creates the key from the parts identifying the entity instance.
+            </summary>
+            <param name="entityId">Identifier of the entity kind.</param>
+            <param name="instanceId">Identifier of the instance within the entity kind.</param>
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.#ctor(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <summary>
+                Creates the key identifying the given entity instance.
+            </summary>
+            <param name="entity">Entity instance to create the key for.</param>
+        </member>
+        <member name="P:Sagittaras.Scripting.Entities.ScriptedEntityKey.EntityId">
+            <summary>
+                Identifier of the entity kind, as declared by <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/>.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Entities.ScriptedEntityKey.InstanceId">
+            <summary>
+                Identifier of the instance, as declared by <see cref="P:Sagittaras.Scripting.Entities.ITransientScriptedEntity.InstanceId"/>.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.op_Equality(Sagittaras.Scripting.Entities.ScriptedEntityKey,Sagittaras.Scripting.Entities.ScriptedEntityKey)">
+            <summary>
+                Compares two keys for equality.
+            </summary>
+            <param name="left">Key on the left side of the comparison.</param>
+            <param name="right">Key on the right side of the comparison.</param>
+            <returns>Returns true when both keys identify the same entity instance; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.op_Inequality(Sagittaras.Scripting.Entities.ScriptedEntityKey,Sagittaras.Scripting.Entities.ScriptedEntityKey)">
+            <summary>
+                Compares two keys for inequality.
+            </summary>
+            <param name="left">Key on the left side of the comparison.</param>
+            <param name="right">Key on the right side of the comparison.</param>
+            <returns>Returns true when the keys identify different entity instances; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.Equals(Sagittaras.Scripting.Entities.ScriptedEntityKey)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Entities.ScriptedEntityKey.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Scripting.IEntityScript">
+            <summary>
+                Entity script represents extensible hook-points for further customization of the behavior of a specific game entity.
+            </summary>
+            <remarks>
+                The script is bound to an entity by its identifier - the implementation declares the target through
+                <see cref="T:Sagittaras.Scripting.Attributes.ScriptedEntityAttribute"/> and the core reaches it by passing an
+                <see cref="T:Sagittaras.Scripting.Entities.IScriptedEntity"/> to <see cref="T:Sagittaras.Scripting.IScriptManager"/>. A single script instance is
+                shared by every entity carrying that identifier, so it must stay stateless with respect to the
+                individual entity - per-instance state belongs to <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/>.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.IGameScript">
+            <summary>
+                General marker interface for scripting extensions.
+            </summary>
+            <remarks>
+                <para>
+                    Game Script allows for wiring custom logic into the core library of your game by providing
+                    extensible hook-points for further customization of the behavior.
+                </para>
+                <para>
+                    The core module declares an abstract base script annotated by
+                    <see cref="T:Sagittaras.Scripting.Attributes.GameScriptAttribute"/>, whose members are the hook-points it is willing
+                    to expose. An extending module derives from that base, overrides only the hook-points it cares
+                    about, and the core calls them back through <see cref="T:Sagittaras.Scripting.IScriptManager"/> without ever
+                    referencing the extension.
+                </para>
+                <para>
+                    This interface is never implemented directly - derive from <see cref="T:Sagittaras.Scripting.IGlobalScript"/>,
+                    <see cref="T:Sagittaras.Scripting.IEntityScript"/> or <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/>, which differ in what the
+                    script is bound to and how long its instance lives.
+                </para>
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.IGlobalScript">
+            <summary>
+                Global Script represents extensible hook-points without a specific game entity target.
+            </summary>
+            <remarks>
+                Use it for hook-points that belong to a system rather than to a single entity - loot rolls,
+                difficulty scaling, save migrations and similar cross-cutting behavior. Every registered
+                implementation of the same base script is a valid target of a call, so a single hook-point may be
+                answered by several extending modules at once.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.IScriptManager">
+            <summary>
+                Represents a global entrypoint for calling and invoking instances of <see cref="T:Sagittaras.Scripting.IGameScript"/>.
+            </summary>
+            <remarks>
+                <para>
+                    The manager is the only place where the core module meets the extending ones. The core reaches
+                    its own hook-point by calling <c>Call</c> with the abstract base script as the type argument;
+                    the manager resolves the registered implementations and invokes the passed delegate on them.
+                    A hook-point with no implementation is not an error - the call simply does nothing and the
+                    result-returning overloads fall back to the default value.
+                </para>
+                <para>
+                    Overloads differ only in what the script is bound to: no target for
+                    <see cref="T:Sagittaras.Scripting.IGlobalScript"/>, an entity identity for <see cref="T:Sagittaras.Scripting.IEntityScript"/>, and a concrete
+                    entity instance for <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/>. The manager itself only dispatches -
+                    the scripts are held by <see cref="T:Sagittaras.Scripting.Registries.IGlobalScriptRegistry"/>,
+                    <see cref="T:Sagittaras.Scripting.Registries.IEntityScriptRegistry"/> and <see cref="T:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry"/>.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)">
+            <summary>
+                Creates the transient script serving the given entity instance under the <typeparamref name="TGameScript"/> entrypoint.
+            </summary>
+            <remarks>
+                The created instance lives alongside the <paramref name="entity"/> until it raises
+                <see cref="E:Sagittaras.Scripting.Entities.ITransientScriptedEntity.Released"/>; calling the method again for an entity that
+                has been released starts a fresh, freshly initialized script instance.
+            </remarks>
+            <param name="entity">Scripted entity instance for which the script is created.</param>
+            <param name="args">Arguments of the spawn, as offered by the entrypoint.</param>
+            <typeparam name="TGameScript">Entrypoint to create the script under.</typeparam>
+            <typeparam name="TArgs">Arguments offered by the entrypoint.</typeparam>
+            <exception cref="T:System.InvalidOperationException">Thrown when the entity instance already holds a script reached through one of the entrypoints of this one.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Instantiate``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <summary>
+                Creates the transient script serving the given entity instance under an entrypoint offering no arguments.
+            </summary>
+            <param name="entity">Scripted entity instance for which the script is created.</param>
+            <typeparam name="TGameScript">Entrypoint to create the script under.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Call``1(System.Action{``0})">
+            <summary>
+                Executes the <paramref name="hook"/> action for the <typeparamref name="TGameScript"/> instance.
+            </summary>
+            <remarks>
+                The action is executed for every registered implementation of <typeparamref name="TGameScript"/>,
+                ordered by <see cref="T:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute"/>, so multiple extending modules may react to
+                the same hook-point.
+            </remarks>
+            <param name="hook">Action to execute.</param>
+            <typeparam name="TGameScript">Type of <see cref="T:Sagittaras.Scripting.IGlobalScript"/> to execute the <paramref name="hook"/> action for.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Call``2(System.Func{``0,``1},``1)">
+            <summary>
+                Executes the <paramref name="hook"/> action for the <typeparamref name="TGameScript"/> instance and returns the result.
+            </summary>
+            <remarks>
+                Method iterates all possible instances of <typeparamref name="TGameScript"/> until the first
+                result differing from the default of <typeparamref name="TResult"/> is found. The first script
+                that answers therefore wins, and the remaining ones are not asked at all - which is what
+                <see cref="T:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute"/> is there to decide.
+            </remarks>
+            <param name="hook">Action to execute.</param>
+            <param name="default">
+                Value returned when none of the scripts answered. It says nothing about what counts as an
+                answer - a script never sees it, so passing the question on stays tied to the default of
+                <typeparamref name="TResult"/>.
+            </param>
+            <typeparam name="TGameScript">Type of <see cref="T:Sagittaras.Scripting.IGlobalScript"/> to execute the <paramref name="hook"/> action for.</typeparam>
+            <typeparam name="TResult">Type of the result returned by the <paramref name="hook"/> action.</typeparam>
+            <returns>The result of the <paramref name="hook"/> action, or <paramref name="default"/> when no script answered.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Call``1(Sagittaras.Scripting.Entities.IScriptedEntity,System.Action{``0})">
+            <summary>
+                Executes the <paramref name="hook"/> action for the <typeparamref name="TGameScript"/> instance
+                registered for the <paramref name="entity"/>.
+            </summary>
+            <remarks>
+                The script is looked up by <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/> and there is at most one under the
+                entrypoint. Entities without a script for the given hook-point keep the default behavior of
+                the core module.
+            </remarks>
+            <param name="entity">Scripted entity whose script is the target of the call.</param>
+            <param name="hook">Action to execute.</param>
+            <typeparam name="TGameScript">Type of <see cref="T:Sagittaras.Scripting.IEntityScript"/> to execute the <paramref name="hook"/> action for.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Call``2(Sagittaras.Scripting.Entities.IScriptedEntity,System.Func{``0,``1},``1)">
+            <summary>
+                Executes the <paramref name="hook"/> action for the <typeparamref name="TGameScript"/> instance
+                registered for the <paramref name="entity"/> and returns the result.
+            </summary>
+            <remarks>
+                Lets the script of the entity override a value the core module would otherwise compute on its own.
+                An entity holds at most one script per entrypoint, so whatever it answers is final - even the
+                default of <typeparamref name="TResult"/>. Only the absence of a script yields
+                <paramref name="default"/>.
+            </remarks>
+            <param name="entity">Scripted entity whose script is the target of the call.</param>
+            <param name="hook">Action to execute.</param>
+            <param name="default">Value returned when the entity has no script under the entrypoint.</param>
+            <typeparam name="TGameScript">Type of <see cref="T:Sagittaras.Scripting.IEntityScript"/> to execute the <paramref name="hook"/> action for.</typeparam>
+            <typeparam name="TResult">Type of the result returned by the <paramref name="hook"/> action.</typeparam>
+            <returns>The result of the <paramref name="hook"/> action, or <paramref name="default"/> when the entity has no script.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Call``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity,System.Action{``0})">
+            <summary>
+                Executes the <paramref name="hook"/> action for the <typeparamref name="TGameScript"/> instance
+                belonging to this single <paramref name="entity"/> instance.
+            </summary>
+            <remarks>
+                Targets the script instance created by <see cref="M:Sagittaras.Scripting.IScriptManager.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)"/>, so the
+                hook-point may rely on the state the script has accumulated over the lifecycle of that very
+                entity instance. Nothing happens before the script is created, or after the entity has been
+                released.
+            </remarks>
+            <param name="entity">Scripted entity instance whose script is the target of the call.</param>
+            <param name="hook">Action to execute.</param>
+            <typeparam name="TGameScript">Type of <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/> to execute the <paramref name="hook"/> action for.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.Call``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,System.Func{``0,``1},``1)">
+            <summary>
+                Executes the <paramref name="hook"/> action for the <typeparamref name="TGameScript"/> instance
+                belonging to this single <paramref name="entity"/> instance and returns the result.
+            </summary>
+            <remarks>
+                Lets the script of this particular entity instance override a value the core module would
+                otherwise compute on its own. Whatever the script answers is final - only the absence of one,
+                before it is created or after the entity has been released, yields <paramref name="default"/>.
+            </remarks>
+            <param name="entity">Scripted entity instance whose script is the target of the call.</param>
+            <param name="hook">Action to execute.</param>
+            <param name="default">Value returned when the entity instance has no script under the entrypoint.</param>
+            <typeparam name="TGameScript">Type of <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/> to execute the <paramref name="hook"/> action for.</typeparam>
+            <typeparam name="TResult">Type of the result returned by the <paramref name="hook"/> action.</typeparam>
+            <returns>The result of the <paramref name="hook"/> action, or <paramref name="default"/> when the entity instance has no script.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.HasScript``1">
+            <summary>
+                Tells whether any script extends the <typeparamref name="TGameScript"/> hook-points.
+            </summary>
+            <remarks>
+                Worth asking before work that only pays off once a script is there to see it - gathering a
+                context, building a snapshot. Reaching a hook-point nobody extends is cheap on its own and
+                needs no guarding.
+            </remarks>
+            <typeparam name="TGameScript">Entrypoint to ask about.</typeparam>
+            <returns>Returns true when at least one script is registered under the entrypoint; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.GetScripts``1">
+            <summary>
+                Gets every script extending the <typeparamref name="TGameScript"/> hook-points.
+            </summary>
+            <remarks>
+                Plural because a global hook-point is a broadcast - the entrypoint may be extended by several
+                modules at once. Scripts come ordered by <see cref="T:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute"/>, the same order
+                <c>Call</c> reaches them in.
+            </remarks>
+            <typeparam name="TGameScript">Entrypoint to get the scripts for.</typeparam>
+            <returns>Returns the registered scripts, or an empty list when there is none.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.HasScript``1(Sagittaras.Scripting.Entities.IScriptedEntity)">
+            <summary>
+                Tells whether the <paramref name="entity"/> is served by a script under the <typeparamref name="TGameScript"/> entrypoint.
+            </summary>
+            <param name="entity">Scripted entity to ask about.</param>
+            <typeparam name="TGameScript">Entrypoint to ask about.</typeparam>
+            <returns>Returns true when the entity has a script under the entrypoint; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.GetScript``1(Sagittaras.Scripting.Entities.IScriptedEntity)">
+            <summary>
+                Gets the script serving the <paramref name="entity"/> under the <typeparamref name="TGameScript"/> entrypoint.
+            </summary>
+            <remarks>
+                Singular because an entity holds at most one script per entrypoint. Reach for it to hold the
+                script across several calls; a single hook-point is better reached by <c>Call</c>, which needs
+                no null check of its own.
+            </remarks>
+            <param name="entity">Scripted entity whose script is looked up.</param>
+            <typeparam name="TGameScript">Entrypoint to get the script for.</typeparam>
+            <returns>Returns the script serving the entity, or null when it has none.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.HasScript``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <summary>
+                Tells whether this single <paramref name="entity"/> instance is served by a script under the
+                <typeparamref name="TGameScript"/> entrypoint.
+            </summary>
+            <remarks>
+                False until the script is created by <see cref="M:Sagittaras.Scripting.IScriptManager.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)"/>, and again
+                once the entity has been released.
+            </remarks>
+            <param name="entity">Scripted entity instance to ask about.</param>
+            <typeparam name="TGameScript">Entrypoint to ask about.</typeparam>
+            <returns>Returns true when the entity instance has a script under the entrypoint; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.IScriptManager.GetScript``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <summary>
+                Gets the script bound to this single <paramref name="entity"/> instance under the
+                <typeparamref name="TGameScript"/> entrypoint.
+            </summary>
+            <param name="entity">Scripted entity instance whose script is looked up.</param>
+            <typeparam name="TGameScript">Entrypoint to get the script for.</typeparam>
+            <returns>Returns the script bound to the entity instance, or null when it has none.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.ITransientEntityScript">
+            <summary>
+                Counterpart of <see cref="T:Sagittaras.Scripting.IEntityScript"/> - while Entity Script serves all instances of
+                the Entity, Transient Entity Script exists per instance of the Entity.
+            </summary>
+            <remarks>
+                <para>
+                    Because the instance is not shared, the script may keep state of the single entity it was
+                    created for - a combat phase, accumulated damage, a spawn timer. The instance is created by
+                    <see cref="M:Sagittaras.Scripting.IScriptManager.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)"/> and discarded once the entity
+                    raises <see cref="E:Sagittaras.Scripting.Entities.ITransientScriptedEntity.Released"/>.
+                </para>
+                <para>
+                    Despite the kinship the interface deliberately does not derive from
+                    <see cref="T:Sagittaras.Scripting.IEntityScript"/>. The two have a different lifecycle and are served by a different
+                    registry, and an inheritance between them would let a transient entrypoint satisfy the shared
+                    entity calls of <see cref="T:Sagittaras.Scripting.IScriptManager"/> - where it would silently find nothing instead of
+                    failing to compile.
+                </para>
+                <para>
+                    This interface only marks the script for the storage. The script is always written against
+                    <see cref="T:Sagittaras.Scripting.ITransientEntityScript`1"/>, which carries the initialization contract.
+                </para>
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.ITransientEntityScript`1">
+            <summary>
+                Transient Entity Script initialized by the arguments its entrypoint offers.
+            </summary>
+            <remarks>
+                <para>
+                    The entrypoint - the abstract base script annotated by
+                    <see cref="T:Sagittaras.Scripting.Attributes.GameScriptAttribute"/> - binds <typeparamref name="TArgs"/> once, and
+                    every concrete script derived from it inherits that contract. An entrypoint offering nothing
+                    but the entity itself binds <see cref="T:Sagittaras.Scripting.NoArgs"/>.
+                </para>
+                <para>
+                    State is taken in <see cref="M:Sagittaras.Scripting.ITransientEntityScript`1.Initialize(Sagittaras.Scripting.Entities.ITransientScriptedEntity,`0@)"/> rather than through a constructor, so the script can
+                    be created by a plain <c>new</c> and, later on, rented from a pool and initialized again. The
+                    price is that dependencies cannot be injected through the constructor nor held in readonly
+                    fields; a container has to reach the script by property or method injection.
+                </para>
+            </remarks>
+            <typeparam name="TArgs">
+                Arguments offered by the entrypoint. Declare it as a readonly struct - it travels by
+                <c>in</c> reference, so a struct keeps the spawn free of boxing.
+            </typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.ITransientEntityScript`1.Initialize(Sagittaras.Scripting.Entities.ITransientScriptedEntity,`0@)">
+            <summary>
+                Binds the freshly created script to the entity instance it serves.
+            </summary>
+            <remarks>
+                Called exactly once per created instance, before any hook-point of the script is reached. An
+                implementation rented from a pool must overwrite all of its state here, as the instance may
+                carry the leftovers of the entity it served previously.
+            </remarks>
+            <param name="entity">Entity instance the script was created for.</param>
+            <param name="args">Arguments of the spawn, as offered by the entrypoint.</param>
+        </member>
+        <member name="T:Sagittaras.Scripting.NoArgs">
+            <summary>
+                Arguments of a script that needs nothing but the entity it was created for.
+            </summary>
+            <remarks>
+                Keeps a single initialization contract for every transient script - an entrypoint offering no
+                spawn arguments declares <see cref="T:Sagittaras.Scripting.ITransientEntityScript`1"/> over this empty struct
+                instead of a second, argument-less interface.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.EntityScriptKey">
+            <summary>
+                Identifies the script serving a kind of entity under a single entrypoint.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Registries.EntityScriptKey.EntityId">
+            <summary>
+                Identifier of the entity kind the script serves.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Registries.EntityScriptKey.Entrypoint">
+            <summary>
+                Entrypoint the script is reached through.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.EntityScriptRegistry">
+            <inheritdoc />
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.EntityScriptRegistry._scripts">
+            <summary>
+                Script serving each pair of an entity and an entrypoint.
+            </summary>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.EntityScriptRegistry.TryGet``1(System.String,``0@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.GlobalScriptRegistry">
+            <inheritdoc />
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.GlobalScriptRegistry._scripts">
+            <summary>
+                Scripts registered under each entrypoint, ordered by their priority.
+            </summary>
+            <remarks>
+                Values are instances of <see cref="T:System.Collections.Generic.List`1"/> of the entrypoint type used as the key, so a
+                lookup casts the whole bucket at once instead of every script in it. The generic type cannot
+                be expressed here, registration keeps the pairing valid.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.GlobalScriptRegistry.Get``1">
+            <inheritdoc />
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.IEntityScriptRegistry">
+            <summary>
+                Holds the <see cref="T:Sagittaras.Scripting.IEntityScript"/> instances indexed by the entity they serve and the
+                entrypoints they are reachable through.
+            </summary>
+            <remarks>
+                <para>
+                    An entity holds at most one script per entrypoint - two scripts answering the same hook-point
+                    for the same entity would be a conflict, not a broadcast. Registering a second one is refused.
+                </para>
+                <para>
+                    The limit is per entrypoint, not per entity, so an entity may still be served by scripts from
+                    hierarchies that never meet - being lootable and being interactive are separate contracts.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.IEntityScriptRegistry.TryGet``1(System.String,``0@)">
+            <summary>
+                Gets the script serving the given entity under the given entrypoint.
+            </summary>
+            <remarks>
+                The instance is shared by every entity carrying the identifier. Entrypoints of transient
+                scripts cannot reach this method at all, as <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/> does not
+                derive from <see cref="T:Sagittaras.Scripting.IEntityScript"/> - their instances belong to
+                <see cref="T:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry"/>.
+            </remarks>
+            <param name="entityId">Identifier of the entity, as declared by <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/>.</param>
+            <param name="script">Registered script, when there is one.</param>
+            <typeparam name="TGameScript">Entrypoint to get the script for.</typeparam>
+            <returns>Returns true when the entity is served by a script under the entrypoint; otherwise false.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.IGlobalScriptRegistry">
+            <summary>
+                Holds the <see cref="T:Sagittaras.Scripting.IGlobalScript"/> instances indexed by the entrypoints they are reachable through.
+            </summary>
+            <remarks>
+                Global hook-points are a broadcast - several modules may extend the same one, so the registry
+                keeps a collection per entrypoint rather than a single script.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.IGlobalScriptRegistry.Get``1">
+            <summary>
+                Gets every script registered under the given entrypoint.
+            </summary>
+            <remarks>
+                Scripts come ordered by <see cref="T:Sagittaras.Scripting.Attributes.ScriptPriorityAttribute"/>, the highest priority first. An
+                entrypoint nobody extends yields an empty list - it is an ordinary state of a hook-point, not
+                an error, and costs no allocation.
+            </remarks>
+            <typeparam name="TGameScript">Entrypoint to get the scripts for.</typeparam>
+            <returns>Returns the registered scripts, or an empty list when there is none.</returns>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry">
+            <summary>
+                Creates, serves and discards the <see cref="T:Sagittaras.Scripting.ITransientEntityScript"/> instances bound to the
+                individual instances of a scripted entity.
+            </summary>
+            <remarks>
+                <para>
+                    Unlike the other two registries this one changes during the game, as entities spawn and get
+                    released. It is not safe for concurrent use - registration, instantiation and calls are
+                    expected to happen on the thread owning the game loop.
+                </para>
+                <para>
+                    The registry subscribes to <see cref="E:Sagittaras.Scripting.Entities.ITransientScriptedEntity.Released"/> for every entity it
+                    creates a script for, and unsubscribes when the scripts are dropped. An entity that never
+                    raises the event keeps its scripts alive for as long as it lives.
+                </para>
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)">
+            <summary>
+                Creates the script serving the given entity instance under the given entrypoint.
+            </summary>
+            <remarks>
+                <para>
+                    The concrete script to create is the one registered for <see cref="P:Sagittaras.Scripting.Entities.IScriptedEntity.Id"/> of
+                    the entity under the entrypoint. Nothing happens when the entity has no script there.
+                </para>
+                <para>
+                    <typeparamref name="TArgs"/> is fixed by the entrypoint, so the call site cannot pass
+                    arguments the script was not written for. Passed by <c>in</c> reference and never boxed.
+                </para>
+            </remarks>
+            <param name="entity">Entity instance to create the script for.</param>
+            <param name="args">Arguments of the spawn, as offered by the entrypoint.</param>
+            <typeparam name="TGameScript">Entrypoint to create the script under.</typeparam>
+            <typeparam name="TArgs">Arguments offered by the entrypoint.</typeparam>
+            <exception cref="T:System.InvalidOperationException">Thrown when the entity instance already holds a script reached through one of the entrypoints of this one.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry.Instantiate``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <summary>
+                Creates the script serving the given entity instance under an entrypoint offering no arguments.
+            </summary>
+            <param name="entity">Entity instance to create the script for.</param>
+            <typeparam name="TGameScript">Entrypoint to create the script under.</typeparam>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry.TryGet``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``0@)">
+            <summary>
+                Gets the script serving the given entity instance under the given entrypoint.
+            </summary>
+            <remarks>
+                Yields nothing until the script is created by one of the <c>Instantiate</c> overloads, and
+                again once the entity has been released.
+            </remarks>
+            <param name="entity">Entity instance whose script is looked up.</param>
+            <param name="script">Script serving the entity instance, when there is one.</param>
+            <typeparam name="TGameScript">Entrypoint to get the script for.</typeparam>
+            <returns>Returns true when the entity instance is served by a script under the entrypoint; otherwise false.</returns>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry.Release(Sagittaras.Scripting.Entities.ScriptedEntityKey@)">
+            <summary>
+                Drops every script bound to the given entity instance.
+            </summary>
+            <remarks>
+                Called automatically when the entity raises <see cref="E:Sagittaras.Scripting.Entities.ITransientScriptedEntity.Released"/>.
+                Takes the key rather than the entity, so the scripts can be dropped even once the entity
+                itself is gone. Releasing an entity that holds no script does nothing.
+            </remarks>
+            <param name="key">Key of the entity instance whose scripts are dropped.</param>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.ScriptedEntityInstance">
+            <summary>
+                Scripts currently bound to a single living instance of a scripted entity.
+            </summary>
+            <remarks>
+                Holds the entity itself, not only its key - the registry has to reach it again to unsubscribe from
+                <see cref="E:Sagittaras.Scripting.Entities.ITransientScriptedEntity.Released"/> once the scripts are dropped.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Scripting.Registries.ScriptedEntityInstance.Entity">
+            <summary>
+                Entity instance the scripts belong to.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Registries.ScriptedEntityInstance.Scripts">
+            <summary>
+                Scripts indexed by every entrypoint they are reachable through.
+            </summary>
+            <remarks>
+                A single script appears under each of its entrypoints, so the same instance is present
+                several times over.
+            </remarks>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry">
+            <inheritdoc />
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry._registrations">
+            <summary>
+                How to create the script of each pair of an entity and an entrypoint.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry._activator">
+            <summary>
+                Provides and takes back the script instances.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry._instances">
+            <summary>
+                Scripts of the entity instances currently alive.
+            </summary>
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry._released">
+            <summary>
+                Distinct scripts of a single entity instance, reused by every release.
+            </summary>
+            <remarks>
+                A script is indexed under each of its entrypoints, so releasing an entity would hand the same
+                instance to the activator several times over.
+            </remarks>
+        </member>
+        <member name="F:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry._releasedHandler">
+            <summary>
+                Handler subscribed to the entities holding a script.
+            </summary>
+            <remarks>
+                Created once and reused, so that subscribing on a spawn does not allocate a delegate.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry.Instantiate``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry.TryGet``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``0@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry.Release(Sagittaras.Scripting.Entities.ScriptedEntityKey@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry.Index(Sagittaras.Scripting.Entities.ITransientScriptedEntity,Sagittaras.Scripting.ITransientEntityScript,System.Collections.Generic.IReadOnlyList{System.Type})">
+            <summary>
+                Indexes the created script under each of its entrypoints.
+            </summary>
+            <param name="entity">Entity instance the script serves.</param>
+            <param name="script">Script that has just been created.</param>
+            <param name="entrypoints">Entrypoints the script is reachable through.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown when the entity instance already holds a script under one of the entrypoints.</exception>
+        </member>
+        <member name="M:Sagittaras.Scripting.Registries.TransientEntityScriptRegistry.OnEntityReleased(System.Object,Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <summary>
+                Drops the scripts of an entity that announced the end of its lifecycle.
+            </summary>
+            <param name="sender">Source of the event.</param>
+            <param name="entity">Entity being released.</param>
+        </member>
+        <member name="T:Sagittaras.Scripting.Registries.TransientScriptRegistration">
+            <summary>
+                Describes how a transient script is created and where it is indexed once it exists.
+            </summary>
+            <remarks>
+                Both parts are resolved while the concrete type is still known statically, so a spawn needs no
+                reflection at all.
+            </remarks>
+        </member>
+        <member name="P:Sagittaras.Scripting.Registries.TransientScriptRegistration.Factory">
+            <summary>
+                Takes an instance of the concrete script from the activator.
+            </summary>
+        </member>
+        <member name="P:Sagittaras.Scripting.Registries.TransientScriptRegistration.Entrypoints">
+            <summary>
+                Entrypoints the created instance is indexed under.
+            </summary>
+        </member>
+        <member name="T:Sagittaras.Scripting.ScriptManager">
+            <inheritdoc />
+            <remarks>
+                Dispatching only - the scripts themselves are held by the registries. Use
+                <see cref="T:Sagittaras.Scripting.Building.ScriptRegistryBuilder"/> to register them and create the manager.
+            </remarks>
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.#ctor(Sagittaras.Scripting.Registries.IGlobalScriptRegistry,Sagittaras.Scripting.Registries.IEntityScriptRegistry,Sagittaras.Scripting.Registries.ITransientEntityScriptRegistry)">
+            <summary>
+                Creates the manager over the registries holding the registered scripts.
+            </summary>
+            <param name="globals">Registry of the scripts without an entity target.</param>
+            <param name="entities">Registry of the scripts shared by all instances of an entity.</param>
+            <param name="transients">Registry of the scripts created per instance of an entity.</param>
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Instantiate``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,``1@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Instantiate``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Call``1(System.Action{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Call``2(System.Func{``0,``1},``1)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Call``1(Sagittaras.Scripting.Entities.IScriptedEntity,System.Action{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Call``2(Sagittaras.Scripting.Entities.IScriptedEntity,System.Func{``0,``1},``1)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Call``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity,System.Action{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.Call``2(Sagittaras.Scripting.Entities.ITransientScriptedEntity,System.Func{``0,``1},``1)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.HasScript``1">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.GetScripts``1">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.HasScript``1(Sagittaras.Scripting.Entities.IScriptedEntity)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.GetScript``1(Sagittaras.Scripting.Entities.IScriptedEntity)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.HasScript``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <inheritdoc />
+        </member>
+        <member name="M:Sagittaras.Scripting.ScriptManager.GetScript``1(Sagittaras.Scripting.Entities.ITransientScriptedEntity)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
