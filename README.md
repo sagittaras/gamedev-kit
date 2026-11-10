@@ -64,12 +64,6 @@ without a fixed release schedule.
 Coordinate system, cell properties, entity movement tracking. Even though we run the entire Vectro Blast on it,
 it is a highly portable abstraction that anyone can use!
 
-### ✅ Condition System
-
-A general-purpose constraint system for validating conditions in the context of the current state of an entity.
-
-It was created for validating spells in Spellborn — it turned out that the applicability without domain binding is endless.
-
 ### 📜 Scripting System
 
 Are you splitting your project into domain-specific packages and looking for a way to open up certain places for external scripting?
