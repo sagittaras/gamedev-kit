@@ -7,6 +7,7 @@
     <a href="./messaging/index.md"><img src="https://img.shields.io/badge/Sagittaras.Messaging-crimson?style=flat-square" alt="Sagittaras.Messaging"/></a>
     <a href="./progression/index.md"><img src="https://img.shields.io/badge/Sagittaras.Progression-orange?style=flat-square" alt="Sagittaras.Progression"/></a>
     <a href="./conditions/index.md"><img src="https://img.shields.io/badge/Sagittaras.Conditions-darkcyan?style=flat-square" alt="Sagittaras.Conditions"/></a>
+    <a href="./scripting/index.md"><img src="https://img.shields.io/badge/Sagittaras.Scripting-goldenrod?style=flat-square" alt="Sagittaras.Scripting"/></a>
 </p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
@@ -242,6 +243,46 @@ if (evaluator.Evaluate(spell, new CastContext(caster, target)))
 ```
 
 > 📦 [Documentation](./conditions/index.md) · **Dependencies:** none
+
+---
+
+### Sagittaras.Scripting
+
+Extensible hook-points for wiring custom logic into the core of your game. A core module declares its hook-points
+as an abstract base script, extending modules derive from it and override only what they care about, and the core
+reaches them through an `IScriptManager` without ever referencing them. Scripts are found by scanning an assembly,
+they may target the game as a whole, a kind of entity, or one living instance of it, and the per-instance ones are
+pooled so that spawns do not allocate.
+
+```csharp
+// The core declares where its behavior can be altered.
+[GameScript]
+public abstract class CreatureScript : ITransientEntityScript<CreatureSpawn>
+{
+    public virtual void Initialize(ITransientScriptedEntity entity, in CreatureSpawn args) { }
+
+    public virtual void OnAggro() { }
+    public virtual int OnDamageTaken(int damage) => damage;
+}
+
+// An extending module answers for one creature.
+[ScriptedEntity("boss_onyxia")]
+public class OnyxiaScript : CreatureScript
+{
+    public override int OnDamageTaken(int damage) => damage * 2;
+}
+
+// Boot once...
+IScriptManager scripts = new ScriptRegistryBuilder()
+    .Discover(typeof(OnyxiaScript).Assembly)
+    .Build();
+
+// ...then reach the hook-point from the core, knowing nothing about the module.
+scripts.Instantiate<CreatureScript, CreatureSpawn>(creature, in args);
+int damage = scripts.Call<CreatureScript, int>(creature, script => script.OnDamageTaken(100));
+```
+
+> 📦 [Documentation](./scripting/index.md) · **Dependencies:** none
 
 ---
 

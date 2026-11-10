@@ -64,12 +64,6 @@ without a fixed release schedule.
 Coordinate system, cell properties, entity movement tracking. Even though we run the entire Vectro Blast on it,
 it is a highly portable abstraction that anyone can use!
 
-### 📜 Scripting System
-
-Are you splitting your project into domain-specific packages and looking for a way to open up certain places for external scripting?
-
-We were looking for it too, and you don't have to! Define hook-points, prepare a base-script — the framework takes care of the rest.
-
 ## License
 
 Apache 2.0 License. See [LICENSE](LICENSE) for details.
