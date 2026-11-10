@@ -8,6 +8,7 @@
     <a href="./progression/index.md"><img src="https://img.shields.io/badge/Sagittaras.Progression-orange?style=flat-square" alt="Sagittaras.Progression"/></a>
     <a href="./conditions/index.md"><img src="https://img.shields.io/badge/Sagittaras.Conditions-darkcyan?style=flat-square" alt="Sagittaras.Conditions"/></a>
     <a href="./scripting/index.md"><img src="https://img.shields.io/badge/Sagittaras.Scripting-goldenrod?style=flat-square" alt="Sagittaras.Scripting"/></a>
+    <a href="./commands/index.md"><img src="https://img.shields.io/badge/Sagittaras.Commands-slategray?style=flat-square" alt="Sagittaras.Commands"/></a>
 </p>
 
 **Game Development Kit** is a collection of open-source C# libraries by [Sagittaras Games](https://sagittaras.games),
@@ -122,8 +123,9 @@ if (table.TryNext(out string? loot))
 ### Sagittaras.GuardClauses
 
 Lightweight guard clause pattern for defensive programming. Provides a fluent `Guard.Against` entry point
-with extension methods for common input validation — range checks, comparisons, and zero guards — that throw
-descriptive `ArgumentOutOfRangeException` instead of silent failures.
+with extension methods for common validation — ranges, comparisons and zero guards over numbers, single-word
+and non-empty guards over strings, and invariants of an object's own state — that throw descriptively
+instead of failing silently.
 
 ```csharp
 public void SetHealth(int value, int max)
@@ -283,6 +285,45 @@ int damage = scripts.Call<CreatureScript, int>(creature, script => script.OnDama
 ```
 
 > 📦 [Documentation](./scripting/index.md) · **Dependencies:** none
+
+---
+
+### Sagittaras.Commands
+
+The backend of an in-game developer console. Commands are types arranged in a hierarchy — `spawn entity goblin`
+walks it down to the command doing the work — and declare typed arguments, options and flags that reach them
+already read, converted and validated, so the same command runs from a console line, a button in the editor
+tooling or a script. A line that cannot be read is answered with an output pointing at the wrong word, an output can
+carry more than text for a console with an interface of its own, and a built-in help describes whatever was
+registered.
+
+```csharp
+public class GodCommand : Command
+{
+    private static readonly Flag Off = new("off", "Turn the mode off instead of on");
+
+    public GodCommand() : base("god", "Makes the player unkillable")
+    {
+        Accepts(Off);
+    }
+
+    public override ICommandOutput Invoke(ICommandInput input)
+    {
+        return CommandOutput.Success(input.GetValue<bool>(Off) ? "God mode off." : "God mode on.");
+    }
+}
+
+// Boot once...
+ICommandManager commands = new CommandRegistryBuilder()
+    .Add(new GodCommand())
+    .WithHelp()
+    .Build();
+
+// ...then run whatever is typed into the console.
+ICommandOutput output = commands.Execute("god --off");
+```
+
+> 📦 [Documentation](./commands/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 

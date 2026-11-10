@@ -22,6 +22,26 @@ namespace Sagittaras.GuardClauses.Extensions
         }
 
         /// <summary>
+        ///     Ensures that the provided integer input is not zero; otherwise, throws an <see cref="ArgumentOutOfRangeException"/>.
+        /// </summary>
+        /// <remarks>
+        ///     For a value that simply must not be zero, where zero carries a meaning of its own elsewhere -
+        ///     a code telling a failure from a success, an amount that has to move something.
+        ///     <see cref="DivisionByZero"/> is the same check said about a divisor.
+        /// </remarks>
+        /// <param name="_">The guard clause instance. This parameter is often provided implicitly and is not directly used in the method logic.</param>
+        /// <param name="input">The integer input to validate.</param>
+        /// <param name="message">A custom message to include in the exception.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the input value is zero.</exception>
+        public static void Zero(this IGuardClause _, int input, string? message = null)
+        {
+            if (input == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), input, message ?? "Value must not be zero");
+            }
+        }
+
+        /// <summary>
         ///     Ensures that the provided integer input is not less than zero; otherwise, throws an <see cref="ArgumentOutOfRangeException"/>.
         /// </summary>
         /// <param name="_">The guard clause instance. This parameter is often provided implicitly and is not directly used in the method logic.</param>
