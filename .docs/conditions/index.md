@@ -8,6 +8,16 @@ Because conditions are data rather than code, they can live in your content file
 and be shipped with items, spells or quests. The logic that actually performs a check is registered once, in
 code, and reused by every condition of that type.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Conditions` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.conditions/)) | `com.sagittaras.gamedevkit.conditions` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Conditions/)) | `Sagittaras.Conditions` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 This package has no dependencies on other packages from the kit.

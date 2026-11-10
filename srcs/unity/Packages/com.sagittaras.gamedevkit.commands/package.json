@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.commands",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Command System",
+  "description": "Hierarchical commands for developer consoles and debug tooling, keeping the parsing of an input apart from the invocation it resolves to.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/commands/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=commands",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "commands",
+    "console",
+    "debug",
+    "cli"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.scripting",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Scripting System",
+  "description": "Extensible hook-points allowing custom scripts to alter the behavior of core game modules.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/scripting/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=scripting",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "scripting",
+    "hooks",
+    "modding",
+    "extensibility"
+  ]
+}

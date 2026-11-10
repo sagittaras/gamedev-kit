@@ -9,13 +9,23 @@ was typed as — it declares what it takes, and receives values already read, co
 lets the same command be run from a console line, from a button in the editor tooling or from a startup script,
 and what keeps the parser a service the game can replace without touching a single command.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Commands` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.commands/)) | `com.sagittaras.gamedevkit.commands` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Commands/)) | `Sagittaras.Commands` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 | Package | Required |
 |---|---|
 | [Sagittaras.GuardClauses](../guard-clauses/index.md) | ✅ |
 
-Make sure `Sagittaras.GuardClauses.dll` is present in `Assets/Plugins/` alongside `Sagittaras.Commands.dll`.
+When installing the package manually, make sure the packages listed above are present too.
 
 ## Architecture
 

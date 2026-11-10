@@ -10,6 +10,16 @@ boss in the third dungeon fights differently, and it should not have to be rebui
 does. With hook-points the dependency only ever points one way — the extending module knows the core, the core
 knows nothing.
 
+## Installation
+
+| | |
+|---|---|
+| Namespace | `Sagittaras.Scripting` |
+| Unity package ([OpenUPM](https://openupm.com/packages/com.sagittaras.gamedevkit.scripting/)) | `com.sagittaras.gamedevkit.scripting` |
+| NuGet package ([nuget.org](https://www.nuget.org/packages/Sagittaras.Scripting/)) | `Sagittaras.Scripting` |
+
+See [Installation](../index.md#installation) for adding the package to your project.
+
 ## Dependencies
 
 This package has no dependencies on other packages from the kit.

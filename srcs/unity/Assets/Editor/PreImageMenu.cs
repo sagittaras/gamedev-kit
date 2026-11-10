@@ -44,6 +44,18 @@ namespace Sagittaras.DevelopmentKit.Editor
             Run(PreImageBuild.ForSolution());
         }
 
+        [MenuItem(BuildMenu + "Sagittaras.Commands", priority = PackagePriority)]
+        private static void BuildCommands()
+        {
+            Run(PreImageBuild.ForProject("Sagittaras.Commands"));
+        }
+
+        [MenuItem(BuildMenu + "Sagittaras.Conditions", priority = PackagePriority)]
+        private static void BuildConditions()
+        {
+            Run(PreImageBuild.ForProject("Sagittaras.Conditions"));
+        }
+
         [MenuItem(BuildMenu + "Sagittaras.Dices", priority = PackagePriority)]
         private static void BuildDices()
         {
@@ -68,6 +80,12 @@ namespace Sagittaras.DevelopmentKit.Editor
             Run(PreImageBuild.ForProject("Sagittaras.Progression"));
         }
 
+        [MenuItem(BuildMenu + "Sagittaras.Scripting", priority = PackagePriority)]
+        private static void BuildScripting()
+        {
+            Run(PreImageBuild.ForProject("Sagittaras.Scripting"));
+        }
+
         [MenuItem(BuildMenu + "Sagittaras.Timing", priority = PackagePriority)]
         private static void BuildTiming()
         {
@@ -75,10 +93,13 @@ namespace Sagittaras.DevelopmentKit.Editor
         }
 
         [MenuItem(BuildAllMenu, true)]
+        [MenuItem(BuildMenu + "Sagittaras.Commands", true)]
+        [MenuItem(BuildMenu + "Sagittaras.Conditions", true)]
         [MenuItem(BuildMenu + "Sagittaras.Dices", true)]
         [MenuItem(BuildMenu + "Sagittaras.GuardClauses", true)]
         [MenuItem(BuildMenu + "Sagittaras.Messaging", true)]
         [MenuItem(BuildMenu + "Sagittaras.Progression", true)]
+        [MenuItem(BuildMenu + "Sagittaras.Scripting", true)]
         [MenuItem(BuildMenu + "Sagittaras.Timing", true)]
         private static bool CanBuild()
         {

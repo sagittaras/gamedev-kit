@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/main/src/NerdBank.GitVersioning/version.schema.json",
+  "inherit": true,
+  "version": "1.0",
+  "pathFilters": [
+    ".",
+    "../../unity/Packages/com.sagittaras.gamedevkit.conditions",
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.conditions/Plugins",
+    ":!../../unity/Packages/com.sagittaras.gamedevkit.conditions/Plugins.meta"
+  ]
+}

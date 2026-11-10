@@ -1,0 +1,25 @@
+{
+  "name": "com.sagittaras.gamedevkit.conditions",
+  "version": "0.0.0",
+  "displayName": "Sagittaras Conditions",
+  "description": "Data-driven conditions describing requirements of game entities and their evaluation.",
+  "unity": "2021.3",
+  "license": "Apache-2.0",
+  "licensesUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/sagittaras/gamedev-kit/blob/main/.docs/conditions/index.md",
+  "changelogUrl": "https://github.com/sagittaras/gamedev-kit/releases?q=conditions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sagittaras/gamedev-kit.git"
+  },
+  "author": {
+    "name": "Sagittaras Games",
+    "url": "https://github.com/sagittaras"
+  },
+  "keywords": [
+    "conditions",
+    "requirements",
+    "data-driven",
+    "rpg"
+  ]
+}

@@ -1,5 +1,17 @@
 {
   "dependencies": {
+    "com.sagittaras.gamedevkit.commands": {
+      "version": "file:com.sagittaras.gamedevkit.commands",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.sagittaras.gamedevkit.conditions": {
+      "version": "file:com.sagittaras.gamedevkit.conditions",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.sagittaras.gamedevkit.dices": {
       "version": "file:com.sagittaras.gamedevkit.dices",
       "depth": 0,
@@ -20,6 +32,12 @@
     },
     "com.sagittaras.gamedevkit.progression": {
       "version": "file:com.sagittaras.gamedevkit.progression",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.sagittaras.gamedevkit.scripting": {
+      "version": "file:com.sagittaras.gamedevkit.scripting",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

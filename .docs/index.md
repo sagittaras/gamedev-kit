@@ -244,7 +244,7 @@ if (evaluator.Evaluate(spell, new CastContext(caster, target)))
 }
 ```
 
-> 📦 [Documentation](./conditions/index.md) · **Dependencies:** none
+> 📦 [Documentation](./conditions/index.md) · **Unity:** [`com.sagittaras.gamedevkit.conditions`](https://openupm.com/packages/com.sagittaras.gamedevkit.conditions/) · **NuGet:** [`Sagittaras.Conditions`](https://www.nuget.org/packages/Sagittaras.Conditions/) · **Dependencies:** none
 
 ---
 
@@ -284,7 +284,7 @@ scripts.Instantiate<CreatureScript, CreatureSpawn>(creature, in args);
 int damage = scripts.Call<CreatureScript, int>(creature, script => script.OnDamageTaken(100));
 ```
 
-> 📦 [Documentation](./scripting/index.md) · **Dependencies:** none
+> 📦 [Documentation](./scripting/index.md) · **Unity:** [`com.sagittaras.gamedevkit.scripting`](https://openupm.com/packages/com.sagittaras.gamedevkit.scripting/) · **NuGet:** [`Sagittaras.Scripting`](https://www.nuget.org/packages/Sagittaras.Scripting/) · **Dependencies:** none
 
 ---
 
@@ -323,7 +323,7 @@ ICommandManager commands = new CommandRegistryBuilder()
 ICommandOutput output = commands.Execute("god --off");
 ```
 
-> 📦 [Documentation](./commands/index.md) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
+> 📦 [Documentation](./commands/index.md) · **Unity:** [`com.sagittaras.gamedevkit.commands`](https://openupm.com/packages/com.sagittaras.gamedevkit.commands/) · **NuGet:** [`Sagittaras.Commands`](https://www.nuget.org/packages/Sagittaras.Commands/) · **Dependencies:** [Sagittaras.GuardClauses](#sagittarasguardclauses)
 
 ---
 
